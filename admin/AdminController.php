@@ -177,4 +177,59 @@ class AdminController {
         $this->flash('success', 'Client "' . ($tenant['slug'] ?? '') . '" supprime (base de donnees supprimee)');
         $this->redirect('/tenants');
     }
+
+    // ===================== RESET PASSWORD =====================
+
+    public function resetPassword(string $id): void {
+        $this->requireAuth();
+
+        $tenant = Tenant::getById($id);
+        if (!$tenant) {
+            $this->flash('error', 'Client introuvable');
+            $this->redirect('/tenants');
+            return;
+        }
+
+        $newPassword = $_POST['new_password'] ?? '';
+        $userId = $_POST['user_id'] ?? '';
+
+        if (strlen($newPassword) < 6) {
+            $this->flash('error', 'Le mot de passe doit contenir au moins 6 caracteres.');
+            $this->redirect('/tenants/edit/' . $id);
+            return;
+        }
+
+        try {
+            // Connect to tenant's database
+            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . $tenant['db_name'] . ";charset=" . DB_CHARSET;
+            $tenantDb = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+
+            if ($userId) {
+                // Reset specific user
+                $stmt = $tenantDb->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+                $stmt->execute([password_hash($newPassword, PASSWORD_DEFAULT), $userId]);
+                $user = $tenantDb->prepare("SELECT username FROM users WHERE id = ?");
+                $user->execute([$userId]);
+                $username = $user->fetchColumn() ?: 'inconnu';
+            } else {
+                // Reset first admin user
+                $stmt = $tenantDb->prepare("UPDATE users SET password_hash = ? WHERE role = 'admin' ORDER BY created_at ASC LIMIT 1");
+                $stmt->execute([password_hash($newPassword, PASSWORD_DEFAULT)]);
+                $username = 'admin';
+            }
+
+            // Log the action
+            $logStmt = $this->db->prepare("INSERT INTO tenant_log (tenant_id, admin_id, action, details) VALUES (?, ?, 'reset_password', ?)");
+            $logStmt->execute([$id, $_SESSION['super_admin_id'], "Mot de passe reinitialise pour: $username"]);
+
+            $this->flash('success', 'Mot de passe de "' . $username . '" reinitialise avec succes pour ' . $tenant['slug']);
+            $this->redirect('/tenants/edit/' . $id);
+        } catch (Exception $e) {
+            $this->flash('error', 'Erreur: ' . $e->getMessage());
+            $this->redirect('/tenants/edit/' . $id);
+        }
+    }
 }

@@ -62,6 +62,7 @@
                     <div class="btn-group" style="justify-content:flex-end;">
                         <a href="<?= APP_BASE . '/' . $t['slug'] . '/login' ?>" target="_blank" class="btn btn-icon btn-sm btn-secondary" title="Acceder"><i class="fas fa-external-link-alt"></i></a>
                         <a href="<?= adminUrl('/tenants/edit/' . $t['id']) ?>" class="btn btn-icon btn-sm btn-secondary" title="Modifier"><i class="fas fa-pen"></i></a>
+                        <a href="<?= adminUrl('/tenants/edit/' . $t['id']) ?>#reset-section" class="btn btn-icon btn-sm btn-secondary" title="Reset mot de passe" style="color:#DC2626;"><i class="fas fa-key"></i></a>
                         <form method="POST" action="<?= adminUrl('/tenants/toggle/' . $t['id']) ?>" style="display:inline;">
                             <button type="submit" class="btn btn-icon btn-sm btn-<?= $t['is_active'] ? 'warning' : 'success' ?>" title="<?= $t['is_active'] ? 'Desactiver' : 'Activer' ?>">
                                 <i class="fas fa-<?= $t['is_active'] ? 'pause' : 'play' ?>"></i>

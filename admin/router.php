@@ -30,6 +30,7 @@ $routes = [
         '/tenants/update/{id}' => 'updateTenant',
         '/tenants/toggle/{id}' => 'toggleTenant',
         '/tenants/delete/{id}' => 'deleteTenant',
+        '/tenants/reset-password/{id}' => 'resetPassword',
     ]
 ];
 
