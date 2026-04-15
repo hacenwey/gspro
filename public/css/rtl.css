@@ -1,0 +1,104 @@
+/* ============================================
+   GestionPro - RTL (Arabic) Support
+   ============================================ */
+
+:root {
+    --font: 'Noto Sans Arabic', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* === Sidebar === */
+.sidebar {
+    left: auto;
+    right: 0;
+}
+
+.main-content {
+    margin-left: 0;
+    margin-right: var(--sidebar-width);
+}
+
+/* === Text alignment === */
+.table thead th {
+    text-align: right;
+}
+
+.table .text-right {
+    text-align: left !important;
+}
+
+/* === Forms === */
+select.form-control {
+    background-position: left 12px center;
+    padding-left: 36px;
+    padding-right: 14px;
+}
+
+.toolbar-search input {
+    padding-left: 14px;
+    padding-right: 40px;
+}
+
+.toolbar-search .search-icon {
+    left: auto;
+    right: 14px;
+}
+
+/* === Navigation === */
+.nav-item .badge {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* === POS Cart === */
+.pos-cart-item .item-total {
+    text-align: left;
+}
+
+/* === Toast === */
+.toast-container {
+    right: auto;
+    left: 20px;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* === Sidebar User === */
+.sidebar-user .avatar {
+    order: 0;
+}
+
+/* === Cards & misc directional === */
+.kpi-card {
+    flex-direction: row-reverse;
+}
+
+.pos-cart-header span {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* === Sign out icon flip === */
+.fa-sign-out-alt {
+    transform: scaleX(-1);
+}
+
+/* === Modal === */
+.modal-footer {
+    justify-content: flex-start;
+}
+
+/* === Responsive === */
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(100%);
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .main-content {
+        margin-right: 0;
+    }
+}

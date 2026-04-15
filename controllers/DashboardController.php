@@ -4,6 +4,9 @@ class DashboardController extends Controller {
     public function index(): void {
         $this->requireAuth();
 
+        // Check onboarding
+        $onboardingDone = $this->db->query("SELECT setting_value FROM settings WHERE setting_key = 'onboarding_done'")->fetchColumn();
+
         $today = date('Y-m-d');
         $monthStart = date('Y-m-01');
 
@@ -56,7 +59,14 @@ class DashboardController extends Controller {
             ORDER BY total_amount DESC LIMIT 5
         ")->fetchAll();
 
-        $data['pageTitle'] = 'Tableau de bord';
+        $data['pageTitle'] = __('dash.title');
+        $data['showOnboarding'] = ($onboardingDone !== '1');
+        if ($data['showOnboarding']) {
+            $data['companySettings'] = [];
+            foreach ($this->db->query("SELECT * FROM settings")->fetchAll() as $s) {
+                $data['companySettings'][$s['setting_key']] = $s['setting_value'];
+            }
+        }
         $this->render('dashboard/index', $data);
     }
 

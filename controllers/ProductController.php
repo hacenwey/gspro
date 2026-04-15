@@ -65,7 +65,7 @@ class ProductController extends Controller {
             $this->input('unit', 'piece'),
             $this->input('purchase_price', 0),
             $this->input('selling_price', 0),
-            $this->input('tax_rate', 19),
+            $this->input('tax_rate', TAX_RATE_DEFAULT),
             $this->input('min_stock', 0),
             $this->input('current_stock', 0),
         ]);
@@ -103,7 +103,7 @@ class ProductController extends Controller {
             $this->input('unit', 'piece'),
             $this->input('purchase_price', 0),
             $this->input('selling_price', 0),
-            $this->input('tax_rate', 19),
+            $this->input('tax_rate', TAX_RATE_DEFAULT),
             $this->input('min_stock', 0),
             $id
         ]);

@@ -4,8 +4,11 @@ session_start();
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/core/helpers.php';
+require_once __DIR__ . '/core/Lang.php';
 require_once __DIR__ . '/core/Controller.php';
 require_once __DIR__ . '/core/Router.php';
+
+Lang::init();
 
 // ===================== ROUTES =====================
 
@@ -83,6 +86,11 @@ Router::get('/payments', 'PaymentController', 'index');
 Router::get('/settings', 'SettingsController', 'index');
 Router::post('/settings/update', 'SettingsController', 'update');
 Router::post('/settings/users/store', 'SettingsController', 'storeUser');
+
+// Onboarding
+Router::get('/onboarding', 'OnboardingController', 'index');
+Router::post('/onboarding/company', 'OnboardingController', 'saveCompany');
+Router::get('/onboarding/skip', 'OnboardingController', 'skip');
 
 // API endpoints
 Router::get('/api/clients/search', 'ClientController', 'search');

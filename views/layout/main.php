@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="<?= Lang::locale() ?>" dir="<?= Lang::dir() ?>" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle ?? 'GestionPro') ?> - GestionPro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
+    <?php if (Lang::isRtl()): ?>
+    <link rel="stylesheet" href="<?= asset('css/rtl.css') ?>">
+    <?php endif; ?>
     <?php if (isset($extraCss)): ?>
     <style><?= $extraCss ?></style>
     <?php endif; ?>
@@ -22,56 +25,56 @@
         </div>
         <nav class="sidebar-nav">
             <div class="nav-section">
-                <div class="nav-section-title">Principal</div>
+                <div class="nav-section-title"><?= __('nav.main') ?></div>
                 <a href="<?= url('/dashboard') ?>" class="nav-item <?= isActive('/dashboard') ?>">
                     <span class="icon"><i class="fas fa-chart-line"></i></span>
-                    Tableau de bord
+                    <?= __('nav.dashboard') ?>
                 </a>
                 <a href="<?= url('/caisse') ?>" class="nav-item <?= isActive('/caisse') ?>">
                     <span class="icon"><i class="fas fa-cash-register"></i></span>
-                    Caisse (POS)
+                    <?= __('nav.pos') ?>
                 </a>
             </div>
             <div class="nav-section">
-                <div class="nav-section-title">Gestion</div>
+                <div class="nav-section-title"><?= __('nav.management') ?></div>
                 <a href="<?= url('/products') ?>" class="nav-item <?= isActive('/products') ?>">
                     <span class="icon"><i class="fas fa-boxes-stacked"></i></span>
-                    Produits & Stock
+                    <?= __('nav.products') ?>
                 </a>
                 <a href="<?= url('/categories') ?>" class="nav-item <?= isActive('/categories') ?>">
                     <span class="icon"><i class="fas fa-tags"></i></span>
-                    Categories
+                    <?= __('nav.categories') ?>
                 </a>
                 <a href="<?= url('/clients') ?>" class="nav-item <?= isActive('/clients') ?>">
                     <span class="icon"><i class="fas fa-users"></i></span>
-                    Clients
+                    <?= __('nav.clients') ?>
                 </a>
                 <a href="<?= url('/suppliers') ?>" class="nav-item <?= isActive('/suppliers') ?>">
                     <span class="icon"><i class="fas fa-truck"></i></span>
-                    Fournisseurs
+                    <?= __('nav.suppliers') ?>
                 </a>
             </div>
             <div class="nav-section">
-                <div class="nav-section-title">Finances</div>
+                <div class="nav-section-title"><?= __('nav.finances') ?></div>
                 <a href="<?= url('/invoices') ?>" class="nav-item <?= isActive('/invoices') ?>">
                     <span class="icon"><i class="fas fa-file-invoice-dollar"></i></span>
-                    Devis & Factures
+                    <?= __('nav.invoices') ?>
                 </a>
                 <a href="<?= url('/debts') ?>" class="nav-item <?= isActive('/debts') ?>">
                     <span class="icon"><i class="fas fa-hand-holding-dollar"></i></span>
-                    Dettes & Credits
+                    <?= __('nav.debts') ?>
                 </a>
                 <a href="<?= url('/payments') ?>" class="nav-item <?= isActive('/payments') ?>">
                     <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
-                    Paiements
+                    <?= __('nav.payments') ?>
                 </a>
             </div>
             <?php if (hasRole('admin', 'manager')): ?>
             <div class="nav-section">
-                <div class="nav-section-title">Administration</div>
+                <div class="nav-section-title"><?= __('nav.admin') ?></div>
                 <a href="<?= url('/settings') ?>" class="nav-item <?= isActive('/settings') ?>">
                     <span class="icon"><i class="fas fa-cog"></i></span>
-                    Parametres
+                    <?= __('nav.settings') ?>
                 </a>
             </div>
             <?php endif; ?>
@@ -84,7 +87,7 @@
                     <div class="user-name"><?= e($user['full_name']) ?></div>
                     <div class="user-role"><?= e($user['role']) ?></div>
                 </div>
-                <a href="<?= url('/logout') ?>" title="Deconnexion" style="color: rgba(255,255,255,0.5); font-size: 16px;">
+                <a href="<?= url('/logout') ?>" title="<?= __('auth.logout') ?>" style="color: rgba(255,255,255,0.5); font-size: 16px;">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </div>
@@ -99,9 +102,17 @@
                 <button class="btn-menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h2><?= e($pageTitle ?? 'Tableau de bord') ?></h2>
+                <h2><?= e($pageTitle ?? __('dash.title')) ?></h2>
             </div>
             <div class="header-right">
+                <!-- Language Toggle -->
+                <div class="lang-toggle">
+                    <?php $otherLang = Lang::locale() === 'fr' ? 'ar' : 'fr'; ?>
+                    <a href="?lang=<?= $otherLang ?>" class="btn btn-sm btn-secondary" title="<?= $otherLang === 'ar' ? 'العربية' : 'Francais' ?>">
+                        <i class="fas fa-language"></i>
+                        <?= $otherLang === 'ar' ? 'عربي' : 'FR' ?>
+                    </a>
+                </div>
                 <button class="btn btn-sm btn-secondary" onclick="toggleTheme()" title="Theme">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -123,6 +134,11 @@
     </main>
 </div>
 
+<script>
+    const APP_CURRENCY = '<?= CURRENCY ?>';
+    const APP_LANG = '<?= Lang::locale() ?>';
+    const APP_RTL = <?= Lang::isRtl() ? 'true' : 'false' ?>;
+</script>
 <script src="<?= asset('js/app.js') ?>"></script>
 <?php if (isset($extraJs)): ?>
 <script><?= $extraJs ?></script>

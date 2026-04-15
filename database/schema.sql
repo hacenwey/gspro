@@ -45,7 +45,7 @@ CREATE TABLE products (
     unit VARCHAR(20) NOT NULL DEFAULT 'piece',
     purchase_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     selling_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-    tax_rate DECIMAL(5,2) DEFAULT 19.00,
+    tax_rate DECIMAL(5,2) DEFAULT 16.00,
     min_stock INT DEFAULT 0,
     current_stock INT DEFAULT 0,
     image VARCHAR(255) NULL,
@@ -207,7 +207,7 @@ CREATE TABLE payments (
     supplier_id CHAR(36) NULL,
     cash_session_id CHAR(36) NULL,
     amount DECIMAL(12,2) NOT NULL,
-    method ENUM('cash','card','check','transfer','mobile') NOT NULL DEFAULT 'cash',
+    method ENUM('cash','card','check','transfer','mobile','bankily','masrivi','sedad') NOT NULL DEFAULT 'cash',
     reference VARCHAR(100) NULL,
     payment_date DATE NOT NULL,
     notes TEXT NULL,
@@ -311,7 +311,7 @@ INSERT INTO users (id, username, email, password_hash, full_name, role) VALUES
 -- Default settings
 INSERT INTO settings (setting_key, setting_value) VALUES
 ('company_name', 'Mon Entreprise'),
-('company_address', ''),
+('company_address', 'Nouakchott, Mauritanie'),
 ('company_phone', ''),
 ('company_email', ''),
 ('company_tax_id', ''),
@@ -320,12 +320,13 @@ INSERT INTO settings (setting_key, setting_value) VALUES
 ('quote_prefix', 'DEV'),
 ('credit_note_prefix', 'AVO'),
 ('po_prefix', 'BC'),
-('default_tax_rate', '19'),
-('currency', 'DA'),
-('currency_symbol', 'د.ج'),
+('default_tax_rate', '16'),
+('currency', 'MRU'),
+('currency_symbol', 'UM'),
 ('default_payment_terms', '30'),
 ('default_quote_validity', '30'),
-('low_stock_alert', '1');
+('low_stock_alert', '1'),
+('onboarding_done', '0');
 
 -- Sample categories
 INSERT INTO categories (id, name, description) VALUES

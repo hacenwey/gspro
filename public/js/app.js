@@ -66,7 +66,9 @@ function confirmDelete(form, message) {
 
 // Format number as currency
 function formatMoney(amount) {
-    return new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount) + ' DA';
+    const currency = (typeof APP_CURRENCY !== 'undefined') ? APP_CURRENCY : 'MRU';
+    const locale = (typeof APP_LANG !== 'undefined' && APP_LANG === 'ar') ? 'ar-MR' : 'fr-FR';
+    return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount) + ' ' + currency;
 }
 
 // Close sidebar on mobile when navigating

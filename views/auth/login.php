@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="<?= Lang::locale() ?>" dir="<?= Lang::dir() ?>" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - GestionPro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title><?= __('auth.login') ?> - GestionPro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
+    <?php if (Lang::isRtl()): ?>
+    <link rel="stylesheet" href="<?= asset('css/rtl.css') ?>">
+    <?php endif; ?>
     <style>
         body {
             min-height: 100vh;
@@ -67,7 +70,7 @@
         <div class="login-brand">
             <div class="logo">GP</div>
             <h1>GestionPro</h1>
-            <p>Gestion Commerciale Integree</p>
+            <p><?= __('auth.tagline') ?></p>
         </div>
 
         <?php if (!empty($error)): ?>
@@ -79,17 +82,23 @@
 
         <form method="POST" action="<?= url('/login') ?>">
             <div class="form-group">
-                <label class="form-label">Nom d'utilisateur ou email</label>
+                <label class="form-label"><?= __('auth.username') ?></label>
                 <input type="text" name="username" class="form-control" placeholder="admin" value="<?= e($username ?? '') ?>" required autofocus>
             </div>
             <div class="form-group">
-                <label class="form-label">Mot de passe</label>
-                <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
+                <label class="form-label"><?= __('auth.password') ?></label>
+                <input type="password" name="password" class="form-control" placeholder="<?= __('auth.password') ?>" required>
             </div>
             <button type="submit" class="btn btn-primary btn-login">
                 <i class="fas fa-sign-in-alt"></i>
-                Se connecter
+                <?= __('auth.submit') ?>
             </button>
+            <div style="text-align:center;margin-top:16px;">
+                <?php $otherLang = Lang::locale() === 'fr' ? 'ar' : 'fr'; ?>
+                <a href="?lang=<?= $otherLang ?>" style="color:var(--text-muted);font-size:13px;">
+                    <i class="fas fa-language"></i> <?= $otherLang === 'ar' ? 'العربية' : 'Francais' ?>
+                </a>
+            </div>
         </form>
     </div>
 </div>

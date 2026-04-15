@@ -124,10 +124,13 @@
                 <div class="form-group">
                     <label class="form-label">Mode de paiement</label>
                     <select name="method" class="form-control">
-                        <option value="cash">Especes</option>
-                        <option value="card">Carte</option>
-                        <option value="check">Cheque</option>
-                        <option value="transfer">Virement</option>
+                        <option value="cash"><?= __('payments.method.cash') ?></option>
+                        <option value="card"><?= __('payments.method.card') ?></option>
+                        <option value="bankily"><?= __('payments.method.bankily') ?></option>
+                        <option value="masrivi"><?= __('payments.method.masrivi') ?></option>
+                        <option value="sedad"><?= __('payments.method.sedad') ?></option>
+                        <option value="check"><?= __('payments.method.check') ?></option>
+                        <option value="transfer"><?= __('payments.method.transfer') ?></option>
                     </select>
                 </div>
                 <div class="form-group">
