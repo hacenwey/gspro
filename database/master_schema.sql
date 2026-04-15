@@ -55,3 +55,36 @@ CREATE TABLE tenant_log (
 ) ENGINE=InnoDB;
 
 CREATE INDEX idx_tenant_log_date ON tenant_log(created_at);
+
+-- ===================== SUPPORT TICKETS =====================
+CREATE TABLE tickets (
+    id CHAR(36) PRIMARY KEY,
+    tenant_id CHAR(36) NOT NULL,
+    user_name VARCHAR(100) NOT NULL,
+    user_email VARCHAR(100) NULL,
+    subject VARCHAR(255) NOT NULL,
+    category ENUM('bug','feature','billing','general','urgent') NOT NULL DEFAULT 'general',
+    priority ENUM('low','medium','high','critical') NOT NULL DEFAULT 'medium',
+    status ENUM('open','in_progress','waiting','resolved','closed') NOT NULL DEFAULT 'open',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    closed_at DATETIME NULL,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_tickets_tenant ON tickets(tenant_id);
+CREATE INDEX idx_tickets_status ON tickets(status);
+CREATE INDEX idx_tickets_created ON tickets(created_at);
+
+-- ===================== TICKET MESSAGES =====================
+CREATE TABLE ticket_messages (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ticket_id CHAR(36) NOT NULL,
+    sender_type ENUM('client','admin') NOT NULL,
+    sender_name VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_ticket_messages_ticket ON ticket_messages(ticket_id);

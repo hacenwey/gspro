@@ -23,6 +23,8 @@ $routes = [
         '/tenants'      => 'tenants',
         '/tenants/create' => 'createTenant',
         '/tenants/edit/{id}' => 'editTenant',
+        '/tickets'      => 'tickets',
+        '/tickets/view/{id}' => 'viewTicket',
     ],
     'POST' => [
         '/login'          => 'login',
@@ -31,6 +33,8 @@ $routes = [
         '/tenants/toggle/{id}' => 'toggleTenant',
         '/tenants/delete/{id}' => 'deleteTenant',
         '/tenants/reset-password/{id}' => 'resetPassword',
+        '/tickets/reply/{id}' => 'replyTicket',
+        '/tickets/status/{id}' => 'updateTicketStatus',
     ]
 ];
 

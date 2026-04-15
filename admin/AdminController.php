@@ -88,8 +88,20 @@ class AdminController {
         $recentTenants = $this->db->query("SELECT * FROM tenants ORDER BY created_at DESC LIMIT 5")->fetchAll();
         $recentLog = $this->db->query("SELECT tl.*, t.slug, t.company_name FROM tenant_log tl LEFT JOIN tenants t ON t.id = tl.tenant_id ORDER BY tl.created_at DESC LIMIT 10")->fetchAll();
 
+        // Ticket stats
+        $openTickets = 0;
+        $totalTickets = 0;
+        $recentTickets = [];
+        try {
+            $openTickets = (int)$this->db->query("SELECT COUNT(*) FROM tickets WHERE status IN ('open','in_progress')")->fetchColumn();
+            $totalTickets = (int)$this->db->query("SELECT COUNT(*) FROM tickets")->fetchColumn();
+            $recentTickets = $this->db->query(
+                "SELECT t.*, tn.slug, tn.company_name FROM tickets t LEFT JOIN tenants tn ON tn.id = t.tenant_id ORDER BY t.created_at DESC LIMIT 5"
+            )->fetchAll();
+        } catch (Exception $e) {}
+
         $flash = $this->getFlash();
-        $this->render('dashboard', compact('totalTenants', 'activeTenants', 'recentTenants', 'recentLog', 'flash'));
+        $this->render('dashboard', compact('totalTenants', 'activeTenants', 'recentTenants', 'recentLog', 'openTickets', 'totalTickets', 'recentTickets', 'flash'));
     }
 
     // ===================== TENANTS CRUD =====================
@@ -176,6 +188,132 @@ class AdminController {
         Tenant::delete($id);
         $this->flash('success', 'Client "' . ($tenant['slug'] ?? '') . '" supprime (base de donnees supprimee)');
         $this->redirect('/tenants');
+    }
+
+    // ===================== SUPPORT TICKETS =====================
+
+    public function tickets(): void {
+        $this->requireAuth();
+
+        $status = $_GET['status'] ?? '';
+        $sql = "SELECT t.*, tn.slug, tn.company_name,
+                (SELECT COUNT(*) FROM ticket_messages WHERE ticket_id = t.id) as msg_count,
+                (SELECT created_at FROM ticket_messages WHERE ticket_id = t.id ORDER BY created_at DESC LIMIT 1) as last_message_at
+                FROM tickets t
+                LEFT JOIN tenants tn ON tn.id = t.tenant_id";
+        $params = [];
+
+        if ($status && in_array($status, ['open', 'in_progress', 'waiting', 'resolved', 'closed'])) {
+            $sql .= " WHERE t.status = ?";
+            $params[] = $status;
+        }
+        $sql .= " ORDER BY FIELD(t.status, 'open', 'in_progress', 'waiting', 'resolved', 'closed'), t.updated_at DESC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $tickets = $stmt->fetchAll();
+
+        // Counts
+        $countRows = $this->db->query("SELECT status, COUNT(*) as cnt FROM tickets GROUP BY status")->fetchAll();
+        $counts = ['all' => 0, 'open' => 0, 'in_progress' => 0, 'waiting' => 0, 'resolved' => 0, 'closed' => 0];
+        foreach ($countRows as $row) {
+            $counts[$row['status']] = (int)$row['cnt'];
+            $counts['all'] += (int)$row['cnt'];
+        }
+
+        $flash = $this->getFlash();
+        $this->render('tickets', compact('tickets', 'counts', 'status', 'flash'));
+    }
+
+    public function viewTicket(string $id): void {
+        $this->requireAuth();
+
+        $stmt = $this->db->prepare(
+            "SELECT t.*, tn.slug, tn.company_name, tn.owner_email
+             FROM tickets t LEFT JOIN tenants tn ON tn.id = t.tenant_id WHERE t.id = ?"
+        );
+        $stmt->execute([$id]);
+        $ticket = $stmt->fetch();
+
+        if (!$ticket) {
+            $this->flash('error', 'Ticket introuvable');
+            $this->redirect('/tickets');
+            return;
+        }
+
+        $msgStmt = $this->db->prepare("SELECT * FROM ticket_messages WHERE ticket_id = ? ORDER BY created_at ASC");
+        $msgStmt->execute([$id]);
+        $messages = $msgStmt->fetchAll();
+
+        $flash = $this->getFlash();
+        $this->render('ticket_view', compact('ticket', 'messages', 'flash'));
+    }
+
+    public function replyTicket(string $id): void {
+        $this->requireAuth();
+
+        $message = trim($_POST['message'] ?? '');
+        $newStatus = $_POST['status'] ?? '';
+
+        if (empty($message)) {
+            $this->flash('error', 'Le message est requis.');
+            $this->redirect('/tickets/view/' . $id);
+            return;
+        }
+
+        $adminName = $_SESSION['super_admin_name'] ?? 'Admin';
+
+        $msgStmt = $this->db->prepare(
+            "INSERT INTO ticket_messages (ticket_id, sender_type, sender_name, message) VALUES (?, 'admin', ?, ?)"
+        );
+        $msgStmt->execute([$id, $adminName, $message]);
+
+        // Update status if provided
+        if ($newStatus && in_array($newStatus, ['open', 'in_progress', 'waiting', 'resolved', 'closed'])) {
+            $updateSql = "UPDATE tickets SET status = ?";
+            $updateParams = [$newStatus];
+            if (in_array($newStatus, ['resolved', 'closed'])) {
+                $updateSql .= ", closed_at = NOW()";
+            } else {
+                $updateSql .= ", closed_at = NULL";
+            }
+            $updateSql .= " WHERE id = ?";
+            $updateParams[] = $id;
+            $this->db->prepare($updateSql)->execute($updateParams);
+        }
+
+        $this->flash('success', 'Reponse envoyee.');
+        $this->redirect('/tickets/view/' . $id);
+    }
+
+    public function updateTicketStatus(string $id): void {
+        $this->requireAuth();
+
+        $newStatus = $_POST['status'] ?? '';
+        if (!in_array($newStatus, ['open', 'in_progress', 'waiting', 'resolved', 'closed'])) {
+            $this->flash('error', 'Statut invalide.');
+            $this->redirect('/tickets');
+            return;
+        }
+
+        $updateSql = "UPDATE tickets SET status = ?";
+        $updateParams = [$newStatus];
+        if (in_array($newStatus, ['resolved', 'closed'])) {
+            $updateSql .= ", closed_at = NOW()";
+        } else {
+            $updateSql .= ", closed_at = NULL";
+        }
+        $updateSql .= " WHERE id = ?";
+        $updateParams[] = $id;
+        $this->db->prepare($updateSql)->execute($updateParams);
+
+        $statLabel = match($newStatus) {
+            'open' => 'Ouvert', 'in_progress' => 'En cours',
+            'waiting' => 'En attente', 'resolved' => 'Resolu',
+            'closed' => 'Ferme', default => $newStatus
+        };
+        $this->flash('success', 'Statut mis a jour: ' . $statLabel);
+        $this->redirect('/tickets/view/' . $id);
     }
 
     // ===================== RESET PASSWORD =====================

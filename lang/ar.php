@@ -13,6 +13,8 @@ return [
     'nav.invoices' => 'العروض والفواتير',
     'nav.debts' => 'الديون',
     'nav.payments' => 'المدفوعات',
+    'nav.support' => 'الدعم',
+    'nav.tickets' => 'الدعم الفني',
     'nav.admin' => 'الإدارة',
     'nav.settings' => 'الإعدادات',
 
@@ -405,4 +407,11 @@ return [
     'onboarding.feat.instant_invoice_desc' => 'فاتورة تلقائية عند كل بيع',
     'onboarding.feat.cash_report' => 'تقرير الصندوق',
     'onboarding.feat.cash_report_desc' => 'ملخص نهاية اليوم',
+
+    // Support Tickets
+    'tickets.title' => 'الدعم الفني',
+    'tickets.subtitle' => 'طلبات الدعم الفني الخاصة بك',
+    'tickets.new' => 'تذكرة جديدة',
+    'tickets.create' => 'تذكرة جديدة',
+    'tickets.empty' => 'لا توجد تذاكر',
 ];

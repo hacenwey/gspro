@@ -13,6 +13,8 @@ return [
     'nav.invoices' => 'Devis & Factures',
     'nav.debts' => 'Dettes & Credits',
     'nav.payments' => 'Paiements',
+    'nav.support' => 'Support',
+    'nav.tickets' => 'Support',
     'nav.admin' => 'Administration',
     'nav.settings' => 'Parametres',
 
@@ -407,4 +409,11 @@ return [
     'onboarding.feat.instant_invoice_desc' => 'Facture auto a chaque vente',
     'onboarding.feat.cash_report' => 'Rapport de caisse',
     'onboarding.feat.cash_report_desc' => 'Bilan fin de journee',
+
+    // Support Tickets
+    'tickets.title' => 'Support',
+    'tickets.subtitle' => 'Vos demandes de support technique',
+    'tickets.new' => 'Nouveau ticket',
+    'tickets.create' => 'Nouveau ticket',
+    'tickets.empty' => 'Aucun ticket',
 ];

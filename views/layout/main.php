@@ -74,6 +74,26 @@
                     <?= __('nav.payments') ?>
                 </a>
             </div>
+            <div class="nav-section">
+                <div class="nav-section-title"><?= __('nav.support') ?: 'Support' ?></div>
+                <a href="<?= url('/tickets') ?>" class="nav-item <?= isActive('/tickets') ?>">
+                    <span class="icon"><i class="fas fa-headset"></i></span>
+                    <?= __('nav.tickets') ?: 'Support' ?>
+                    <?php
+                    // Show open ticket count badge
+                    try {
+                        if (class_exists('Tenant') && Tenant::current()) {
+                            $__tCount = Tenant::getMasterDB()->prepare("SELECT COUNT(*) FROM tickets WHERE tenant_id = ? AND status IN ('open','in_progress','waiting')");
+                            $__tCount->execute([Tenant::current()['id']]);
+                            $__openTickets = (int)$__tCount->fetchColumn();
+                            if ($__openTickets > 0): ?>
+                                <span class="badge badge-danger" style="margin-left:auto;font-size:10px;padding:2px 7px;border-radius:100px;"><?= $__openTickets ?></span>
+                            <?php endif;
+                        }
+                    } catch (Exception $e) {}
+                    ?>
+                </a>
+            </div>
             <?php if (hasRole('admin', 'manager')): ?>
             <div class="nav-section">
                 <div class="nav-section-title"><?= __('nav.admin') ?></div>

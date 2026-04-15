@@ -24,6 +24,13 @@
             <div class="stat-label">Clients inactifs</div>
         </div>
     </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:#F59E0B;"><i class="fas fa-headset"></i></div>
+        <div>
+            <div class="stat-value"><?= $openTickets ?><span style="font-size:14px;color:var(--text-muted);font-weight:400;"> / <?= $totalTickets ?></span></div>
+            <div class="stat-label">Tickets ouverts</div>
+        </div>
+    </div>
 </div>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
@@ -62,26 +69,64 @@
         </div>
     </div>
 
-    <!-- Activity Log -->
+    <!-- Recent Tickets -->
     <div class="card">
-        <div class="card-header"><h3>Activite recente</h3></div>
+        <div class="card-header">
+            <h3><i class="fas fa-headset" style="color:#F59E0B;margin-right:4px;"></i> Tickets recents</h3>
+            <a href="<?= adminUrl('/tickets') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-arrow-right"></i> Voir tous</a>
+        </div>
         <div class="card-body" style="padding:0;">
-            <?php if (empty($recentLog)): ?>
-            <div class="empty-state" style="padding:30px;"><p>Aucune activite</p></div>
+            <?php if (empty($recentTickets)): ?>
+            <div class="empty-state" style="padding:30px;"><p>Aucun ticket</p></div>
             <?php else: ?>
             <table class="table">
-                <thead><tr><th>Action</th><th>Client</th><th>Date</th></tr></thead>
+                <thead><tr><th>Ticket</th><th>Client</th><th>Sujet</th><th>Statut</th></tr></thead>
                 <tbody>
-                <?php foreach ($recentLog as $log): ?>
+                <?php foreach ($recentTickets as $tk): ?>
+                <?php
+                    $tkStatLabel = match($tk['status']) { 'open'=>'Ouvert','in_progress'=>'En cours','waiting'=>'Attente','resolved'=>'Resolu','closed'=>'Ferme',default=>$tk['status'] };
+                    $tkStatClass = match($tk['status']) { 'open'=>'success','in_progress'=>'primary','waiting'=>'warning','resolved'=>'info','closed'=>'secondary',default=>'secondary' };
+                ?>
                 <tr>
-                    <td style="font-size:12px;"><?= e($log['action']) ?></td>
-                    <td style="font-weight:600;"><?= e($log['slug'] ?? $log['company_name'] ?? '-') ?></td>
-                    <td style="font-size:12px;"><?= formatDateTime($log['created_at']) ?></td>
+                    <td>
+                        <a href="<?= adminUrl('/tickets/view/' . $tk['id']) ?>" class="text-mono" style="font-weight:700;font-size:11px;color:var(--primary);">
+                            #<?= substr($tk['id'], 0, 8) ?>
+                        </a>
+                    </td>
+                    <td style="font-size:12px;"><?= e($tk['company_name'] ?? '-') ?></td>
+                    <td style="font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                        <a href="<?= adminUrl('/tickets/view/' . $tk['id']) ?>" style="color:var(--text);"><?= e($tk['subject']) ?></a>
+                    </td>
+                    <td><span class="badge badge-<?= $tkStatClass ?>" style="font-size:10px;"><?= $tkStatLabel ?></span></td>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
             <?php endif; ?>
         </div>
+    </div>
+</div>
+
+<!-- Activity Log -->
+<div class="card" style="margin-top:20px;">
+    <div class="card-header"><h3><i class="fas fa-clock-rotate-left" style="color:#0EA5E9;margin-right:4px;"></i> Activite recente</h3></div>
+    <div class="card-body" style="padding:0;">
+        <?php if (empty($recentLog)): ?>
+        <div class="empty-state" style="padding:30px;"><p>Aucune activite</p></div>
+        <?php else: ?>
+        <table class="table">
+            <thead><tr><th>Action</th><th>Client</th><th>Details</th><th>Date</th></tr></thead>
+            <tbody>
+            <?php foreach ($recentLog as $log): ?>
+            <tr>
+                <td><span class="badge badge-secondary" style="font-size:11px;"><?= e($log['action']) ?></span></td>
+                <td style="font-weight:600;"><?= e($log['slug'] ?? $log['company_name'] ?? '-') ?></td>
+                <td style="font-size:12px;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= e($log['details'] ?? '') ?></td>
+                <td style="font-size:12px;"><?= formatDateTime($log['created_at']) ?></td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php endif; ?>
     </div>
 </div>

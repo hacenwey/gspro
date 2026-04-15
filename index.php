@@ -137,6 +137,13 @@ Router::get('/debts/view/{id}', 'DebtController', 'view');
 // Payments
 Router::get('/payments', 'PaymentController', 'index');
 
+// Support Tickets
+Router::get('/tickets', 'TicketController', 'index');
+Router::get('/tickets/create', 'TicketController', 'create');
+Router::post('/tickets/store', 'TicketController', 'store');
+Router::get('/tickets/view/{id}', 'TicketController', 'view');
+Router::post('/tickets/reply/{id}', 'TicketController', 'reply');
+
 // Settings
 Router::get('/settings', 'SettingsController', 'index');
 Router::post('/settings/update', 'SettingsController', 'update');

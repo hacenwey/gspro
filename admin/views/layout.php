@@ -70,6 +70,16 @@
             <a href="<?= adminUrl('/tenants') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/tenants') ? 'active' : '' ?>">
                 <i class="fas fa-building"></i> Clients
             </a>
+            <a href="<?= adminUrl('/tickets') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/tickets') ? 'active' : '' ?>" style="position:relative;">
+                <i class="fas fa-headset"></i> Tickets
+                <?php
+                try {
+                    $__openCount = Tenant::getMasterDB()->query("SELECT COUNT(*) FROM tickets WHERE status IN ('open','in_progress')")->fetchColumn();
+                    if ($__openCount > 0): ?>
+                    <span style="position:absolute;right:12px;background:#DC2626;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;"><?= $__openCount ?></span>
+                    <?php endif;
+                } catch (Exception $e) {} ?>
+            </a>
         </nav>
         <div class="admin-sidebar-footer">
             <div style="margin-bottom: 8px;">
