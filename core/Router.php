@@ -1,6 +1,19 @@
 <?php
 class Router {
     private static array $routes = [];
+    private static string $base = '';
+
+    /**
+     * Set the base URL for routing (includes tenant slug).
+     * e.g. /gestion_commerciale/ahmed
+     */
+    public static function setBase(string $base): void {
+        self::$base = rtrim($base, '/');
+    }
+
+    public static function getBase(): string {
+        return self::$base ?: APP_URL;
+    }
 
     public static function get(string $path, string $controller, string $method): void {
         self::$routes['GET'][$path] = ['controller' => $controller, 'method' => $method];
@@ -12,7 +25,7 @@ class Router {
 
     public static function dispatch(): void {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $base = APP_URL;
+        $base = self::$base ?: APP_URL;
         $path = str_replace($base, '', $uri);
         $path = '/' . trim($path, '/');
         if ($path === '/') $path = '/dashboard';
@@ -50,5 +63,12 @@ class Router {
         require_once $controllerFile;
         $controller = new $route['controller']();
         call_user_func_array([$controller, $route['method']], $params);
+    }
+
+    /**
+     * Reset routes (used between admin and tenant routing).
+     */
+    public static function reset(): void {
+        self::$routes = [];
     }
 }

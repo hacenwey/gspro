@@ -28,13 +28,19 @@ class Controller {
     }
 
     protected function redirect(string $path): void {
-        header('Location: ' . APP_URL . $path);
+        header('Location: ' . url($path));
         exit;
     }
 
     protected function requireAuth(): void {
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
+        }
+        // In multi-tenant mode, verify the session belongs to this tenant
+        if (class_exists('Tenant') && Tenant::slug()) {
+            if (($_SESSION['tenant_slug'] ?? '') !== Tenant::slug()) {
+                $this->redirect('/login');
+            }
         }
     }
 

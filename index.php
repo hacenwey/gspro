@@ -3,14 +3,63 @@ session_start();
 
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/core/Tenant.php';
 require_once __DIR__ . '/core/helpers.php';
 require_once __DIR__ . '/core/Lang.php';
 require_once __DIR__ . '/core/Controller.php';
 require_once __DIR__ . '/core/Router.php';
 
+// ===================== MULTI-TENANT ROUTING =====================
+
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$pathAfterBase = str_replace(APP_BASE, '', $uri);
+$pathAfterBase = '/' . trim($pathAfterBase, '/');
+
+// --- Super Admin Panel ---
+if ($pathAfterBase === '/admin' || str_starts_with($pathAfterBase, '/admin/')) {
+    Router::setBase(APP_BASE . '/admin');
+    require_once __DIR__ . '/admin/router.php';
+    exit;
+}
+
+// --- Landing page (no slug, root access) ---
+if ($pathAfterBase === '/' || $pathAfterBase === '') {
+    require_once __DIR__ . '/core/Tenant.php';
+    require_once __DIR__ . '/views/landing.php';
+    exit;
+}
+
+// --- Database install scripts (allow direct access) ---
+if (str_starts_with($pathAfterBase, '/database/')) {
+    return false;
+}
+
+// --- Extract tenant slug (first segment after base) ---
+$segments = explode('/', trim($pathAfterBase, '/'));
+$tenantSlug = $segments[0] ?? null;
+
+if (!$tenantSlug) {
+    http_response_code(404);
+    echo '<!DOCTYPE html><html><body style="font-family:Inter,sans-serif;text-align:center;padding:80px;"><h1>404</h1><p>Page introuvable.</p><a href="' . APP_BASE . '/">Retour</a></body></html>';
+    exit;
+}
+
+// Load tenant
+if (!Tenant::load($tenantSlug)) {
+    http_response_code(404);
+    echo '<!DOCTYPE html><html><body style="font-family:Inter,sans-serif;text-align:center;padding:80px;">';
+    echo '<h1>Client introuvable</h1>';
+    echo '<p>Le compte <strong>' . htmlspecialchars($tenantSlug) . '</strong> n\'existe pas ou est desactive.</p>';
+    echo '<a href="' . APP_BASE . '/">Retour</a></body></html>';
+    exit;
+}
+
+// Set base URL for this tenant: /gestion_commerciale/{slug}
+Router::setBase(APP_BASE . '/' . $tenantSlug);
+
 Lang::init();
 
-// ===================== ROUTES =====================
+// ===================== TENANT ROUTES =====================
 
 // Auth
 Router::get('/login', 'AuthController', 'loginForm');

@@ -5,11 +5,23 @@ function e(string $str): string {
 }
 
 function url(string $path = ''): string {
-    return APP_URL . $path;
+    // Use Router base if set (includes tenant slug), otherwise APP_BASE
+    if (class_exists('Router') && Router::getBase()) {
+        return Router::getBase() . $path;
+    }
+    return APP_BASE . $path;
 }
 
 function asset(string $path): string {
-    return APP_URL . '/public/' . $path;
+    return APP_BASE . '/public/' . $path;
+}
+
+function tenantUrl(string $slug, string $path = ''): string {
+    return APP_BASE . '/' . $slug . $path;
+}
+
+function adminUrl(string $path = ''): string {
+    return APP_BASE . '/admin' . $path;
 }
 
 function formatMoney($amount): string {
@@ -28,7 +40,7 @@ function formatDateTime($datetime): string {
 
 function isActive(string $path): string {
     $current = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $base = APP_URL . $path;
+    $base = url($path);
     return str_starts_with($current, $base) ? 'active' : '';
 }
 

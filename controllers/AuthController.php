@@ -2,7 +2,8 @@
 class AuthController extends Controller {
 
     public function loginForm(): void {
-        if (isset($_SESSION['user_id'])) {
+        // Check if user is already logged in for THIS tenant
+        if (isset($_SESSION['user_id']) && $this->isSameTenant()) {
             $this->redirect('/dashboard');
         }
         require APP_ROOT . '/views/auth/login.php';
@@ -30,6 +31,11 @@ class AuthController extends Controller {
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
+            // Store tenant slug in session to scope login
+            if (class_exists('Tenant') && Tenant::slug()) {
+                $_SESSION['tenant_slug'] = Tenant::slug();
+            }
+
             // Update last login
             $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
             $stmt->execute([$user['id']]);
@@ -42,8 +48,21 @@ class AuthController extends Controller {
     }
 
     public function logout(): void {
+        $slug = $_SESSION['tenant_slug'] ?? null;
         session_destroy();
-        header('Location: ' . APP_URL . '/login');
+        if ($slug) {
+            header('Location: ' . APP_BASE . '/' . $slug . '/login');
+        } else {
+            header('Location: ' . APP_BASE . '/');
+        }
         exit;
+    }
+
+    /**
+     * Check if the session belongs to the current tenant.
+     */
+    private function isSameTenant(): bool {
+        if (!class_exists('Tenant') || !Tenant::slug()) return true;
+        return ($_SESSION['tenant_slug'] ?? '') === Tenant::slug();
     }
 }

@@ -83,6 +83,9 @@
         <div class="login-brand">
             <div class="logo">GP</div>
             <h1>GestionPro</h1>
+            <?php if (class_exists('Tenant') && Tenant::current()): ?>
+            <p style="font-weight:600;color:var(--text);font-size:15px;margin-bottom:4px;"><?= e(Tenant::current()['company_name']) ?></p>
+            <?php endif; ?>
             <p><?= __('auth.tagline') ?></p>
         </div>
 

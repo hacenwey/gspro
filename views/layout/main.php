@@ -21,7 +21,12 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="logo">GP</div>
-            <h1>GestionPro</h1>
+            <div>
+                <h1>GestionPro</h1>
+                <?php if (class_exists('Tenant') && Tenant::current()): ?>
+                <div style="font-size:11px;color:var(--text-muted);font-weight:500;margin-top:2px;"><?= e(Tenant::current()['company_name']) ?></div>
+                <?php endif; ?>
+            </div>
         </div>
         <nav class="sidebar-nav">
             <div class="nav-section">

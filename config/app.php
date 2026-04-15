@@ -1,7 +1,7 @@
 <?php
 define('APP_NAME', 'GestionPro');
-define('APP_VERSION', '1.0.0');
-define('APP_URL', '/gestion_commerciale');
+define('APP_VERSION', '2.0.0');
+define('APP_BASE', '/gestion_commerciale');
 define('APP_ROOT', dirname(__DIR__));
 define('CURRENCY', 'MRU');
 define('CURRENCY_SYMBOL', 'UM');
@@ -27,3 +27,6 @@ define('PO_PREFIX', 'BC');
 // Supported languages
 define('SUPPORTED_LANGS', ['fr', 'ar']);
 define('DEFAULT_LANG', 'fr');
+
+// Multi-tenant mode
+define('MULTI_TENANT', true);

@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteBase /gestion_commerciale/admin/
+
+# Route everything through admin/index.php (which loads the main router)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php [QSA,L]
