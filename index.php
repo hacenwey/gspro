@@ -24,8 +24,14 @@ if ($pathAfterBase === '/admin' || str_starts_with($pathAfterBase, '/admin/')) {
 
 // --- Landing page (no slug, root access) ---
 if ($pathAfterBase === '/' || $pathAfterBase === '') {
-    require_once __DIR__ . '/core/Tenant.php';
     require_once __DIR__ . '/views/landing.php';
+    exit;
+}
+
+// --- Self-registration (public) ---
+if ($pathAfterBase === '/register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/controllers/RegisterController.php';
+    (new RegisterController())->register();
     exit;
 }
 
