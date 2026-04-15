@@ -87,7 +87,7 @@
                     <div class="user-name"><?= e($user['full_name']) ?></div>
                     <div class="user-role"><?= e($user['role']) ?></div>
                 </div>
-                <a href="<?= url('/logout') ?>" title="<?= __('auth.logout') ?>" style="color: rgba(255,255,255,0.5); font-size: 16px;">
+                <a href="<?= url('/logout') ?>" title="<?= __('auth.logout') ?>" style="color: var(--text-muted); font-size: 16px;">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </div>
@@ -99,7 +99,7 @@
     <main class="main-content">
         <header class="header">
             <div class="header-left">
-                <button class="btn-menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+                <button class="btn-menu-toggle mobile-toggle" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </button>
                 <h2><?= e($pageTitle ?? __('dash.title')) ?></h2>
@@ -113,7 +113,7 @@
                         <?= $otherLang === 'ar' ? 'عربي' : 'FR' ?>
                     </a>
                 </div>
-                <button class="btn btn-sm btn-secondary" onclick="toggleTheme()" title="Theme">
+                <button class="btn btn-sm btn-secondary theme-toggle" onclick="toggleTheme()" title="Theme">
                     <i class="fas fa-moon"></i>
                 </button>
             </div>

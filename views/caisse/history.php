@@ -1,14 +1,14 @@
 <div class="d-flex justify-between align-center mb-3">
-    <a href="<?= url('/caisse') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-arrow-left"></i> Retour a la caisse</a>
+    <a href="<?= url('/caisse') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-arrow-left"></i> <?= __('common.back') ?></a>
 </div>
 
 <div class="card">
     <div class="card-body" style="padding:0;">
         <?php if (empty($sessions)): ?>
-        <div class="empty-state"><div class="icon"><i class="fas fa-cash-register"></i></div><p>Aucune session de caisse</p></div>
+        <div class="empty-state"><div class="icon"><i class="fas fa-cash-register"></i></div><p><?= __('pos.no_sessions') ?></p></div>
         <?php else: ?>
         <table class="table">
-            <thead><tr><th>Caissier</th><th>Ouverture</th><th>Cloture</th><th class="text-right">Fond initial</th><th class="text-right">Solde cloture</th><th class="text-right">Ecart</th><th>Statut</th></tr></thead>
+            <thead><tr><th><?= __('pos.cashier') ?></th><th><?= __('pos.opened') ?></th><th><?= __('pos.closed') ?></th><th class="text-right"><?= __('pos.initial_balance') ?></th><th class="text-right"><?= __('pos.closing_amount') ?></th><th class="text-right"><?= __('pos.difference') ?></th><th><?= __('common.status') ?></th></tr></thead>
             <tbody>
             <?php foreach ($sessions as $s): ?>
             <tr>
@@ -20,7 +20,7 @@
                 <td class="text-right text-mono fw-bold <?= ($s['difference'] ?? 0) < 0 ? 'text-danger' : (($s['difference'] ?? 0) > 0 ? 'text-success' : '') ?>">
                     <?= $s['difference'] !== null ? formatMoney($s['difference']) : '-' ?>
                 </td>
-                <td><span class="badge badge-<?= $s['status'] === 'open' ? 'success' : 'secondary' ?>"><?= $s['status'] === 'open' ? 'Ouverte' : 'Cloturee' ?></span></td>
+                <td><span class="badge badge-<?= $s['status'] === 'open' ? 'success' : 'secondary' ?>"><?= $s['status'] === 'open' ? __('pos.open_status') : __('pos.closed_status') ?></span></td>
             </tr>
             <?php endforeach; ?>
             </tbody>

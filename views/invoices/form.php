@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header">
-        <h3><i class="fas fa-file-invoice" style="margin-right:8px;color:var(--primary);"></i><?= $selectedType === 'quote' ? 'Nouveau devis' : 'Nouvelle facture' ?></h3>
-        <a href="<?= url('/invoices') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
+        <h3><i class="fas fa-file-invoice" style="color:var(--primary);"></i> <?= $selectedType === 'quote' ? __('invoices.new_quote_title') : __('invoices.new_invoice_title') ?></h3>
+        <a href="<?= url('/invoices') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-arrow-left"></i> <?= __('common.back') ?></a>
     </div>
     <div class="card-body">
         <form method="POST" action="<?= url('/invoices/store') ?>" id="invoiceForm">
@@ -11,20 +11,20 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">Client *</label>
+                    <label class="form-label"><?= __('invoices.client') ?> *</label>
                     <select name="customer_id" class="form-control" required>
-                        <option value="">-- Choisir un client --</option>
+                        <option value=""><?= __('invoices.choose_client') ?></option>
                         <?php foreach ($customers as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $selectedCustomer === $c['id'] ? 'selected' : '' ?>><?= e(($c['first_name'] ?? '') . ' ' . $c['last_name']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Date d'emission</label>
+                    <label class="form-label"><?= __('invoices.issue_date') ?></label>
                     <input type="date" name="issue_date" class="form-control" value="<?= date('Y-m-d') ?>">
                 </div>
                 <div class="form-group">
-                    <label class="form-label"><?= $selectedType === 'quote' ? 'Date de validite' : 'Date d\'echeance' ?></label>
+                    <label class="form-label"><?= $selectedType === 'quote' ? __('invoices.validity_date') : __('invoices.due_date') ?></label>
                     <input type="date" name="<?= $selectedType === 'quote' ? 'validity_date' : 'due_date' ?>" class="form-control" value="<?= date('Y-m-d', strtotime('+30 days')) ?>">
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <!-- Items -->
             <div class="card mt-2" style="border: 2px dashed var(--border);">
                 <div class="card-header">
-                    <h3>Lignes du document</h3>
+                    <h3><?= __('invoices.lines') ?></h3>
                 </div>
                 <div class="card-body" style="padding: 0;">
                     <table class="table" id="itemsTable">
@@ -40,30 +40,30 @@
                         <tbody id="itemsBody"></tbody>
                     </table>
                     <div style="padding: 12px 16px;">
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="addLine()"><i class="fas fa-plus"></i> Ajouter une ligne</button>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="addLine()"><i class="fas fa-plus"></i> <?= __('invoices.add_line') ?></button>
                     </div>
                 </div>
             </div>
 
             <!-- Totals -->
             <div style="max-width: 350px; margin-left: auto; margin-top: 20px;">
-                <div class="pos-total-row"><span>Sous-total HT</span><span class="text-mono fw-bold" id="invSubtotal">0,00 DA</span></div>
-                <div class="pos-total-row"><span>TVA</span><span class="text-mono fw-bold" id="invTax">0,00 DA</span></div>
+                <div class="pos-total-row"><span><?= __('invoices.subtotal') ?></span><span class="text-mono fw-bold" id="invSubtotal">0,00 <?= CURRENCY ?></span></div>
+                <div class="pos-total-row"><span><?= __('invoices.tax') ?></span><span class="text-mono fw-bold" id="invTax">0,00 <?= CURRENCY ?></span></div>
                 <div class="form-group" style="margin-top:8px;">
-                    <label class="form-label">Remise globale (DA)</label>
+                    <label class="form-label">Remise globale (<?= CURRENCY ?>)</label>
                     <input type="number" name="discount_amount" class="form-control" step="0.01" min="0" value="0" onchange="calcTotals()">
                 </div>
-                <div class="pos-total-row grand-total"><span>TOTAL TTC</span><span class="text-mono" id="invTotal">0,00 DA</span></div>
+                <div class="pos-total-row grand-total"><span><?= __('invoices.total_ttc') ?></span><span class="text-mono" id="invTotal">0,00 <?= CURRENCY ?></span></div>
             </div>
 
             <div class="form-group mt-2">
-                <label class="form-label">Notes / Conditions</label>
+                <label class="form-label"><?= __('invoices.notes') ?></label>
                 <textarea name="notes" class="form-control" rows="2"></textarea>
             </div>
 
             <div class="btn-group mt-2">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
-                <a href="<?= url('/invoices') ?>" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <?= __('common.save') ?></button>
+                <a href="<?= url('/invoices') ?>" class="btn btn-secondary"><?= __('common.cancel') ?></a>
             </div>
         </form>
     </div>
@@ -89,7 +89,7 @@ function addLine(productId = '', qty = 1) {
         <td><select class="form-control" onchange="onProductChange(${n}, this)" style="font-size:12px;">${options}</select></td>
         <td><input type="number" class="form-control" id="qty-${n}" value="${qty}" min="0.001" step="1" onchange="calcTotals()" style="text-align:center;"></td>
         <td><input type="number" class="form-control text-mono" id="price-${n}" value="0" step="0.01" min="0" onchange="calcTotals()"></td>
-        <td><input type="number" class="form-control" id="tax-${n}" value="19" step="0.01" min="0" onchange="calcTotals()" style="text-align:center;"></td>
+        <td><input type="number" class="form-control" id="tax-${n}" value="<?= TAX_RATE_DEFAULT ?>" step="0.01" min="0" onchange="calcTotals()" style="text-align:center;"></td>
         <td><input type="number" class="form-control" id="disc-${n}" value="0" step="0.01" min="0" max="100" onchange="calcTotals()" style="text-align:center;"></td>
         <td class="text-right text-mono fw-bold" id="ltotal-${n}">0,00</td>
         <td><button type="button" class="btn btn-icon btn-sm btn-danger" onclick="removeLine(${n})"><i class="fas fa-times"></i></button></td>
@@ -158,7 +158,10 @@ function calcTotals() {
     document.getElementById('itemsJson').value = JSON.stringify(items);
 }
 
-function formatM(v) { return new Intl.NumberFormat('fr-FR', {minimumFractionDigits:2}).format(v) + ' DA'; }
+function formatM(v) {
+    const currency = (typeof APP_CURRENCY !== 'undefined') ? APP_CURRENCY : 'MRU';
+    return new Intl.NumberFormat('fr-FR', {minimumFractionDigits:2}).format(v) + ' ' + currency;
+}
 
 addLine();
 </script>

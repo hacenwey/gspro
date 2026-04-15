@@ -3,29 +3,29 @@
     <div class="kpi-card">
         <div class="kpi-icon blue"><i class="fas fa-coins"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">CA du jour</div>
+            <div class="kpi-label"><?= __('dash.today_sales') ?></div>
             <div class="kpi-value"><?= formatMoney($todaySales) ?></div>
-            <div class="kpi-change"><?= $todayCount ?> vente(s)</div>
+            <div class="kpi-change"><?= $todayCount ?> <?= __('dash.today_count') ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon green"><i class="fas fa-chart-bar"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">CA du mois</div>
+            <div class="kpi-label"><?= __('dash.month_sales') ?></div>
             <div class="kpi-value"><?= formatMoney($monthSales) ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon orange"><i class="fas fa-hand-holding-dollar"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Creances clients</div>
+            <div class="kpi-label"><?= __('dash.receivables') ?></div>
             <div class="kpi-value"><?= formatMoney($totalReceivables) ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon red"><i class="fas fa-file-invoice"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Dettes fournisseurs</div>
+            <div class="kpi-label"><?= __('dash.payables') ?></div>
             <div class="kpi-value"><?= formatMoney($totalPayables) ?></div>
         </div>
     </div>
@@ -35,9 +35,9 @@
     <!-- Revenue Chart -->
     <div class="card">
         <div class="card-header">
-            <h3><i class="fas fa-chart-area" style="color: var(--primary); margin-right: 8px;"></i>Evolution du CA</h3>
+            <h3><i class="fas fa-chart-area" style="color: var(--primary);"></i> <?= __('dash.revenue_chart') ?></h3>
             <div class="btn-group">
-                <button class="btn btn-sm btn-secondary chart-period active" data-period="7d">7j</button>
+                <button class="btn btn-sm btn-primary chart-period active" data-period="7d">7j</button>
                 <button class="btn btn-sm btn-secondary chart-period" data-period="30d">30j</button>
                 <button class="btn btn-sm btn-secondary chart-period" data-period="12m">12m</button>
             </div>
@@ -50,17 +50,17 @@
     <!-- Top Products -->
     <div class="card">
         <div class="card-header">
-            <h3><i class="fas fa-trophy" style="color: var(--accent); margin-right: 8px;"></i>Top produits (mois)</h3>
+            <h3><i class="fas fa-trophy" style="color: var(--accent);"></i> <?= __('dash.top_products') ?></h3>
         </div>
         <div class="card-body" style="padding: 0;">
             <?php if (empty($topProducts)): ?>
             <div class="empty-state" style="padding: 40px 20px;">
                 <div class="icon"><i class="fas fa-chart-pie"></i></div>
-                <p>Aucune vente ce mois-ci</p>
+                <p><?= __('dash.no_sales') ?></p>
             </div>
             <?php else: ?>
             <table class="table">
-                <thead><tr><th>Produit</th><th class="text-right">Qte</th><th class="text-right">Montant</th></tr></thead>
+                <thead><tr><th><?= __('common.product') ?></th><th class="text-right"><?= __('common.quantity') ?></th><th class="text-right"><?= __('common.amount') ?></th></tr></thead>
                 <tbody>
                 <?php foreach ($topProducts as $i => $p): ?>
                 <tr>
@@ -83,18 +83,18 @@
     <!-- Low Stock Alerts -->
     <div class="card">
         <div class="card-header">
-            <h3><i class="fas fa-triangle-exclamation" style="color: var(--danger); margin-right: 8px;"></i>Alertes stock bas (<?= $lowStockCount ?>)</h3>
-            <a href="<?= url('/products') ?>" class="btn btn-sm btn-secondary">Voir tout</a>
+            <h3><i class="fas fa-triangle-exclamation" style="color: var(--danger);"></i> <?= __('dash.low_stock_alerts') ?> (<?= $lowStockCount ?>)</h3>
+            <a href="<?= url('/products') ?>" class="btn btn-sm btn-secondary"><?= __('dash.view_all') ?></a>
         </div>
         <div class="card-body" style="padding: 0;">
             <?php if (empty($lowStock)): ?>
             <div class="empty-state" style="padding: 40px 20px;">
                 <div class="icon"><i class="fas fa-check-circle"></i></div>
-                <p>Tous les stocks sont OK</p>
+                <p><?= __('dash.all_stock_ok') ?></p>
             </div>
             <?php else: ?>
             <table class="table">
-                <thead><tr><th>Produit</th><th class="text-center">Stock</th><th class="text-center">Min</th><th></th></tr></thead>
+                <thead><tr><th><?= __('common.product') ?></th><th class="text-center"><?= __('common.stock') ?></th><th class="text-center">Min</th><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($lowStock as $p): ?>
                 <tr>
@@ -121,21 +121,21 @@
         </div>
     </div>
 
-    <!-- Recent Invoices & Overdue Debts -->
+    <!-- Recent Invoices -->
     <div class="card">
         <div class="card-header">
-            <h3><i class="fas fa-clock" style="color: var(--info); margin-right: 8px;"></i>Dernieres factures</h3>
-            <a href="<?= url('/invoices') ?>" class="btn btn-sm btn-secondary">Voir tout</a>
+            <h3><i class="fas fa-clock" style="color: var(--info);"></i> <?= __('dash.recent_invoices') ?></h3>
+            <a href="<?= url('/invoices') ?>" class="btn btn-sm btn-secondary"><?= __('dash.view_all') ?></a>
         </div>
         <div class="card-body" style="padding: 0;">
             <?php if (empty($recentInvoices)): ?>
             <div class="empty-state" style="padding: 40px 20px;">
                 <div class="icon"><i class="fas fa-file-invoice"></i></div>
-                <p>Aucune facture</p>
+                <p><?= __('dash.no_invoices') ?></p>
             </div>
             <?php else: ?>
             <table class="table">
-                <thead><tr><th>N°</th><th>Client</th><th class="text-right">Total</th><th>Statut</th></tr></thead>
+                <thead><tr><th><?= __('common.number') ?></th><th><?= __('invoices.client') ?></th><th class="text-right"><?= __('common.total') ?></th><th><?= __('common.status') ?></th></tr></thead>
                 <tbody>
                 <?php foreach ($recentInvoices as $inv): ?>
                 <tr>
@@ -157,21 +157,21 @@
     <div class="kpi-card">
         <div class="kpi-icon purple"><i class="fas fa-box"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Produits actifs</div>
+            <div class="kpi-label"><?= __('dash.active_products') ?></div>
             <div class="kpi-value"><?= $totalProducts ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon blue"><i class="fas fa-users"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Clients</div>
+            <div class="kpi-label"><?= __('dash.clients_count') ?></div>
             <div class="kpi-value"><?= $totalClients ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon orange"><i class="fas fa-exclamation-triangle"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Stock bas</div>
+            <div class="kpi-label"><?= __('dash.low_stock') ?></div>
             <div class="kpi-value"><?= $lowStockCount ?></div>
         </div>
     </div>
@@ -192,36 +192,57 @@ function loadChart(period) {
 
             const ctx = document.getElementById('revenueChart').getContext('2d');
             const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-            gradient.addColorStop(0, 'rgba(46,134,193,0.15)');
-            gradient.addColorStop(1, 'rgba(46,134,193,0)');
+            gradient.addColorStop(0, 'rgba(79,70,229,0.12)');
+            gradient.addColorStop(1, 'rgba(79,70,229,0)');
 
             revenueChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Chiffre d\'affaires',
+                        label: '<?= __('dash.revenue') ?>',
                         data: values,
-                        borderColor: '#2E86C1',
+                        borderColor: '#4F46E5',
                         backgroundColor: gradient,
                         fill: true,
                         tension: 0.4,
                         borderWidth: 2.5,
                         pointRadius: 3,
-                        pointBackgroundColor: '#2E86C1'
+                        pointBackgroundColor: '#4F46E5',
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#4F46E5',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15,23,42,0.9)',
+                            titleFont: { size: 12 },
+                            bodyFont: { size: 13, weight: '600' },
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { callback: v => v.toLocaleString('fr-FR') + ' ' + APP_CURRENCY }
+                            grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
+                            ticks: {
+                                callback: v => v.toLocaleString('fr-FR') + ' ' + APP_CURRENCY,
+                                font: { size: 11 }
+                            }
                         },
-                        x: { grid: { display: false } }
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 11 } }
+                        }
                     }
                 }
             });
@@ -230,13 +251,12 @@ function loadChart(period) {
 
 document.querySelectorAll('.chart-period').forEach(btn => {
     btn.addEventListener('click', function() {
-        document.querySelectorAll('.chart-period').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        this.classList.add('btn-primary');
-        document.querySelectorAll('.chart-period:not(.active)').forEach(b => {
-            b.classList.remove('btn-primary');
+        document.querySelectorAll('.chart-period').forEach(b => {
+            b.classList.remove('active', 'btn-primary');
             b.classList.add('btn-secondary');
         });
+        this.classList.add('active', 'btn-primary');
+        this.classList.remove('btn-secondary');
         loadChart(this.dataset.period);
     });
 });
@@ -250,11 +270,11 @@ loadChart('7d');
     <div class="modal" style="max-width:720px;overflow:visible;">
         <style>
         .ob-header {
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
             padding: 32px 32px 28px;
             text-align: center;
             color: #fff;
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
         }
         .ob-header h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
         .ob-header p { font-size: 14px; opacity: 0.85; }
@@ -280,10 +300,10 @@ loadChart('7d');
             display: flex; align-items: center; justify-content: center;
             font-size: 24px; margin: 0 auto 16px;
         }
-        .ob-icon.blue { background: rgba(46,134,193,0.1); color: var(--secondary); }
-        .ob-icon.green { background: rgba(39,174,96,0.1); color: var(--success); }
-        .ob-icon.orange { background: rgba(243,156,18,0.1); color: var(--accent); }
-        .ob-icon.purple { background: rgba(142,68,173,0.1); color: #8E44AD; }
+        .ob-icon.blue { background: rgba(14,165,233,0.1); color: var(--secondary); }
+        .ob-icon.green { background: rgba(16,185,129,0.1); color: var(--success); }
+        .ob-icon.orange { background: rgba(245,158,11,0.1); color: var(--accent); }
+        .ob-icon.purple { background: rgba(139,92,246,0.1); color: #8B5CF6; }
         .ob-title { font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 4px; }
         .ob-desc { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 20px; }
         .ob-features {
@@ -355,10 +375,10 @@ loadChart('7d');
                 <div class="ob-title"><?= __('onboarding.step2_title') ?></div>
                 <div class="ob-desc"><?= __('onboarding.step2_desc') ?></div>
                 <div class="ob-features">
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'إدارة المخزون' : 'Gestion de stock' ?></h4><p><?= Lang::locale()==='ar' ? 'تتبع المدخلات والمخرجات تلقائياً' : 'Entrees/sorties automatiques' ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'رمز البار' : 'Code-barres' ?></h4><p><?= Lang::locale()==='ar' ? 'مسح سريع للمنتجات' : 'Scan rapide des produits' ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'تنبيهات المخزون' : 'Alertes stock' ?></h4><p><?= Lang::locale()==='ar' ? 'إشعار عند انخفاض المخزون' : 'Notification stock bas' ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'الأصناف' : 'Categories' ?></h4><p><?= Lang::locale()==='ar' ? 'تنظيم المنتجات حسب الصنف' : 'Organisez vos produits' ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.stock') ?></h4><p><?= __('onboarding.feat.stock_desc') ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.barcode') ?></h4><p><?= __('onboarding.feat.barcode_desc') ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.alerts') ?></h4><p><?= __('onboarding.feat.alerts_desc') ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.categories') ?></h4><p><?= __('onboarding.feat.categories_desc') ?></p></div></div>
                 </div>
             </div>
 
@@ -368,9 +388,9 @@ loadChart('7d');
                 <div class="ob-title"><?= __('onboarding.step3_title') ?></div>
                 <div class="ob-desc"><?= __('onboarding.step3_desc') ?></div>
                 <div class="ob-features">
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'إدارة الديون' : 'Suivi des credits' ?></h4><p><?= Lang::locale()==='ar' ? 'اعرف من يدين لك بالضبط' : 'Sachez qui vous doit combien' ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'فئات الزبائن' : 'Categories VIP' ?></h4><p><?= Lang::locale()==='ar' ? 'عادي، مميز، عابر' : 'Regular, VIP, Occasionnel' ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'سجل المشتريات' : 'Historique achats' ?></h4><p><?= Lang::locale()==='ar' ? 'كل عمليات الزبون' : 'Toutes les transactions' ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.credits') ?></h4><p><?= __('onboarding.feat.credits_desc') ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.vip') ?></h4><p><?= __('onboarding.feat.vip_desc') ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.history') ?></h4><p><?= __('onboarding.feat.history_desc') ?></p></div></div>
                     <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4>Mobile Money</h4><p>Bankily, Masrivi, Sedad</p></div></div>
                 </div>
             </div>
@@ -381,10 +401,10 @@ loadChart('7d');
                 <div class="ob-title"><?= __('onboarding.step4_title') ?></div>
                 <div class="ob-desc"><?= __('onboarding.step4_desc') ?></div>
                 <div class="ob-features">
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'بيع سريع' : 'Vente rapide' ?></h4><p><?= Lang::locale()==='ar' ? 'واجهة بسيطة وسريعة' : 'Interface simple et rapide' ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'بيع بالدين' : 'Vente a credit' ?></h4><p><?= Lang::locale()==='ar' ? 'تتبع تلقائي للديون' : 'Suivi automatique des dettes' ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'فواتير فورية' : 'Factures instantanees' ?></h4><p><?= Lang::locale()==='ar' ? 'فاتورة تلقائية عند كل بيع' : 'Facture auto a chaque vente' ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= Lang::locale()==='ar' ? 'تقرير الصندوق' : 'Rapport de caisse' ?></h4><p><?= Lang::locale()==='ar' ? 'ملخص نهاية اليوم' : 'Bilan fin de journee' ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.fast_sale') ?></h4><p><?= __('onboarding.feat.fast_sale_desc') ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.credit_sale') ?></h4><p><?= __('onboarding.feat.credit_sale_desc') ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.instant_invoice') ?></h4><p><?= __('onboarding.feat.instant_invoice_desc') ?></p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.cash_report') ?></h4><p><?= __('onboarding.feat.cash_report_desc') ?></p></div></div>
                 </div>
             </div>
 
@@ -402,7 +422,7 @@ loadChart('7d');
             <button class="btn btn-secondary btn-sm" id="obPrev" style="visibility:hidden;" onclick="obNav(-1)">
                 <i class="fas fa-arrow-<?= Lang::isRtl() ? 'right' : 'left' ?>"></i> <?= __('onboarding.prev') ?>
             </button>
-            <button class="btn btn-sm" style="color:var(--text-muted);" id="obSkip" onclick="obSkip()">
+            <button class="btn btn-sm btn-ghost" id="obSkip" onclick="obSkip()">
                 <?= __('onboarding.skip') ?>
             </button>
             <button class="btn btn-primary btn-sm" id="obNext" onclick="obNav(1)">
@@ -472,12 +492,10 @@ loadChart('7d');
             });
     };
 
-    // Prevent closing by clicking overlay
     document.getElementById('onboardingModal').addEventListener('click', function(e) {
         if (e.target === this) e.stopPropagation();
     });
 
-    // Clickable dots
     document.querySelectorAll('.ob-dot').forEach(d => {
         d.addEventListener('click', function() {
             step = parseInt(this.dataset.s);

@@ -1,15 +1,15 @@
 <?php if (!$session): ?>
 <!-- Open Cash Session -->
 <div class="card" style="max-width: 500px; margin: 60px auto;">
-    <div class="card-header"><h3><i class="fas fa-cash-register" style="margin-right:8px;color:var(--primary);"></i>Ouvrir la caisse</h3></div>
+    <div class="card-header"><h3><i class="fas fa-cash-register" style="margin-right:8px;color:var(--primary);"></i><?= __('pos.open') ?></h3></div>
     <div class="card-body">
         <form method="POST" action="<?= url('/caisse/open') ?>">
             <?= csrf_field() ?>
             <div class="form-group">
-                <label class="form-label">Fond de caisse initial (DA)</label>
+                <label class="form-label"><?= __('pos.opening_balance') ?> (<?= CURRENCY ?>)</label>
                 <input type="number" name="opening_balance" class="form-control" step="0.01" min="0" value="0" style="font-size:24px;font-weight:700;text-align:center;font-family:var(--font-mono);" required autofocus>
             </div>
-            <button type="submit" class="btn btn-success btn-lg w-100" style="justify-content:center;"><i class="fas fa-door-open"></i> Ouvrir la caisse</button>
+            <button type="submit" class="btn btn-success btn-lg w-100" style="justify-content:center;"><i class="fas fa-door-open"></i> <?= __('pos.open') ?></button>
         </form>
     </div>
 </div>
@@ -21,11 +21,11 @@
         <div style="margin-bottom: 12px; display: flex; gap: 8px;">
             <div class="toolbar-search" style="flex:1;max-width:100%;">
                 <span class="search-icon"><i class="fas fa-search"></i></span>
-                <input type="text" id="posSearch" class="form-control" placeholder="Rechercher ou scanner un code-barres..." autofocus>
+                <input type="text" id="posSearch" class="form-control" placeholder="<?= __('pos.search') ?>" autofocus>
             </div>
         </div>
         <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
-            <button class="btn btn-sm btn-primary cat-filter active" data-cat="all">Tout</button>
+            <button class="btn btn-sm btn-primary cat-filter active" data-cat="all"><?= __('pos.all') ?></button>
             <?php foreach ($categories as $cat): ?>
             <button class="btn btn-sm btn-secondary cat-filter" data-cat="<?= $cat['id'] ?>"><?= e($cat['name']) ?></button>
             <?php endforeach; ?>
@@ -35,7 +35,7 @@
             <div class="pos-product-card" data-id="<?= $p['id'] ?>" data-name="<?= e($p['name']) ?>" data-price="<?= $p['selling_price'] ?>" data-tax="<?= $p['tax_rate'] ?>" data-stock="<?= $p['current_stock'] ?>" data-cat="<?= $p['category_id'] ?>" data-ref="<?= e($p['reference']) ?>" data-barcode="<?= e($p['barcode'] ?? '') ?>">
                 <div class="name"><?= e($p['name']) ?></div>
                 <div class="price"><?= formatMoney($p['selling_price']) ?></div>
-                <div class="stock">Stock: <?= $p['current_stock'] ?></div>
+                <div class="stock"><?= __('pos.stock_label') ?>: <?= $p['current_stock'] ?></div>
             </div>
             <?php endforeach; ?>
         </div>
@@ -44,54 +44,54 @@
     <!-- Cart -->
     <div class="pos-cart">
         <div class="pos-cart-header">
-            <i class="fas fa-shopping-cart" style="margin-right: 8px;"></i>Panier
+            <i class="fas fa-shopping-cart" style="margin-right: 8px;"></i><?= __('pos.cart') ?>
             <span id="cartCount" style="margin-left: auto; background: var(--primary); color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px;">0</span>
         </div>
 
         <!-- Client Selection -->
         <div style="padding: 10px 16px; border-bottom: 1px solid var(--border);">
-            <input type="text" id="clientSearch" class="form-control" placeholder="Rechercher client (optionnel)..." style="font-size: 12px; padding: 8px 12px;">
+            <input type="text" id="clientSearch" class="form-control" placeholder="<?= __('pos.client_search') ?>" style="font-size: 12px; padding: 8px 12px;">
             <div id="clientResult" style="font-size: 12px; margin-top: 4px; color: var(--text-secondary);"></div>
         </div>
 
         <div class="pos-cart-items" id="cartItems">
             <div class="empty-state" id="cartEmpty" style="padding: 40px 20px;">
                 <div class="icon"><i class="fas fa-shopping-basket"></i></div>
-                <p>Panier vide</p>
+                <p><?= __('pos.cart_empty') ?></p>
             </div>
         </div>
 
         <div class="pos-cart-totals">
-            <div class="pos-total-row"><span>Sous-total HT</span><span class="amount" id="subtotal">0,00 DA</span></div>
-            <div class="pos-total-row"><span>TVA</span><span class="amount" id="taxTotal">0,00 DA</span></div>
-            <div class="pos-total-row grand-total"><span>TOTAL TTC</span><span class="amount" id="grandTotal">0,00 DA</span></div>
+            <div class="pos-total-row"><span><?= __('invoices.subtotal') ?></span><span class="amount" id="subtotal">0,00 <?= CURRENCY ?></span></div>
+            <div class="pos-total-row"><span><?= __('invoices.tax') ?></span><span class="amount" id="taxTotal">0,00 <?= CURRENCY ?></span></div>
+            <div class="pos-total-row grand-total"><span><?= __('invoices.total_ttc') ?></span><span class="amount" id="grandTotal">0,00 <?= CURRENCY ?></span></div>
         </div>
 
         <div class="pos-actions">
-            <button class="btn btn-warning" onclick="holdCart()"><i class="fas fa-pause"></i> Attente</button>
-            <button class="btn btn-danger" onclick="clearCart()"><i class="fas fa-times"></i> Annuler</button>
-            <button class="btn btn-success btn-pay" onclick="openPayment()"><i class="fas fa-money-bill-wave"></i> PAYER</button>
+            <button class="btn btn-warning" onclick="holdCart()"><i class="fas fa-pause"></i> <?= __('pos.hold') ?></button>
+            <button class="btn btn-danger" onclick="clearCart()"><i class="fas fa-times"></i> <?= __('pos.cancel') ?></button>
+            <button class="btn btn-success btn-pay" onclick="openPayment()"><i class="fas fa-money-bill-wave"></i> <?= __('pos.pay') ?></button>
         </div>
     </div>
 </div>
 
 <!-- Close Session Button -->
 <div style="margin-top: 16px; text-align: right;">
-    <button class="btn btn-sm btn-secondary" onclick="openModal('closeModal')"><i class="fas fa-door-closed"></i> Cloturer la caisse</button>
-    <a href="<?= url('/caisse/history') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-history"></i> Historique</a>
+    <button class="btn btn-sm btn-secondary" onclick="openModal('closeModal')"><i class="fas fa-door-closed"></i> <?= __('pos.close_session') ?></button>
+    <a href="<?= url('/caisse/history') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-history"></i> <?= __('pos.history') ?></a>
 </div>
 
 <!-- Payment Modal -->
 <div class="modal-overlay" id="payModal">
     <div class="modal">
-        <div class="modal-header"><h3>Paiement</h3><button class="modal-close" onclick="closeModal('payModal')">&times;</button></div>
+        <div class="modal-header"><h3><?= __('pos.payment') ?></h3><button class="modal-close" onclick="closeModal('payModal')">&times;</button></div>
         <div class="modal-body">
             <div style="text-align:center;margin-bottom:20px;">
-                <div style="font-size:14px;color:var(--text-secondary);">Total a payer</div>
-                <div style="font-size:36px;font-weight:800;font-family:var(--font-mono);color:var(--primary);" id="payTotal">0,00 DA</div>
+                <div style="font-size:14px;color:var(--text-secondary);"><?= __('pos.total_to_pay') ?></div>
+                <div style="font-size:36px;font-weight:800;font-family:var(--font-mono);color:var(--primary);" id="payTotal">0,00 <?= CURRENCY ?></div>
             </div>
             <div class="form-group">
-                <label class="form-label">Mode de paiement</label>
+                <label class="form-label"><?= __('pos.payment_method') ?></label>
                 <select id="payMethod" class="form-control">
                     <option value="cash"><?= __('payments.method.cash') ?></option>
                     <option value="card"><?= __('payments.method.card') ?></option>
@@ -104,22 +104,22 @@
                 </select>
             </div>
             <div class="form-group" id="cashGroup">
-                <label class="form-label">Montant recu</label>
+                <label class="form-label"><?= __('pos.amount_received') ?></label>
                 <input type="number" id="payAmount" class="form-control" step="0.01" min="0" style="font-size:24px;font-weight:700;text-align:center;font-family:var(--font-mono);">
             </div>
             <div id="changeDisplay" style="text-align:center;padding:12px;border-radius:var(--radius);background:rgba(39,174,96,0.08);display:none;">
-                <div style="font-size:13px;color:var(--text-secondary);">Monnaie a rendre</div>
-                <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--success);" id="changeAmount">0,00 DA</div>
+                <div style="font-size:13px;color:var(--text-secondary);"><?= __('pos.change') ?></div>
+                <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);color:var(--success);" id="changeAmount">0,00 <?= CURRENCY ?></div>
             </div>
             <div class="form-group" style="margin-top:12px;">
                 <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                    <input type="checkbox" id="creditSale"> Vente a credit
+                    <input type="checkbox" id="creditSale"> <?= __('pos.credit_sale') ?>
                 </label>
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeModal('payModal')">Annuler</button>
-            <button class="btn btn-success" onclick="completeSale()"><i class="fas fa-check"></i> Valider le paiement</button>
+            <button class="btn btn-secondary" onclick="closeModal('payModal')"><?= __('common.cancel') ?></button>
+            <button class="btn btn-success" onclick="completeSale()"><i class="fas fa-check"></i> <?= __('pos.validate') ?></button>
         </div>
     </div>
 </div>
@@ -127,27 +127,27 @@
 <!-- Close Session Modal -->
 <div class="modal-overlay" id="closeModal">
     <div class="modal">
-        <div class="modal-header"><h3>Cloturer la caisse</h3><button class="modal-close" onclick="closeModal('closeModal')">&times;</button></div>
+        <div class="modal-header"><h3><?= __('pos.close') ?></h3><button class="modal-close" onclick="closeModal('closeModal')">&times;</button></div>
         <form method="POST" action="<?= url('/caisse/close') ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">Fond de caisse initial</label>
+                    <label class="form-label"><?= __('pos.opening_initial') ?></label>
                     <div class="text-mono fw-bold" style="font-size:18px;"><?= formatMoney($session['opening_balance']) ?></div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Solde reel en caisse</label>
+                    <label class="form-label"><?= __('pos.closing_balance') ?></label>
                     <input type="number" name="closing_balance" class="form-control" step="0.01" min="0" style="font-size:20px;font-weight:700;font-family:var(--font-mono);" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Notes</label>
+                    <label class="form-label"><?= __('common.notes') ?></label>
                     <textarea name="notes" class="form-control" rows="2"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('closeModal')">Annuler</button>
-                <button type="submit" class="btn btn-danger"><i class="fas fa-door-closed"></i> Cloturer</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('closeModal')"><?= __('common.cancel') ?></button>
+                <button type="submit" class="btn btn-danger"><i class="fas fa-door-closed"></i> <?= __('pos.close') ?></button>
             </div>
         </form>
     </div>
@@ -158,6 +158,13 @@ let cart = [];
 let selectedCustomer = null;
 const sessionId = '<?= $session['id'] ?>';
 const csrfToken = '<?= csrf_token() ?>';
+const POS_LANG = {
+    cartEmpty: '<?= __('pos.cart_empty') ?>',
+    clearConfirm: '<?= __('pos.clear_confirm') ?>',
+    noClient: '<?= __('pos.no_client') ?>',
+    sale: '<?= __('invoices.invoice') ?>',
+    change: '<?= __('pos.change') ?>'
+};
 
 // Product click
 document.querySelectorAll('.pos-product-card').forEach(card => {
@@ -226,7 +233,7 @@ document.getElementById('clientSearch').addEventListener('input', function() {
                         <b>${c.first_name || ''} ${c.last_name}</b> ${c.phone ? '- '+c.phone : ''}
                     </div>`;
                 });
-                document.getElementById('clientResult').innerHTML = html || '<div style="padding:6px;color:var(--text-muted);">Aucun client trouve</div>';
+                document.getElementById('clientResult').innerHTML = html || '<div style="padding:6px;color:var(--text-muted);">' + POS_LANG.noClient + '</div>';
             });
     }, 300);
 });
@@ -241,7 +248,7 @@ function renderCart() {
     const container = document.getElementById('cartItems');
     const emptyHtml = `<div class="empty-state" style="padding: 40px 20px;">
         <div class="icon"><i class="fas fa-shopping-basket"></i></div>
-        <p>Panier vide</p>
+        <p>${POS_LANG.cartEmpty}</p>
     </div>`;
 
     if (cart.length === 0) {
@@ -288,7 +295,7 @@ function changeQty(index, delta) {
 }
 
 function removeItem(index) { cart.splice(index, 1); renderCart(); }
-function clearCart() { if (cart.length === 0 || confirm('Vider le panier ?')) { cart = []; renderCart(); } }
+function clearCart() { if (cart.length === 0 || confirm(POS_LANG.clearConfirm)) { cart = []; renderCart(); } }
 function holdCart() { alert('Fonctionnalite en attente disponible prochainement.'); }
 
 function openPayment() {
@@ -336,7 +343,7 @@ function completeSale() {
             // Success notification
             const toast = document.createElement('div');
             toast.className = 'toast toast-success';
-            toast.innerHTML = `<i class="fas fa-check-circle"></i> Vente ${data.invoice_number} - Total: ${formatMoney(data.total)}${data.change > 0 ? ' | Monnaie: '+formatMoney(data.change) : ''}`;
+            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${POS_LANG.sale} ${data.invoice_number} - Total: ${formatMoney(data.total)}${data.change > 0 ? ' | ' + POS_LANG.change + ': '+formatMoney(data.change) : ''}`;
             const container = document.querySelector('.toast-container') || (() => { const c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); return c; })();
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 5000);

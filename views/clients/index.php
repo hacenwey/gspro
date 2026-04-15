@@ -2,17 +2,17 @@
     <div class="toolbar-search">
         <span class="search-icon"><i class="fas fa-search"></i></span>
         <form method="GET" action="<?= url('/clients') ?>" style="display:contents;">
-            <input type="text" name="search" class="form-control" placeholder="Rechercher par nom, telephone, email..." value="<?= e($search) ?>">
+            <input type="text" name="search" class="form-control" placeholder="<?= __('clients.search') ?>" value="<?= e($search) ?>">
         </form>
     </div>
     <div class="toolbar-filters">
         <select class="form-control" style="width:auto;" onchange="window.location.href='<?= url('/clients') ?>?search=<?= urlencode($search) ?>&category='+this.value">
-            <option value="">Toutes categories</option>
-            <option value="vip" <?= $categoryFilter === 'vip' ? 'selected' : '' ?>>VIP</option>
-            <option value="regular" <?= $categoryFilter === 'regular' ? 'selected' : '' ?>>Regulier</option>
-            <option value="occasional" <?= $categoryFilter === 'occasional' ? 'selected' : '' ?>>Occasionnel</option>
+            <option value=""><?= __('clients.all_categories') ?></option>
+            <option value="vip" <?= $categoryFilter === 'vip' ? 'selected' : '' ?>><?= __('clients.cat.vip') ?></option>
+            <option value="regular" <?= $categoryFilter === 'regular' ? 'selected' : '' ?>><?= __('clients.cat.regular') ?></option>
+            <option value="occasional" <?= $categoryFilter === 'occasional' ? 'selected' : '' ?>><?= __('clients.cat.occasional') ?></option>
         </select>
-        <a href="<?= url('/clients/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau client</a>
+        <a href="<?= url('/clients/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> <?= __('clients.new') ?></a>
     </div>
 </div>
 
@@ -21,27 +21,27 @@
         <?php if (empty($items)): ?>
         <div class="empty-state">
             <div class="icon"><i class="fas fa-users"></i></div>
-            <h4>Aucun client</h4>
-            <p>Ajoutez votre premier client.</p>
-            <a href="<?= url('/clients/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau client</a>
+            <h4><?= __('clients.no_clients') ?></h4>
+            <p><?= __('clients.start_add') ?></p>
+            <a href="<?= url('/clients/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> <?= __('clients.new') ?></a>
         </div>
         <?php else: ?>
         <div class="table-responsive">
             <table class="table">
-                <thead><tr><th>Client</th><th>Telephone</th><th>Email</th><th>Categorie</th><th class="text-right">Solde</th><th class="text-right">Actions</th></tr></thead>
+                <thead><tr><th><?= __('clients.title') ?></th><th><?= __('clients.phone') ?></th><th><?= __('clients.email') ?></th><th><?= __('clients.category') ?></th><th class="text-right"><?= __('clients.balance') ?></th><th class="text-right"><?= __('common.actions') ?></th></tr></thead>
                 <tbody>
                 <?php foreach ($items as $c): ?>
                 <tr>
                     <td>
                         <div class="d-flex align-center gap-1">
-                            <div style="width:36px;height:36px;border-radius:50%;background:<?= $c['category'] === 'vip' ? 'linear-gradient(135deg,#F39C12,#E67E22)' : ($c['category'] === 'regular' ? 'var(--primary)' : 'var(--text-muted)') ?>;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0;">
+                            <div style="width:36px;height:36px;border-radius:var(--radius);background:<?= $c['category'] === 'vip' ? 'linear-gradient(135deg,#F59E0B,#D97706)' : ($c['category'] === 'regular' ? 'var(--primary)' : 'var(--text-muted)') ?>;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0;">
                                 <?= strtoupper(substr($c['last_name'], 0, 2)) ?>
                             </div>
                             <div>
                                 <a href="<?= url('/clients/view/' . $c['id']) ?>" style="font-weight:600;color:var(--text);">
                                     <?= e(($c['first_name'] ? $c['first_name'] . ' ' : '') . $c['last_name']) ?>
                                 </a>
-                                <div style="font-size:11px;color:var(--text-muted);"><?= $c['type'] === 'company' ? 'Entreprise' : 'Particulier' ?></div>
+                                <div style="font-size:11px;color:var(--text-muted);"><?= $c['type'] === 'company' ? __('clients.type.company') : __('clients.type.individual') ?></div>
                             </div>
                         </div>
                     </td>
@@ -61,7 +61,7 @@
                             <a href="<?= url('/clients/edit/' . $c['id']) ?>" class="btn btn-icon btn-sm btn-secondary"><i class="fas fa-pen"></i></a>
                             <form method="POST" action="<?= url('/clients/delete/' . $c['id']) ?>" style="display:inline;">
                                 <?= csrf_field() ?>
-                                <button type="button" class="btn btn-icon btn-sm btn-danger" onclick="confirmDelete(this.parentNode)"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="btn btn-icon btn-sm btn-danger" onclick="confirmDelete(this.parentNode, '<?= __('common.confirm_delete') ?>')"><i class="fas fa-trash"></i></button>
                             </form>
                         </div>
                     </td>

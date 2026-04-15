@@ -3,25 +3,25 @@
     <div class="toolbar-search">
         <span class="search-icon"><i class="fas fa-search"></i></span>
         <form method="GET" action="<?= url('/products') ?>" style="display:contents;">
-            <input type="text" name="search" class="form-control" placeholder="Rechercher produit, reference, code-barres..." value="<?= e($search) ?>">
+            <input type="text" name="search" class="form-control" placeholder="<?= __('products.search') ?>" value="<?= e($search) ?>">
             <?php if ($categoryFilter): ?><input type="hidden" name="category" value="<?= e($categoryFilter) ?>"><?php endif; ?>
             <?php if ($stockFilter): ?><input type="hidden" name="stock" value="<?= e($stockFilter) ?>"><?php endif; ?>
         </form>
     </div>
     <div class="toolbar-filters">
         <select class="form-control" style="width:auto;" onchange="window.location.href='<?= url('/products') ?>?search=<?= urlencode($search) ?>&stock=<?= urlencode($stockFilter) ?>&category='+this.value">
-            <option value="">Toutes categories</option>
+            <option value=""><?= __('products.all_categories') ?></option>
             <?php foreach ($categories as $cat): ?>
             <option value="<?= $cat['id'] ?>" <?= $categoryFilter === $cat['id'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
             <?php endforeach; ?>
         </select>
         <select class="form-control" style="width:auto;" onchange="window.location.href='<?= url('/products') ?>?search=<?= urlencode($search) ?>&category=<?= urlencode($categoryFilter) ?>&stock='+this.value">
-            <option value="">Tout le stock</option>
-            <option value="low" <?= $stockFilter === 'low' ? 'selected' : '' ?>>Stock bas</option>
-            <option value="out" <?= $stockFilter === 'out' ? 'selected' : '' ?>>Rupture</option>
+            <option value=""><?= __('products.all_stock') ?></option>
+            <option value="low" <?= $stockFilter === 'low' ? 'selected' : '' ?>><?= __('products.low_stock') ?></option>
+            <option value="out" <?= $stockFilter === 'out' ? 'selected' : '' ?>><?= __('products.out_of_stock') ?></option>
         </select>
         <a href="<?= url('/products/create') ?>" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nouveau produit
+            <i class="fas fa-plus"></i> <?= __('products.new') ?>
         </a>
     </div>
 </div>
@@ -32,23 +32,23 @@
         <?php if (empty($items)): ?>
         <div class="empty-state">
             <div class="icon"><i class="fas fa-box-open"></i></div>
-            <h4>Aucun produit</h4>
-            <p>Commencez par ajouter votre premier produit.</p>
-            <a href="<?= url('/products/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau produit</a>
+            <h4><?= __('products.no_products') ?></h4>
+            <p><?= __('products.start_add') ?></p>
+            <a href="<?= url('/products/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> <?= __('products.new') ?></a>
         </div>
         <?php else: ?>
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Reference</th>
-                        <th>Designation</th>
-                        <th>Categorie</th>
-                        <th class="text-right">P. Achat</th>
-                        <th class="text-right">P. Vente</th>
-                        <th class="text-center">Stock</th>
-                        <th class="text-center">Statut</th>
-                        <th class="text-right">Actions</th>
+                        <th><?= __('products.reference') ?></th>
+                        <th><?= __('products.designation') ?></th>
+                        <th><?= __('products.category') ?></th>
+                        <th class="text-right"><?= __('products.buy_price') ?></th>
+                        <th class="text-right"><?= __('products.sell_price') ?></th>
+                        <th class="text-center"><?= __('common.stock') ?></th>
+                        <th class="text-center"><?= __('common.status') ?></th>
+                        <th class="text-right"><?= __('common.actions') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,11 +74,11 @@
                         </td>
                         <td class="text-right">
                             <div class="btn-group" style="justify-content: flex-end;">
-                                <a href="<?= url('/products/view/' . $p['id']) ?>" class="btn btn-icon btn-sm btn-secondary" title="Voir"><i class="fas fa-eye"></i></a>
-                                <a href="<?= url('/products/edit/' . $p['id']) ?>" class="btn btn-icon btn-sm btn-secondary" title="Modifier"><i class="fas fa-pen"></i></a>
+                                <a href="<?= url('/products/view/' . $p['id']) ?>" class="btn btn-icon btn-sm btn-secondary" title="<?= __('common.view') ?>"><i class="fas fa-eye"></i></a>
+                                <a href="<?= url('/products/edit/' . $p['id']) ?>" class="btn btn-icon btn-sm btn-secondary" title="<?= __('common.edit') ?>"><i class="fas fa-pen"></i></a>
                                 <form method="POST" action="<?= url('/products/delete/' . $p['id']) ?>" style="display:inline;">
                                     <?= csrf_field() ?>
-                                    <button type="button" class="btn btn-icon btn-sm btn-danger" onclick="confirmDelete(this.parentNode)" title="Supprimer"><i class="fas fa-trash"></i></button>
+                                    <button type="button" class="btn btn-icon btn-sm btn-danger" onclick="confirmDelete(this.parentNode, '<?= __('common.confirm_delete') ?>')" title="<?= __('common.delete') ?>"><i class="fas fa-trash"></i></button>
                                 </form>
                             </div>
                         </td>
@@ -102,5 +102,5 @@
 </div>
 
 <div style="margin-top: 12px; color: var(--text-muted); font-size: 13px;">
-    Total: <?= $total ?> produit(s)
+    <?= __('common.total') ?>: <?= $total ?> <?= __('common.product') ?>(s)
 </div>

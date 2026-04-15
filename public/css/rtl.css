@@ -17,6 +17,13 @@
     margin-right: var(--sidebar-width);
 }
 
+/* === Nav active indicator === */
+.nav-item.active::before {
+    left: auto;
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+
 /* === Text alignment === */
 .table thead th {
     text-align: right;
@@ -60,9 +67,9 @@ select.form-control {
     left: 20px;
 }
 
-@keyframes slideIn {
-    from { transform: translateX(-100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+@keyframes toastIn {
+    from { transform: translateX(-100%) scale(0.9); opacity: 0; }
+    to { transform: translateX(0) scale(1); opacity: 1; }
 }
 
 /* === Sidebar User === */
@@ -88,6 +95,11 @@ select.form-control {
 /* === Modal === */
 .modal-footer {
     justify-content: flex-start;
+}
+
+/* === Buttons group in table === */
+.btn-group {
+    flex-direction: row-reverse;
 }
 
 /* === Responsive === */

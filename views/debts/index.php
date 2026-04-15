@@ -5,21 +5,21 @@
             <i class="fas fa-<?= $typeFilter === 'receivable' ? 'hand-holding-dollar' : 'file-invoice-dollar' ?>"></i>
         </div>
         <div class="kpi-info">
-            <div class="kpi-label">Total <?= $typeFilter === 'receivable' ? 'creances' : 'dettes' ?></div>
+            <div class="kpi-label"><?= __('debts.total_due') ?> <?= $typeFilter === 'receivable' ? __('debts.receivable') : __('debts.payable') ?></div>
             <div class="kpi-value"><?= formatMoney($totalDue) ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon red"><i class="fas fa-exclamation-circle"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">En retard</div>
+            <div class="kpi-label"><?= __('debts.overdue') ?></div>
             <div class="kpi-value"><?= $overdueCount ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon green"><i class="fas fa-list"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Total lignes</div>
+            <div class="kpi-label"><?= __('debts.total_lines') ?></div>
             <div class="kpi-value"><?= $total ?></div>
         </div>
     </div>
@@ -27,18 +27,18 @@
 
 <!-- Tabs -->
 <div class="tabs">
-    <a href="<?= url('/debts?type=receivable') ?>" class="tab <?= $typeFilter === 'receivable' ? 'active' : '' ?>"><i class="fas fa-arrow-down" style="margin-right:6px;color:var(--success);"></i>Creances clients</a>
-    <a href="<?= url('/debts?type=payable') ?>" class="tab <?= $typeFilter === 'payable' ? 'active' : '' ?>"><i class="fas fa-arrow-up" style="margin-right:6px;color:var(--danger);"></i>Dettes fournisseurs</a>
+    <a href="<?= url('/debts?type=receivable') ?>" class="tab <?= $typeFilter === 'receivable' ? 'active' : '' ?>"><i class="fas fa-arrow-down" style="color:var(--success);"></i> <?= __('debts.receivable') ?></a>
+    <a href="<?= url('/debts?type=payable') ?>" class="tab <?= $typeFilter === 'payable' ? 'active' : '' ?>"><i class="fas fa-arrow-up" style="color:var(--danger);"></i> <?= __('debts.payable') ?></a>
 </div>
 
 <div class="toolbar">
     <div class="toolbar-filters">
         <select class="form-control" style="width:auto;" onchange="window.location.href='<?= url('/debts') ?>?type=<?= $typeFilter ?>&status='+this.value">
-            <option value="">Tous statuts</option>
-            <option value="pending" <?= $statusFilter === 'pending' ? 'selected' : '' ?>>En attente</option>
-            <option value="partial" <?= $statusFilter === 'partial' ? 'selected' : '' ?>>Partiel</option>
-            <option value="overdue" <?= $statusFilter === 'overdue' ? 'selected' : '' ?>>En retard</option>
-            <option value="paid" <?= $statusFilter === 'paid' ? 'selected' : '' ?>>Paye</option>
+            <option value=""><?= __('debts.all_statuses') ?></option>
+            <option value="pending" <?= $statusFilter === 'pending' ? 'selected' : '' ?>><?= __('status.pending') ?></option>
+            <option value="partial" <?= $statusFilter === 'partial' ? 'selected' : '' ?>><?= __('status.partial') ?></option>
+            <option value="overdue" <?= $statusFilter === 'overdue' ? 'selected' : '' ?>><?= __('status.overdue') ?></option>
+            <option value="paid" <?= $statusFilter === 'paid' ? 'selected' : '' ?>><?= __('status.paid') ?></option>
         </select>
     </div>
 </div>
@@ -48,19 +48,19 @@
         <?php if (empty($items)): ?>
         <div class="empty-state">
             <div class="icon"><i class="fas fa-hand-holding-dollar"></i></div>
-            <h4>Aucune <?= $typeFilter === 'receivable' ? 'creance' : 'dette' ?></h4>
+            <h4><?= __('debts.no_debts') ?> <?= $typeFilter === 'receivable' ? __('debts.receivable') : __('debts.payable') ?></h4>
         </div>
         <?php else: ?>
         <table class="table">
             <thead>
                 <tr>
-                    <th><?= $typeFilter === 'receivable' ? 'Client' : 'Fournisseur' ?></th>
-                    <th>Echeance</th>
-                    <th class="text-right">Montant</th>
-                    <th class="text-right">Paye</th>
-                    <th class="text-right">Reste du</th>
-                    <th>Statut</th>
-                    <th class="text-right">Actions</th>
+                    <th><?= $typeFilter === 'receivable' ? __('invoices.client') : __('suppliers.title') ?></th>
+                    <th><?= __('debts.due_date') ?></th>
+                    <th class="text-right"><?= __('debts.amount') ?></th>
+                    <th class="text-right"><?= __('debts.paid') ?></th>
+                    <th class="text-right"><?= __('debts.remaining') ?></th>
+                    <th><?= __('common.status') ?></th>
+                    <th class="text-right"><?= __('common.actions') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -76,7 +76,7 @@
                     <?php if ($d['status'] === 'overdue'): ?>
                     <div style="font-size:11px;color:var(--danger);">
                         <?php $days = (int)((time() - strtotime($d['due_date'])) / 86400); ?>
-                        <?= $days ?> jour(s) de retard
+                        <?= $days ?> <?= __('debts.days_overdue') ?>
                     </div>
                     <?php endif; ?>
                 </td>
@@ -87,7 +87,7 @@
                 <td class="text-right">
                     <?php if ($d['status'] !== 'paid'): ?>
                     <button class="btn btn-sm btn-success" onclick="openPayModal('<?= $d['id'] ?>', <?= $d['remaining'] ?>)">
-                        <i class="fas fa-money-bill"></i> Payer
+                        <i class="fas fa-money-bill"></i> <?= __('debts.pay') ?>
                     </button>
                     <?php endif; ?>
                 </td>
@@ -109,20 +109,20 @@
 <!-- Payment Modal -->
 <div class="modal-overlay" id="payDebtModal">
     <div class="modal">
-        <div class="modal-header"><h3>Enregistrer un paiement</h3><button class="modal-close" onclick="closeModal('payDebtModal')">&times;</button></div>
+        <div class="modal-header"><h3><?= __('debts.record_payment') ?></h3><button class="modal-close" onclick="closeModal('payDebtModal')">&times;</button></div>
         <form method="POST" id="payDebtForm" action="">
             <?= csrf_field() ?>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">Montant restant du</label>
+                    <label class="form-label"><?= __('debts.remaining_due') ?></label>
                     <div class="text-mono fw-bold text-danger" style="font-size:20px;" id="debtRemaining"></div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Montant du paiement *</label>
+                    <label class="form-label"><?= __('debts.payment_amount') ?> *</label>
                     <input type="number" name="amount" id="debtPayAmount" class="form-control" step="0.01" min="0.01" required style="font-size:18px;font-weight:700;font-family:var(--font-mono);text-align:center;">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Mode de paiement</label>
+                    <label class="form-label"><?= __('debts.payment_method') ?></label>
                     <select name="method" class="form-control">
                         <option value="cash"><?= __('payments.method.cash') ?></option>
                         <option value="card"><?= __('payments.method.card') ?></option>
@@ -134,13 +134,13 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Notes</label>
+                    <label class="form-label"><?= __('common.notes') ?></label>
                     <textarea name="notes" class="form-control" rows="2"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('payDebtModal')">Annuler</button>
-                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Valider</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('payDebtModal')"><?= __('common.cancel') ?></button>
+                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> <?= __('common.validate') ?></button>
             </div>
         </form>
     </div>

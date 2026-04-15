@@ -2,21 +2,21 @@
     <div class="kpi-card">
         <div class="kpi-icon green"><i class="fas fa-arrow-down"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Total encaissements</div>
+            <div class="kpi-label"><?= __('payments.total_in') ?></div>
             <div class="kpi-value"><?= formatMoney($totalIn) ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon red"><i class="fas fa-arrow-up"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Total decaissements</div>
+            <div class="kpi-label"><?= __('payments.total_out') ?></div>
             <div class="kpi-value"><?= formatMoney($totalOut) ?></div>
         </div>
     </div>
     <div class="kpi-card">
         <div class="kpi-icon blue"><i class="fas fa-balance-scale"></i></div>
         <div class="kpi-info">
-            <div class="kpi-label">Solde net</div>
+            <div class="kpi-label"><?= __('payments.net_balance') ?></div>
             <div class="kpi-value"><?= formatMoney($totalIn - $totalOut) ?></div>
         </div>
     </div>
@@ -25,13 +25,13 @@
 <div class="toolbar">
     <div class="toolbar-filters">
         <select class="form-control" style="width:auto;" onchange="window.location.href='<?= url('/payments') ?>?type='+this.value+'&method=<?= $methodFilter ?>'">
-            <option value="">Tous types</option>
-            <option value="incoming" <?= $typeFilter === 'incoming' ? 'selected' : '' ?>>Encaissements</option>
-            <option value="outgoing" <?= $typeFilter === 'outgoing' ? 'selected' : '' ?>>Decaissements</option>
+            <option value=""><?= __('payments.all_types') ?></option>
+            <option value="incoming" <?= $typeFilter === 'incoming' ? 'selected' : '' ?>><?= __('payments.incoming') ?></option>
+            <option value="outgoing" <?= $typeFilter === 'outgoing' ? 'selected' : '' ?>><?= __('payments.outgoing') ?></option>
         </select>
         <select class="form-control" style="width:auto;" onchange="window.location.href='<?= url('/payments') ?>?type=<?= $typeFilter ?>&method='+this.value">
-            <option value="">Tous moyens</option>
-            <?php foreach (['cash'=>'Especes','card'=>'Carte','check'=>'Cheque','transfer'=>'Virement','mobile'=>'Mobile'] as $k => $v): ?>
+            <option value=""><?= __('payments.all_methods') ?></option>
+            <?php foreach (['cash'=>__('payments.method.cash'),'card'=>__('payments.method.card'),'bankily'=>__('payments.method.bankily'),'masrivi'=>__('payments.method.masrivi'),'sedad'=>__('payments.method.sedad'),'check'=>__('payments.method.check'),'transfer'=>__('payments.method.transfer'),'mobile'=>__('payments.method.mobile')] as $k => $v): ?>
             <option value="<?= $k ?>" <?= $methodFilter === $k ? 'selected' : '' ?>><?= $v ?></option>
             <?php endforeach; ?>
         </select>
@@ -41,17 +41,17 @@
 <div class="card">
     <div class="card-body" style="padding:0;">
         <?php if (empty($items)): ?>
-        <div class="empty-state"><div class="icon"><i class="fas fa-money-bill-wave"></i></div><h4>Aucun paiement</h4></div>
+        <div class="empty-state"><div class="icon"><i class="fas fa-money-bill-wave"></i></div><h4><?= __('payments.no_payments') ?></h4></div>
         <?php else: ?>
         <table class="table">
-            <thead><tr><th>Date</th><th>Type</th><th>Facture</th><th>Tiers</th><th>Methode</th><th class="text-right">Montant</th><th>Par</th></tr></thead>
+            <thead><tr><th><?= __('common.date') ?></th><th><?= __('common.type') ?></th><th><?= __('invoices.invoice') ?></th><th><?= __('debts.party') ?></th><th><?= __('common.method') ?></th><th class="text-right"><?= __('common.amount') ?></th><th><?= __('common.by') ?></th></tr></thead>
             <tbody>
             <?php foreach ($items as $p): ?>
             <tr>
                 <td style="font-size:12px;"><?= formatDate($p['payment_date']) ?></td>
                 <td>
                     <span class="badge badge-<?= $p['type'] === 'incoming' ? 'success' : 'danger' ?>">
-                        <?= $p['type'] === 'incoming' ? 'Encaissement' : 'Decaissement' ?>
+                        <?= $p['type'] === 'incoming' ? __('payments.incoming') : __('payments.outgoing') ?>
                     </span>
                 </td>
                 <td class="text-mono" style="font-size:12px;"><?= e($p['invoice_number'] ?? '-') ?></td>
