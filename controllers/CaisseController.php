@@ -1,0 +1,177 @@
+<?php
+class CaisseController extends Controller {
+
+    public function index(): void {
+        $this->requireAuth();
+
+        // Check for open session
+        $session = $this->db->prepare("SELECT * FROM cash_sessions WHERE user_id = ? AND status = 'open' ORDER BY opened_at DESC LIMIT 1");
+        $session->execute([$_SESSION['user_id']]);
+        $session = $session->fetch();
+
+        $categories = $this->db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
+        $products = $this->db->query("SELECT id, name, reference, barcode, selling_price, tax_rate, current_stock, unit, category_id FROM products WHERE is_active = 1 AND current_stock > 0 ORDER BY name")->fetchAll();
+
+        $this->render('caisse/index', [
+            'pageTitle' => 'Caisse (POS)',
+            'session' => $session,
+            'categories' => $categories,
+            'products' => $products
+        ]);
+    }
+
+    public function open(): void {
+        $this->requireAuth();
+        if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/caisse'); }
+
+        $stmt = $this->db->prepare("INSERT INTO cash_sessions (id, user_id, opening_balance) VALUES (?, ?, ?)");
+        $stmt->execute([$this->generateUUID(), $_SESSION['user_id'], $this->input('opening_balance', 0)]);
+
+        $this->flash('success', 'Caisse ouverte.');
+        $this->redirect('/caisse');
+    }
+
+    public function close(): void {
+        $this->requireAuth();
+        if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/caisse'); }
+
+        $sessionId = $this->input('session_id');
+        $closingBalance = $this->input('closing_balance', 0);
+
+        // Calculate expected balance
+        $session = $this->db->prepare("SELECT * FROM cash_sessions WHERE id = ?");
+        $session->execute([$sessionId]);
+        $session = $session->fetch();
+
+        $cashPayments = $this->db->prepare("SELECT COALESCE(SUM(CASE WHEN type='incoming' THEN amount ELSE -amount END), 0) FROM payments WHERE cash_session_id = ? AND method = 'cash'");
+        $cashPayments->execute([$sessionId]);
+        $cashTotal = $cashPayments->fetchColumn();
+
+        $expectedBalance = $session['opening_balance'] + $cashTotal;
+        $difference = $closingBalance - $expectedBalance;
+
+        $stmt = $this->db->prepare("UPDATE cash_sessions SET closed_at = NOW(), closing_balance = ?, expected_balance = ?, difference = ?, status = 'closed', notes = ? WHERE id = ?");
+        $stmt->execute([$closingBalance, $expectedBalance, $difference, $this->input('notes'), $sessionId]);
+
+        $this->flash('success', 'Caisse cloturee. Ecart: ' . number_format($difference, 2) . ' DA');
+        $this->redirect('/caisse');
+    }
+
+    public function sell(): void {
+        $this->requireAuth();
+        if (!verify_csrf()) { $this->json(['error' => 'Token invalide'], 403); }
+
+        $items = json_decode($this->input('items', '[]'), true);
+        $customerId = $this->input('customer_id') ?: null;
+        $paymentMethod = $this->input('payment_method', 'cash');
+        $amountPaid = (float)$this->input('amount_paid', 0);
+        $sessionId = $this->input('session_id');
+        $isCredit = $this->input('is_credit') === '1';
+
+        if (empty($items)) {
+            $this->json(['error' => 'Panier vide'], 400);
+        }
+
+        if ($isCredit && !$customerId) {
+            $this->json(['error' => 'Un client est requis pour une vente a credit'], 400);
+        }
+
+        $this->db->beginTransaction();
+        try {
+            // Calculate totals
+            $subtotal = 0;
+            $taxAmount = 0;
+            $invoiceItems = [];
+
+            foreach ($items as $item) {
+                $product = $this->db->prepare("SELECT * FROM products WHERE id = ?");
+                $product->execute([$item['id']]);
+                $product = $product->fetch();
+
+                if (!$product || $product['current_stock'] < $item['qty']) {
+                    throw new Exception("Stock insuffisant pour: " . ($product['name'] ?? 'inconnu'));
+                }
+
+                $lineSubtotal = $product['selling_price'] * $item['qty'];
+                $lineTax = $lineSubtotal * ($product['tax_rate'] / 100);
+                $lineTotal = $lineSubtotal + $lineTax;
+
+                $subtotal += $lineSubtotal;
+                $taxAmount += $lineTax;
+
+                $invoiceItems[] = [
+                    'product_id' => $product['id'],
+                    'description' => $product['name'],
+                    'quantity' => $item['qty'],
+                    'unit_price' => $product['selling_price'],
+                    'tax_rate' => $product['tax_rate'],
+                    'line_total' => $lineTotal
+                ];
+            }
+
+            $total = $subtotal + $taxAmount;
+            $invoiceId = $this->generateUUID();
+            $invoiceNumber = $this->generateNumber(INVOICE_PREFIX, 'invoices');
+
+            $status = $isCredit ? 'partial' : 'paid';
+            $paid = $isCredit ? $amountPaid : $total;
+
+            // Create invoice
+            $stmt = $this->db->prepare("INSERT INTO invoices (id, number, type, status, customer_id, user_id, issue_date, due_date, subtotal, tax_amount, total, amount_paid) VALUES (?,?,?,?,?,?,CURDATE(),?,?,?,?,?)");
+            $dueDate = $isCredit ? date('Y-m-d', strtotime('+30 days')) : date('Y-m-d');
+            $stmt->execute([$invoiceId, $invoiceNumber, 'invoice', $status, $customerId, $_SESSION['user_id'], $dueDate, $subtotal, $taxAmount, $total, $paid]);
+
+            // Create invoice items & update stock
+            foreach ($invoiceItems as $item) {
+                $this->db->prepare("INSERT INTO invoice_items (id, invoice_id, product_id, description, quantity, unit_price, tax_rate, line_total) VALUES (?,?,?,?,?,?,?,?)")
+                    ->execute([$this->generateUUID(), $invoiceId, $item['product_id'], $item['description'], $item['quantity'], $item['unit_price'], $item['tax_rate'], $item['line_total']]);
+
+                // Update stock
+                $this->db->prepare("UPDATE products SET current_stock = current_stock - ? WHERE id = ?")->execute([$item['quantity'], $item['product_id']]);
+
+                // Stock movement
+                $this->db->prepare("INSERT INTO stock_movements (id, product_id, type, reason, quantity, unit_cost, reference_type, reference_id, user_id) VALUES (?,?,'out','sale',?,?,'invoice',?,?)")
+                    ->execute([$this->generateUUID(), $item['product_id'], $item['quantity'], $item['unit_price'], $invoiceId, $_SESSION['user_id']]);
+            }
+
+            // Record payment
+            if ($paid > 0) {
+                $this->db->prepare("INSERT INTO payments (id, type, invoice_id, customer_id, cash_session_id, amount, method, payment_date, user_id) VALUES (?,?,?,?,?,?,?,CURDATE(),?)")
+                    ->execute([$this->generateUUID(), 'incoming', $invoiceId, $customerId, $sessionId, $paid, $paymentMethod, $_SESSION['user_id']]);
+            }
+
+            // Create debt if credit sale
+            if ($isCredit && $total > $paid) {
+                $this->db->prepare("INSERT INTO debts (id, type, customer_id, invoice_id, total_amount, paid_amount, due_date, status) VALUES (?,?,?,?,?,?,?,?)")
+                    ->execute([$this->generateUUID(), 'receivable', $customerId, $invoiceId, $total, $paid, $dueDate, $paid > 0 ? 'partial' : 'pending']);
+
+                // Update customer balance
+                if ($customerId) {
+                    $remaining = $total - $paid;
+                    $this->db->prepare("UPDATE customers SET balance = balance - ? WHERE id = ?")->execute([$remaining, $customerId]);
+                }
+            }
+
+            $this->db->commit();
+            $this->json(['success' => true, 'invoice_number' => $invoiceNumber, 'total' => $total, 'change' => max(0, $amountPaid - $total)]);
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            $this->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function history(): void {
+        $this->requireAuth();
+        $sessions = $this->db->query("SELECT cs.*, u.full_name FROM cash_sessions cs JOIN users u ON cs.user_id = u.id ORDER BY cs.opened_at DESC LIMIT 30")->fetchAll();
+        $this->render('caisse/history', ['pageTitle' => 'Historique Caisse', 'sessions' => $sessions]);
+    }
+
+    public function searchProducts(): void {
+        $this->requireAuth();
+        $q = $this->input('q', '');
+        $stmt = $this->db->prepare("SELECT id, name, reference, barcode, selling_price, tax_rate, current_stock, unit FROM products WHERE is_active = 1 AND current_stock > 0 AND (name LIKE ? OR reference LIKE ? OR barcode = ?) ORDER BY name LIMIT 20");
+        $stmt->execute(["%$q%", "%$q%", $q]);
+        $this->json($stmt->fetchAll());
+    }
+}

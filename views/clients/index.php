@@ -1,0 +1,82 @@
+<div class="toolbar">
+    <div class="toolbar-search">
+        <span class="search-icon"><i class="fas fa-search"></i></span>
+        <form method="GET" action="<?= url('/clients') ?>" style="display:contents;">
+            <input type="text" name="search" class="form-control" placeholder="Rechercher par nom, telephone, email..." value="<?= e($search) ?>">
+        </form>
+    </div>
+    <div class="toolbar-filters">
+        <select class="form-control" style="width:auto;" onchange="window.location.href='<?= url('/clients') ?>?search=<?= urlencode($search) ?>&category='+this.value">
+            <option value="">Toutes categories</option>
+            <option value="vip" <?= $categoryFilter === 'vip' ? 'selected' : '' ?>>VIP</option>
+            <option value="regular" <?= $categoryFilter === 'regular' ? 'selected' : '' ?>>Regulier</option>
+            <option value="occasional" <?= $categoryFilter === 'occasional' ? 'selected' : '' ?>>Occasionnel</option>
+        </select>
+        <a href="<?= url('/clients/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau client</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        <?php if (empty($items)): ?>
+        <div class="empty-state">
+            <div class="icon"><i class="fas fa-users"></i></div>
+            <h4>Aucun client</h4>
+            <p>Ajoutez votre premier client.</p>
+            <a href="<?= url('/clients/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau client</a>
+        </div>
+        <?php else: ?>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th>Client</th><th>Telephone</th><th>Email</th><th>Categorie</th><th class="text-right">Solde</th><th class="text-right">Actions</th></tr></thead>
+                <tbody>
+                <?php foreach ($items as $c): ?>
+                <tr>
+                    <td>
+                        <div class="d-flex align-center gap-1">
+                            <div style="width:36px;height:36px;border-radius:50%;background:<?= $c['category'] === 'vip' ? 'linear-gradient(135deg,#F39C12,#E67E22)' : ($c['category'] === 'regular' ? 'var(--primary)' : 'var(--text-muted)') ?>;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0;">
+                                <?= strtoupper(substr($c['last_name'], 0, 2)) ?>
+                            </div>
+                            <div>
+                                <a href="<?= url('/clients/view/' . $c['id']) ?>" style="font-weight:600;color:var(--text);">
+                                    <?= e(($c['first_name'] ? $c['first_name'] . ' ' : '') . $c['last_name']) ?>
+                                </a>
+                                <div style="font-size:11px;color:var(--text-muted);"><?= $c['type'] === 'company' ? 'Entreprise' : 'Particulier' ?></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><?= e($c['phone'] ?? '-') ?></td>
+                    <td style="font-size:12px;"><?= e($c['email'] ?? '-') ?></td>
+                    <td>
+                        <span class="badge <?= $c['category'] === 'vip' ? 'badge-vip' : ($c['category'] === 'regular' ? 'badge-primary' : 'badge-secondary') ?>">
+                            <?= strtoupper($c['category']) ?>
+                        </span>
+                    </td>
+                    <td class="text-right text-mono fw-bold <?= $c['balance'] < 0 ? 'text-danger' : '' ?>">
+                        <?= formatMoney($c['balance']) ?>
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group" style="justify-content: flex-end;">
+                            <a href="<?= url('/clients/view/' . $c['id']) ?>" class="btn btn-icon btn-sm btn-secondary"><i class="fas fa-eye"></i></a>
+                            <a href="<?= url('/clients/edit/' . $c['id']) ?>" class="btn btn-icon btn-sm btn-secondary"><i class="fas fa-pen"></i></a>
+                            <form method="POST" action="<?= url('/clients/delete/' . $c['id']) ?>" style="display:inline;">
+                                <?= csrf_field() ?>
+                                <button type="button" class="btn btn-icon btn-sm btn-danger" onclick="confirmDelete(this.parentNode)"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php if ($totalPages > 1): ?>
+        <div class="card-footer"><div class="pagination">
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <a href="<?= url('/clients') ?>?page=<?= $i ?>&search=<?= urlencode($search) ?>&category=<?= urlencode($categoryFilter) ?>" class="<?= $i === $page ? 'active' : '' ?>"><?= $i ?></a>
+            <?php endfor; ?>
+        </div></div>
+        <?php endif; ?>
+        <?php endif; ?>
+    </div>
+</div>
