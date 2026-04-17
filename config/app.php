@@ -1,4 +1,5 @@
 <?php
+if (defined('APP_NAME')) { return; }
 define('APP_NAME', 'GestionPro');
 define('APP_VERSION', '2.0.0');
 define('APP_BASE', '/gestion_commerciale');
