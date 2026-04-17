@@ -72,12 +72,7 @@ class Tenant {
      */
     public static function getMasterDB(): PDO {
         if (self::$masterDb === null) {
-            $dsn = "mysql:host=" . DB_HOST . ";dbname=gestionpro_master;charset=" . DB_CHARSET;
-            self::$masterDb = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ]);
+            self::$masterDb = new PDO(db_dsn('gestionpro_master'), DB_USER, DB_PASS, db_pdo_options());
         }
         return self::$masterDb;
     }
@@ -131,12 +126,7 @@ class Tenant {
                 throw new RuntimeException('No tenant loaded');
             }
             $dbName = self::$current['db_name'];
-            $dsn = "mysql:host=" . DB_HOST . ";dbname=$dbName;charset=" . DB_CHARSET;
-            self::$tenantDb = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ]);
+            self::$tenantDb = new PDO(db_dsn($dbName), DB_USER, DB_PASS, db_pdo_options());
         }
         return self::$tenantDb;
     }
@@ -168,9 +158,7 @@ class Tenant {
         );
 
         // Create tenant database
-        $pdo = new PDO("mysql:host=" . DB_HOST . ";charset=utf8mb4", DB_USER, DB_PASS, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ]);
+        $pdo = new PDO(db_dsn(), DB_USER, DB_PASS, db_pdo_options());
         $pdo->exec("CREATE DATABASE `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
         $pdo->exec("USE `$dbName`");
 
@@ -318,9 +306,7 @@ class Tenant {
 
         if ($tenant) {
             // Drop tenant database
-            $pdo = new PDO("mysql:host=" . DB_HOST . ";charset=utf8mb4", DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
+            $pdo = new PDO(db_dsn(), DB_USER, DB_PASS, db_pdo_options());
             $pdo->exec("DROP DATABASE IF EXISTS `{$tenant['db_name']}`");
 
             // Remove from master
