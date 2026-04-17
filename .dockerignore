@@ -7,10 +7,10 @@ node_modules
 *.log
 *.swp
 *.bak
-Dockerfile
 docker-compose.yml
-docker/
 .dockerignore
+.env
+.env.example
 README.md
 public/uploads/*
 !public/uploads/.gitkeep
