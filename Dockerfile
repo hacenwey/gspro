@@ -33,6 +33,9 @@ RUN { \
     } > /usr/local/etc/php/conf.d/app.ini
 
 COPY docker/apache/gestion_commerciale.conf /etc/apache2/sites-available/000-default.conf
+COPY docker/apache/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
+    && chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /var/www/html/gestion_commerciale
 
@@ -42,3 +45,5 @@ RUN mkdir -p /var/www/html/gestion_commerciale/public/uploads \
     && chown -R www-data:www-data /var/www/html/gestion_commerciale
 
 EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
