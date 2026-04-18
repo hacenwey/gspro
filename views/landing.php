@@ -1,10 +1,10 @@
 <?php
-// Allow manual currency override via ?currency=MRU|EUR (stored in session)
-if (isset($_GET['currency']) && in_array($_GET['currency'], ['MRU', 'EUR'], true)) {
+// Allow manual currency override via ?currency=MRU|USD (stored in session)
+if (isset($_GET['currency']) && in_array($_GET['currency'], ['MRU', 'USD'], true)) {
     $_SESSION['geo_currency'] = [
         'country'  => $_GET['currency'] === 'MRU' ? 'MR' : 'XX',
         'currency' => $_GET['currency'],
-        'symbol'   => $_GET['currency'] === 'MRU' ? 'UM' : '€',
+        'symbol'   => $_GET['currency'] === 'MRU' ? 'UM' : '$',
     ];
 }
 
@@ -302,7 +302,7 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
             <a href="#faq" class="hide-mobile">FAQ</a>
             <span class="currency-switch hide-mobile" title="Devise d'affichage">
                 <a href="?currency=MRU#pricing" class="<?= $cur === 'MRU' ? 'on' : '' ?>">MRU</a>
-                <a href="?currency=EUR#pricing" class="<?= $cur === 'EUR' ? 'on' : '' ?>">EUR</a>
+                <a href="?currency=USD#pricing" class="<?= $cur === 'USD' ? 'on' : '' ?>">USD</a>
             </span>
             <a href="<?= APP_BASE ?>/admin/login" class="hide-mobile" style="font-size:13px;color:var(--text-muted);" title="Administration"><i class="fas fa-shield-halved"></i></a>
             <a href="javascript:void(0)" class="btn-nav" onclick="openRegister()"><i class="fas fa-rocket"></i> Essayer gratuit</a>
@@ -498,7 +498,7 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 
         <p class="pricing-note">
             <i class="fas fa-circle-info"></i>
-            Devise : <strong><?= $cur ?></strong> (<?= $sym ?>) — <a href="?currency=<?= $cur === 'MRU' ? 'EUR' : 'MRU' ?>#pricing" style="color:var(--primary);">afficher en <?= $cur === 'MRU' ? 'EUR' : 'MRU' ?></a>
+            Devise : <strong><?= $cur ?></strong> (<?= $sym ?>) — <a href="?currency=<?= $cur === 'MRU' ? 'USD' : 'MRU' ?>#pricing" style="color:var(--primary);">afficher en <?= $cur === 'MRU' ? 'USD' : 'MRU' ?></a>
         </p>
     </div>
 </section>

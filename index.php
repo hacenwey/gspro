@@ -6,6 +6,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/core/Tenant.php';
 require_once __DIR__ . '/core/LoginLog.php';
 require_once __DIR__ . '/core/GeoCurrency.php';
+require_once __DIR__ . '/core/Polar.php';
 require_once __DIR__ . '/core/helpers.php';
 require_once __DIR__ . '/core/Lang.php';
 require_once __DIR__ . '/core/Controller.php';
@@ -34,6 +35,13 @@ if ($pathAfterBase === '/' || $pathAfterBase === '') {
 if ($pathAfterBase === '/register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once __DIR__ . '/controllers/RegisterController.php';
     (new RegisterController())->register();
+    exit;
+}
+
+// --- Polar webhook (no tenant scope) ---
+if ($pathAfterBase === '/webhook/polar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/controllers/BillingController.php';
+    (new BillingController())->webhook();
     exit;
 }
 
@@ -70,11 +78,23 @@ Lang::init();
 // ===================== TRIAL / SUBSCRIPTION GATE =====================
 $__trialState = Tenant::trialState();
 $__tenantPath = '/' . trim(substr($pathAfterBase, strlen('/' . $tenantSlug)), '/');
-$__alwaysAllowed = ['/login', '/logout'];
+$__alwaysAllowed = ['/login', '/logout', '/pay/start', '/pay/success'];
 
 // Direct route: /trial-expired and /pay show the paywall page.
 if ($__tenantPath === '/trial-expired' || $__tenantPath === '/pay') {
     require __DIR__ . '/views/trial_expired.php';
+    exit;
+}
+
+// Billing routes (must work even on expired trial so user can actually pay)
+if ($__tenantPath === '/pay/start') {
+    require_once __DIR__ . '/controllers/BillingController.php';
+    (new BillingController())->startCheckout();
+    exit;
+}
+if ($__tenantPath === '/pay/success') {
+    require_once __DIR__ . '/controllers/BillingController.php';
+    (new BillingController())->success();
     exit;
 }
 

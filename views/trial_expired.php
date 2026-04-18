@@ -4,7 +4,9 @@ $slug = Tenant::slug();
 $state = Tenant::trialState();
 $geo = GeoCurrency::detect();
 $plan = $tenant['plan'] ?? 'starter';
+if ($plan === 'free') $plan = 'starter'; // nothing to pay for "free", upsell to starter
 $price = GeoCurrency::formatPrice($plan, $geo['currency'], $geo['symbol']);
+$showPolar = ($geo['currency'] === 'USD') && Polar::isConfigured() && Polar::productIdForPlan($plan);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -64,9 +66,25 @@ $price = GeoCurrency::formatPrice($plan, $geo['currency'], $geo['symbol']);
                 <div class="pper">par mois</div>
             </div>
 
-            <h2 class="cta-title"><i class="fas fa-circle-info" style="color:#4F46E5;"></i> Comment activer ?</h2>
+            <?php if ($showPolar): ?>
+            <h2 class="cta-title"><i class="fas fa-credit-card" style="color:#4F46E5;"></i> Paiement par carte</h2>
+            <p style="font-size:13px;color:#64748B;margin-bottom:16px;">Activation immediate. Abonnement mensuel, resiliable a tout moment.</p>
+            <form method="POST" action="<?= APP_BASE . '/' . e($slug) . '/pay/start' ?>" style="margin-bottom:18px;">
+                <input type="hidden" name="plan" value="<?= e($plan) ?>">
+                <button type="submit" class="contact-btn" style="background:linear-gradient(135deg,#4F46E5,#6366F1);">
+                    <i class="fas fa-credit-card"></i> Payer <?= e($price) ?> par carte
+                </button>
+            </form>
+            <div style="display:flex;align-items:center;gap:12px;margin:20px 0;color:#94A3B8;font-size:12px;">
+                <div style="flex:1;height:1px;background:#E2E8F0;"></div>
+                <span>OU</span>
+                <div style="flex:1;height:1px;background:#E2E8F0;"></div>
+            </div>
+            <?php endif; ?>
+
+            <h2 class="cta-title"><i class="fas fa-mobile-screen" style="color:#25D366;"></i> Paiement mobile / virement</h2>
             <ul class="pay-list">
-                <li><i class="fas fa-mobile-screen"></i> Paiement par Bankily, Masrivi ou Sedad</li>
+                <li><i class="fas fa-mobile-screen"></i> Bankily, Masrivi ou Sedad</li>
                 <li><i class="fas fa-university"></i> Virement bancaire</li>
                 <li><i class="fas fa-headset"></i> Support pour vous guider</li>
             </ul>

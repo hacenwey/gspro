@@ -1,7 +1,7 @@
 <?php
 /**
  * Geo-based currency detection.
- * Mauritania (country=MR) -> MRU, all other countries -> EUR.
+ * Mauritania (country=MR) -> MRU, all other countries -> USD.
  * Results cached per-IP for 24h on disk to avoid hammering the free geo API.
  */
 class GeoCurrency {
@@ -10,20 +10,25 @@ class GeoCurrency {
     private const CACHE_TTL = 86400; // 24h
 
     public const PLANS = [
-        'free'    => ['MRU' => 0,     'EUR' => 0],
-        'starter' => ['MRU' => 5000,  'EUR' => 12],
-        'pro'     => ['MRU' => 15000, 'EUR' => 35],
+        'free'    => ['MRU' => 0,     'USD' => 0],
+        'starter' => ['MRU' => 5000,  'USD' => 12],
+        'pro'     => ['MRU' => 15000, 'USD' => 35],
     ];
 
     /** Detect currency for the current request. */
     public static function detect(): array {
+        // Invalidate stale sessions that still carry an obsolete currency code
+        if (isset($_SESSION['geo_currency']['currency'])
+            && !in_array($_SESSION['geo_currency']['currency'], ['MRU', 'USD'], true)) {
+            unset($_SESSION['geo_currency']);
+        }
         if (isset($_SESSION['geo_currency'])) {
             return $_SESSION['geo_currency'];
         }
 
         $country = self::countryFromIp(self::clientIp());
-        $currency = ($country === 'MR') ? 'MRU' : 'EUR';
-        $symbol   = ($currency === 'MRU') ? 'UM' : '€';
+        $currency = ($country === 'MR') ? 'MRU' : 'USD';
+        $symbol   = ($currency === 'MRU') ? 'UM' : '$';
 
         $result = compact('country', 'currency', 'symbol');
         $_SESSION['geo_currency'] = $result;
