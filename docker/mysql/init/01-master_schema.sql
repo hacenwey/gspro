@@ -88,23 +88,3 @@ CREATE TABLE ticket_messages (
 ) ENGINE=InnoDB;
 
 CREATE INDEX idx_ticket_messages_ticket ON ticket_messages(ticket_id);
-
--- ===================== LOGIN LOGS =====================
-CREATE TABLE login_logs (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    tenant_id CHAR(36) NULL,
-    tenant_slug VARCHAR(50) NULL,
-    actor_type ENUM('tenant_user','super_admin') NOT NULL DEFAULT 'tenant_user',
-    user_id CHAR(36) NULL,
-    username VARCHAR(100) NOT NULL,
-    ip_address VARCHAR(45) NULL,
-    user_agent VARCHAR(255) NULL,
-    success TINYINT(1) NOT NULL DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE SET NULL
-) ENGINE=InnoDB;
-
-CREATE INDEX idx_login_logs_tenant ON login_logs(tenant_id);
-CREATE INDEX idx_login_logs_created ON login_logs(created_at);
-CREATE INDEX idx_login_logs_success ON login_logs(success);
-CREATE INDEX idx_login_logs_actor ON login_logs(actor_type);

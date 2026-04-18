@@ -53,8 +53,29 @@
                     <span class="badge badge-<?= $t['is_active'] ? 'success' : 'danger' ?>">
                         <?= $t['is_active'] ? 'Actif' : 'Inactif' ?>
                     </span>
-                    <?php if ($t['expires_at']): ?>
-                    <div style="font-size:10px;color:var(--text-muted);">Exp: <?= formatDate($t['expires_at']) ?></div>
+                    <?php
+                    $subStatus = $t['subscription_status'] ?? 'active';
+                    $trialState = Tenant::trialState($t);
+                    if ($subStatus === 'trial'):
+                        $daysLeft = $trialState['days_left'] ?? 0;
+                        $trialColor = $trialState['status'] === 'expired' ? '#DC2626' : ($trialState['status'] === 'warning' ? '#F59E0B' : '#0EA5E9');
+                    ?>
+                    <div style="font-size:10px;color:<?= $trialColor ?>;font-weight:600;margin-top:2px;">
+                        <i class="fas fa-clock"></i>
+                        <?php if ($trialState['status'] === 'expired'): ?>
+                            Essai expire
+                        <?php else: ?>
+                            Essai: <?= $daysLeft ?>j
+                        <?php endif; ?>
+                    </div>
+                    <?php elseif ($subStatus === 'active'): ?>
+                    <div style="font-size:10px;color:#10B981;font-weight:600;margin-top:2px;">
+                        <i class="fas fa-check-circle"></i> Abonne
+                    </div>
+                    <?php elseif ($subStatus === 'expired' || $subStatus === 'cancelled'): ?>
+                    <div style="font-size:10px;color:#DC2626;font-weight:600;margin-top:2px;">
+                        <i class="fas fa-circle-xmark"></i> Expire
+                    </div>
                     <?php endif; ?>
                 </td>
                 <td style="font-size:12px;"><?= formatDate($t['created_at']) ?></td>

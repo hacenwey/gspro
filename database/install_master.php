@@ -57,7 +57,7 @@ try {
 
     echo "<h2 style='color:green; font-family: Inter, sans-serif;'>&#10004; Base master installee avec succes!</h2>";
     echo "<p style='font-family: Inter, sans-serif;'>Identifiants super-admin: <strong>superadmin</strong> / <strong>superadmin123</strong></p>";
-    echo "<p style='font-family: Inter, sans-serif;'><a href='/gestion_commerciale/admin/login'>Acceder au panel admin</a></p>";
+    echo "<p style='font-family: Inter, sans-serif;'><a href='" . APP_BASE . "/admin/login'>Acceder au panel admin</a></p>";
 
 } catch (PDOException $e) {
     echo "<h2 style='color:red; font-family: Inter, sans-serif;'>Erreur d'installation</h2>";

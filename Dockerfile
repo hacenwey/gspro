@@ -32,6 +32,11 @@ RUN { \
         echo 'memory_limit = 256M'; \
         echo 'max_execution_time = 120'; \
         echo 'date.timezone = UTC'; \
+        echo 'display_errors = Off'; \
+        echo 'display_startup_errors = Off'; \
+        echo 'log_errors = On'; \
+        echo 'error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT'; \
+        echo 'error_log = /var/log/apache2/php_errors.log'; \
     } > /usr/local/etc/php/conf.d/app.ini
 
 COPY docker/apache/gestion_commerciale.conf /etc/apache2/sites-available/000-default.conf

@@ -63,7 +63,7 @@ try {
 
     echo "<h2 style='color:green; font-family: sans-serif;'>Base de donnees installee avec succes!</h2>";
     echo "<p style='font-family: sans-serif;'>Identifiants: <strong>admin</strong> / <strong>admin123</strong></p>";
-    echo "<p style='font-family: sans-serif;'><a href='/gestion_commerciale/login'>Se connecter</a></p>";
+    echo "<p style='font-family: sans-serif;'><a href='" . APP_BASE . "/login'>Se connecter</a></p>";
 
 } catch (PDOException $e) {
     echo "<h2 style='color:red; font-family: sans-serif;'>Erreur d'installation</h2>";

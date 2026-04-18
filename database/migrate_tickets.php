@@ -56,4 +56,4 @@ foreach ($queries as $sql) {
     }
 }
 echo "<h3 style='color:green;'>Migration complete!</h3>";
-echo "<p><a href='/gestion_commerciale/admin/'>Retour admin</a></p>";
+echo "<p><a href='" . APP_BASE . "/admin/'>Retour admin</a></p>";

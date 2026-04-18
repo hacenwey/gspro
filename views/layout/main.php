@@ -145,6 +145,28 @@
         </header>
 
         <div class="page-content">
+            <?php
+            // Trial warning banner (shown in last 3 days of trial)
+            $__trial = class_exists('Tenant') && Tenant::current() ? Tenant::trialState() : ['status' => 'ok'];
+            if ($__trial['status'] === 'warning'):
+                $daysLeft = $__trial['days_left'];
+            ?>
+            <div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1px solid #F59E0B;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+                <i class="fas fa-triangle-exclamation" style="font-size:22px;color:#D97706;"></i>
+                <div style="flex:1;">
+                    <div style="font-weight:700;color:#92400E;font-size:14px;">
+                        Il vous reste <?= $daysLeft ?> jour<?= $daysLeft > 1 ? 's' : '' ?> d'essai gratuit
+                    </div>
+                    <div style="font-size:12px;color:#78350F;margin-top:2px;">
+                        Activez votre abonnement pour eviter l'interruption de service.
+                    </div>
+                </div>
+                <a href="<?= url('/trial-expired') ?>" style="background:#D97706;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;">
+                    <i class="fas fa-credit-card"></i> Activer
+                </a>
+            </div>
+            <?php endif; ?>
+
             <?php $flash = getFlash(); if ($flash): ?>
             <div class="toast-container">
                 <div class="toast toast-<?= $flash['type'] === 'error' ? 'error' : ($flash['type'] === 'warning' ? 'warning' : 'success') ?>">

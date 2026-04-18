@@ -4,4 +4,6 @@ public/uploads/*
 !public/uploads/.gitkeep
 .idea/
 .vscode/
+.claude/
 *.log
+storage/geo_cache/

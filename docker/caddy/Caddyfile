@@ -1,0 +1,28 @@
+gestionpro.it.com, www.gestionpro.it.com {
+    encode gzip
+
+    # Backward-compat: old /gestion_commerciale/* bookmarks keep working
+    # silently by stripping the prefix before forwarding to the app.
+    handle_path /gestion_commerciale/* {
+        reverse_proxy app:80 {
+            header_up X-Real-IP {remote_host}
+        }
+    }
+
+    reverse_proxy app:80 {
+        header_up X-Real-IP {remote_host}
+    }
+
+    # Basic hardening headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    log {
+        output stdout
+        format console
+    }
+}

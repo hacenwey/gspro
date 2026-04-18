@@ -70,6 +70,9 @@
             <a href="<?= adminUrl('/tenants') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/tenants') ? 'active' : '' ?>">
                 <i class="fas fa-building"></i> Clients
             </a>
+            <a href="<?= adminUrl('/connections') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/connections') ? 'active' : '' ?>">
+                <i class="fas fa-right-to-bracket"></i> Connexions
+            </a>
             <a href="<?= adminUrl('/tickets') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/tickets') ? 'active' : '' ?>" style="position:relative;">
                 <i class="fas fa-headset"></i> Tickets
                 <?php

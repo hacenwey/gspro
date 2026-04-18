@@ -1,0 +1,30 @@
+[mysqld]
+# Tuning for small VPS (1 GB RAM)
+# Total target: ~180 MB
+innodb_buffer_pool_size      = 96M
+innodb_log_buffer_size       = 8M
+innodb_redo_log_capacity     = 64M
+
+# Disable heavy schemas
+performance_schema           = OFF
+
+# Connection memory
+max_connections              = 50
+thread_cache_size            = 8
+table_open_cache             = 256
+table_definition_cache       = 256
+
+# Per-thread buffers (kept small since each connection allocates these)
+sort_buffer_size             = 512K
+read_buffer_size             = 256K
+read_rnd_buffer_size         = 512K
+join_buffer_size             = 512K
+tmp_table_size               = 16M
+max_heap_table_size          = 16M
+
+# Binlog: disabled — single-node, saves ~50 MB + disk
+skip-log-bin
+
+# Host cache — skip DNS for speed + memory
+skip-host-cache
+skip-name-resolve

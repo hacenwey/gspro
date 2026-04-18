@@ -61,13 +61,23 @@ class AdminController {
         $stmt->execute([$username]);
         $admin = $stmt->fetch();
 
+        $logBase = [
+            'actor_type' => 'super_admin',
+            'username'   => $username,
+        ];
+
         if ($admin && password_verify($password, $admin['password_hash'])) {
             $_SESSION['super_admin_id'] = $admin['id'];
             $_SESSION['super_admin_name'] = $admin['full_name'];
 
             $this->db->prepare("UPDATE super_admins SET last_login = NOW() WHERE id = ?")->execute([$admin['id']]);
+
+            LoginLog::record($logBase + ['user_id' => $admin['id'], 'success' => true]);
+
             $this->redirect('/');
         } else {
+            LoginLog::record($logBase + ['user_id' => $admin['id'] ?? null, 'success' => false]);
+
             $error = 'Identifiants incorrects';
             require APP_ROOT . '/admin/views/login.php';
         }
@@ -314,6 +324,110 @@ class AdminController {
         };
         $this->flash('success', 'Statut mis a jour: ' . $statLabel);
         $this->redirect('/tickets/view/' . $id);
+    }
+
+    // ===================== SUBSCRIPTION =====================
+
+    public function activateSubscription(string $id): void {
+        $this->requireAuth();
+        $months = max(1, (int)($_POST['months'] ?? 1));
+
+        $tenant = Tenant::getById($id);
+        if (!$tenant) {
+            $this->flash('error', 'Client introuvable');
+            $this->redirect('/tenants');
+            return;
+        }
+
+        Tenant::activateSubscription($id, $months);
+        $this->flash('success', 'Abonnement active pour ' . $tenant['slug'] . ' (' . $months . ' mois)');
+        $this->redirect('/tenants/edit/' . $id);
+    }
+
+    public function extendTrial(string $id): void {
+        $this->requireAuth();
+        $days = max(1, (int)($_POST['days'] ?? 7));
+
+        $tenant = Tenant::getById($id);
+        if (!$tenant) {
+            $this->flash('error', 'Client introuvable');
+            $this->redirect('/tenants');
+            return;
+        }
+
+        Tenant::extendTrial($id, $days);
+        $this->flash('success', 'Essai prolonge de ' . $days . ' jours pour ' . $tenant['slug']);
+        $this->redirect('/tenants/edit/' . $id);
+    }
+
+    // ===================== CONNECTIONS =====================
+
+    public function connections(): void {
+        $this->requireAuth();
+
+        $tenantFilter = $_GET['tenant'] ?? '';
+        $successFilter = $_GET['success'] ?? '';
+        $limit = min(500, max(20, (int)($_GET['limit'] ?? 100)));
+
+        $where = [];
+        $params = [];
+        if ($tenantFilter !== '') {
+            $where[] = "l.tenant_id = ?";
+            $params[] = $tenantFilter;
+        }
+        if ($successFilter === '1') {
+            $where[] = "l.success = 1";
+        } elseif ($successFilter === '0') {
+            $where[] = "l.success = 0";
+        }
+        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        try {
+            $logs = $this->db->prepare(
+                "SELECT l.*, t.company_name, t.slug AS current_slug
+                 FROM login_logs l
+                 LEFT JOIN tenants t ON t.id = l.tenant_id
+                 $whereSql
+                 ORDER BY l.created_at DESC
+                 LIMIT $limit"
+            );
+            $logs->execute($params);
+            $logs = $logs->fetchAll();
+
+            $stats = [
+                'total'      => (int)$this->db->query("SELECT COUNT(*) FROM login_logs")->fetchColumn(),
+                'success'    => (int)$this->db->query("SELECT COUNT(*) FROM login_logs WHERE success = 1")->fetchColumn(),
+                'failed'     => (int)$this->db->query("SELECT COUNT(*) FROM login_logs WHERE success = 0")->fetchColumn(),
+                'last_24h'   => (int)$this->db->query("SELECT COUNT(*) FROM login_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)")->fetchColumn(),
+                'last_7d'    => (int)$this->db->query("SELECT COUNT(*) FROM login_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn(),
+                'unique_ips' => (int)$this->db->query("SELECT COUNT(DISTINCT ip_address) FROM login_logs WHERE ip_address IS NOT NULL AND ip_address != ''")->fetchColumn(),
+            ];
+
+            $topTenants = $this->db->query(
+                "SELECT l.tenant_id, l.tenant_slug, t.company_name,
+                        COUNT(*) AS total_conn,
+                        SUM(CASE WHEN l.success = 1 THEN 1 ELSE 0 END) AS ok_conn,
+                        MAX(l.created_at) AS last_conn
+                 FROM login_logs l
+                 LEFT JOIN tenants t ON t.id = l.tenant_id
+                 WHERE l.actor_type = 'tenant_user'
+                   AND l.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                 GROUP BY l.tenant_id, l.tenant_slug, t.company_name
+                 ORDER BY total_conn DESC
+                 LIMIT 10"
+            )->fetchAll();
+
+            $tenantsList = $this->db->query("SELECT id, slug, company_name FROM tenants ORDER BY company_name")->fetchAll();
+        } catch (PDOException $e) {
+            $this->flash('error', 'Table login_logs introuvable. Executez database/migrate_login_logs.php');
+            $logs = [];
+            $stats = ['total'=>0,'success'=>0,'failed'=>0,'last_24h'=>0,'last_7d'=>0,'unique_ips'=>0];
+            $topTenants = [];
+            $tenantsList = [];
+        }
+
+        $flash = $this->getFlash();
+        $this->render('connections', compact('logs', 'stats', 'topTenants', 'tenantsList', 'tenantFilter', 'successFilter', 'limit', 'flash'));
     }
 
     // ===================== RESET PASSWORD =====================

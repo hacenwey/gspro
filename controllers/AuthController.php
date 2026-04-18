@@ -23,6 +23,14 @@ class AuthController extends Controller {
         $stmt->execute([$username, $username]);
         $user = $stmt->fetch();
 
+        $tenantInfo = Tenant::current();
+        $logBase = [
+            'tenant_id'   => $tenantInfo['id'] ?? null,
+            'tenant_slug' => Tenant::slug(),
+            'actor_type'  => 'tenant_user',
+            'username'    => $username,
+        ];
+
         if ($user && password_verify($password, $user['password_hash'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['username'];
@@ -40,8 +48,12 @@ class AuthController extends Controller {
             $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
             $stmt->execute([$user['id']]);
 
+            LoginLog::record($logBase + ['user_id' => $user['id'], 'success' => true]);
+
             $this->redirect('/dashboard');
         } else {
+            LoginLog::record($logBase + ['user_id' => $user['id'] ?? null, 'success' => false]);
+
             $error = "Identifiants incorrects.";
             require APP_ROOT . '/views/auth/login.php';
         }

@@ -1,8 +1,8 @@
 RewriteEngine On
-RewriteBase /gestion_commerciale/
+RewriteBase /
 
 # Allow direct access to public files
-RewriteCond %{REQUEST_URI} ^/gestion_commerciale/public/ [NC]
+RewriteCond %{REQUEST_URI} ^/public/ [NC]
 RewriteRule ^ - [L]
 
 # Route everything else through index.php

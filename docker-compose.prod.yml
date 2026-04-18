@@ -17,11 +17,13 @@ services:
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       DB_SSL: "false"
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     volumes:
       - app_uploads:/var/www/html/gestion_commerciale/public/uploads
     restart: unless-stopped
+    mem_limit: 384m
+    mem_reservation: 256m
     logging:
       driver: json-file
       options:
@@ -47,14 +49,15 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
-      - ./database/master_schema.sql:/docker-entrypoint-initdb.d/01-master_schema.sql:ro
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/02-default_tenant_schema.sql:ro
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 10
     restart: unless-stopped
+    mem_limit: 384m
+    mem_reservation: 256m
     logging:
       driver: json-file
       options:
@@ -75,12 +78,38 @@ services:
     ports:
       - "127.0.0.1:8081:80"
     restart: unless-stopped
+    mem_limit: 128m
+    networks:
+      - gestion_net
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: gestion_commerciale_caddy
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    mem_limit: 96m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
       - gestion_net
 
 volumes:
   db_data:
   app_uploads:
+  caddy_data:
+  caddy_config:
 
 networks:
   gestion_net:

@@ -4,6 +4,8 @@ session_start();
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/core/Tenant.php';
+require_once __DIR__ . '/core/LoginLog.php';
+require_once __DIR__ . '/core/GeoCurrency.php';
 require_once __DIR__ . '/core/helpers.php';
 require_once __DIR__ . '/core/Lang.php';
 require_once __DIR__ . '/core/Controller.php';
@@ -64,6 +66,23 @@ if (!Tenant::load($tenantSlug)) {
 Router::setBase(APP_BASE . '/' . $tenantSlug);
 
 Lang::init();
+
+// ===================== TRIAL / SUBSCRIPTION GATE =====================
+$__trialState = Tenant::trialState();
+$__tenantPath = '/' . trim(substr($pathAfterBase, strlen('/' . $tenantSlug)), '/');
+$__alwaysAllowed = ['/login', '/logout'];
+
+// Direct route: /trial-expired and /pay show the paywall page.
+if ($__tenantPath === '/trial-expired' || $__tenantPath === '/pay') {
+    require __DIR__ . '/views/trial_expired.php';
+    exit;
+}
+
+// Gate: block all other pages if expired.
+if ($__trialState['status'] === 'expired' && !in_array($__tenantPath, $__alwaysAllowed, true)) {
+    require __DIR__ . '/views/trial_expired.php';
+    exit;
+}
 
 // ===================== TENANT ROUTES =====================
 

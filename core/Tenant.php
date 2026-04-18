@@ -18,8 +18,7 @@ class Tenant {
      */
     public static function extractSlug(): ?string {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $base = '/gestion_commerciale';
-        $path = str_replace($base, '', $uri);
+        $path = APP_BASE !== '' ? str_replace(APP_BASE, '', $uri) : $uri;
         $path = '/' . trim($path, '/');
 
         // /admin/... → super-admin panel, no tenant
@@ -42,8 +41,7 @@ class Tenant {
      */
     public static function extractPath(): string {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $base = '/gestion_commerciale';
-        $path = str_replace($base, '', $uri);
+        $path = APP_BASE !== '' ? str_replace(APP_BASE, '', $uri) : $uri;
         $path = '/' . trim($path, '/');
 
         $slug = self::extractSlug();
@@ -61,7 +59,7 @@ class Tenant {
      */
     public static function extractAdminPath(): string {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $base = '/gestion_commerciale/admin';
+        $base = APP_BASE . '/admin';
         $path = str_replace($base, '', $uri);
         $path = '/' . trim($path, '/');
         return $path;
@@ -249,7 +247,12 @@ class Tenant {
             default => 500
         };
 
-        $stmt = $masterDb->prepare("INSERT INTO tenants (id, slug, company_name, owner_name, owner_email, owner_phone, db_name, plan, max_users, max_products) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $masterDb->prepare(
+            "INSERT INTO tenants
+                (id, slug, company_name, owner_name, owner_email, owner_phone, db_name,
+                 plan, max_users, max_products, trial_ends_at, subscription_status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), 'trial')"
+        );
         $stmt->execute([
             $tenantId,
             $slug,
@@ -273,7 +276,7 @@ class Tenant {
             'db_name' => $dbName,
             'admin_username' => $adminUsername,
             'admin_password' => $adminPassword,
-            'url' => '/gestion_commerciale/' . $slug . '/login'
+            'url' => APP_BASE . '/' . $slug . '/login'
         ];
     }
 
@@ -323,6 +326,88 @@ class Tenant {
         $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch() ?: null;
+    }
+
+    /**
+     * Returns the trial/subscription state for a tenant row.
+     * Keys: status ('ok'|'warning'|'expired'), days_left, trial_ends_at, subscription_status.
+     */
+    public static function trialState(?array $tenant = null): array {
+        $tenant = $tenant ?? self::$current;
+        $out = ['status' => 'ok', 'days_left' => null, 'trial_ends_at' => null, 'subscription_status' => 'active'];
+        if (!$tenant) return $out;
+
+        $subStatus = $tenant['subscription_status'] ?? 'active';
+        $out['subscription_status'] = $subStatus;
+        $out['trial_ends_at'] = $tenant['trial_ends_at'] ?? null;
+
+        if ($subStatus === 'active') {
+            // If a paid_until is set, check it
+            if (!empty($tenant['subscription_paid_until'])) {
+                $until = strtotime($tenant['subscription_paid_until']);
+                if ($until !== false && $until < time()) {
+                    $out['status'] = 'expired';
+                    return $out;
+                }
+            }
+            return $out;
+        }
+
+        if ($subStatus === 'cancelled' || $subStatus === 'expired') {
+            $out['status'] = 'expired';
+            return $out;
+        }
+
+        // status === 'trial'
+        $trialEnd = !empty($tenant['trial_ends_at']) ? strtotime($tenant['trial_ends_at']) : false;
+        if ($trialEnd === false) {
+            return $out; // no trial set, treat as ok
+        }
+        $daysLeft = (int)ceil(($trialEnd - time()) / 86400);
+        $out['days_left'] = $daysLeft;
+
+        if ($trialEnd < time()) {
+            $out['status'] = 'expired';
+        } elseif ($daysLeft <= 3) {
+            $out['status'] = 'warning';
+        }
+        return $out;
+    }
+
+    /**
+     * Mark a tenant as paid (activate subscription for N months).
+     */
+    public static function activateSubscription(string $tenantId, int $months = 1): void {
+        $db = self::getMasterDB();
+        $stmt = $db->prepare(
+            "UPDATE tenants
+             SET subscription_status = 'active',
+                 paid_at = NOW(),
+                 subscription_paid_until = DATE_ADD(NOW(), INTERVAL ? MONTH)
+             WHERE id = ?"
+        );
+        $stmt->execute([$months, $tenantId]);
+
+        $logStmt = $db->prepare("INSERT INTO tenant_log (tenant_id, action, details) VALUES (?, 'subscription_activated', ?)");
+        $logStmt->execute([$tenantId, json_encode(['months' => $months])]);
+    }
+
+    /**
+     * Extend a tenant's trial by N days.
+     */
+    public static function extendTrial(string $tenantId, int $days = 7): void {
+        $db = self::getMasterDB();
+        // Base extension on max(now, current trial_ends_at) so it's always additive.
+        $stmt = $db->prepare(
+            "UPDATE tenants
+             SET subscription_status = 'trial',
+                 trial_ends_at = DATE_ADD(GREATEST(NOW(), COALESCE(trial_ends_at, NOW())), INTERVAL ? DAY)
+             WHERE id = ?"
+        );
+        $stmt->execute([$days, $tenantId]);
+
+        $logStmt = $db->prepare("INSERT INTO tenant_log (tenant_id, action, details) VALUES (?, 'trial_extended', ?)");
+        $logStmt->execute([$tenantId, json_encode(['days' => $days])]);
     }
 
     /**

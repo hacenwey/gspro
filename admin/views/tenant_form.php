@@ -16,7 +16,7 @@
                 <label class="form-label">Slug URL *</label>
                 <div style="display:flex;align-items:center;gap:0;">
                     <span style="padding:10px 14px;background:var(--bg-subtle);border:1px solid var(--border);border-right:0;border-radius:var(--radius) 0 0 var(--radius);font-size:13px;color:var(--text-muted);white-space:nowrap;">
-                        /gestion_commerciale/
+                        <?= APP_BASE ?>/
                     </span>
                     <input type="text" name="slug" class="form-control" style="border-radius:0 var(--radius) var(--radius) 0;"
                         placeholder="nom-client" required pattern="[a-z0-9_-]+"
@@ -28,7 +28,7 @@
             <div class="form-group">
                 <label class="form-label">Slug URL</label>
                 <div class="text-mono fw-bold" style="font-size:16px;color:var(--primary);">
-                    /gestion_commerciale/<?= e($tenant['slug']) ?>
+                    <?= APP_BASE ?>/<?= e($tenant['slug']) ?>
                 </div>
             </div>
             <?php endif; ?>
@@ -132,6 +132,92 @@
 </div>
 
 <?php if ($tenant): ?>
+<!-- ========== SUBSCRIPTION / TRIAL SECTION ========== -->
+<?php $trState = Tenant::trialState($tenant); $subStatus = $tenant['subscription_status'] ?? 'active'; ?>
+<div class="card" style="max-width:700px;margin-top:20px;">
+    <div class="card-body">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+            <i class="fas fa-credit-card" style="color:#4F46E5;"></i> Abonnement
+        </h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">
+            Gerer l'essai gratuit et l'abonnement de ce client.
+        </p>
+
+        <!-- Status summary -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+            <div style="padding:16px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg);">
+                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Statut</div>
+                <div style="font-size:17px;font-weight:700;margin-top:6px;color:<?= $trState['status'] === 'expired' ? '#DC2626' : ($trState['status'] === 'warning' ? '#F59E0B' : ($subStatus === 'active' ? '#10B981' : '#0EA5E9')) ?>;">
+                    <?php if ($subStatus === 'trial' && $trState['status'] !== 'expired'): ?>
+                        <i class="fas fa-clock"></i> Essai (<?= $trState['days_left'] ?>j)
+                    <?php elseif ($subStatus === 'active'): ?>
+                        <i class="fas fa-check-circle"></i> Abonne
+                    <?php elseif ($trState['status'] === 'expired'): ?>
+                        <i class="fas fa-circle-xmark"></i> Expire
+                    <?php else: ?>
+                        <?= ucfirst($subStatus) ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div style="padding:16px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg);">
+                <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">
+                    <?= $subStatus === 'active' ? 'Valide jusqu\'au' : 'Fin essai' ?>
+                </div>
+                <div style="font-size:15px;font-weight:700;margin-top:6px;">
+                    <?php if ($subStatus === 'active' && !empty($tenant['subscription_paid_until'])): ?>
+                        <?= formatDate($tenant['subscription_paid_until']) ?>
+                    <?php elseif (!empty($tenant['trial_ends_at'])): ?>
+                        <?= formatDate($tenant['trial_ends_at']) ?>
+                    <?php else: ?>
+                        -
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <!-- Activate subscription -->
+            <form method="POST" action="<?= adminUrl('/tenants/activate/' . $tenant['id']) ?>" style="padding:16px;border:1.5px solid #10B981;border-radius:var(--radius-lg);background:rgba(16,185,129,0.04);">
+                <div style="font-weight:700;font-size:14px;color:#10B981;margin-bottom:8px;">
+                    <i class="fas fa-check-circle"></i> Activer l'abonnement
+                </div>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Le client a paye. Activer pour N mois.</p>
+                <div style="display:flex;gap:8px;">
+                    <select name="months" class="form-control" style="font-size:13px;padding:8px;">
+                        <option value="1">1 mois</option>
+                        <option value="3">3 mois</option>
+                        <option value="6">6 mois</option>
+                        <option value="12" selected>12 mois</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm" style="background:#10B981;color:#fff;white-space:nowrap;">
+                        <i class="fas fa-check"></i> Activer
+                    </button>
+                </div>
+            </form>
+
+            <!-- Extend trial -->
+            <form method="POST" action="<?= adminUrl('/tenants/extend-trial/' . $tenant['id']) ?>" style="padding:16px;border:1.5px solid #F59E0B;border-radius:var(--radius-lg);background:rgba(245,158,11,0.04);">
+                <div style="font-weight:700;font-size:14px;color:#F59E0B;margin-bottom:8px;">
+                    <i class="fas fa-clock"></i> Prolonger l'essai
+                </div>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Ajouter des jours gratuits a l'essai.</p>
+                <div style="display:flex;gap:8px;">
+                    <select name="days" class="form-control" style="font-size:13px;padding:8px;">
+                        <option value="3">+3 jours</option>
+                        <option value="7" selected>+7 jours</option>
+                        <option value="14">+14 jours</option>
+                        <option value="30">+30 jours</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm" style="background:#F59E0B;color:#fff;white-space:nowrap;">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- ========== RESET PASSWORD SECTION ========== -->
 <?php
 // Load users from tenant database
