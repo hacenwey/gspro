@@ -638,6 +638,7 @@ class AdminController {
         }
         try {
             $p = Polar::createProduct($name, (int)round($price * 100), $interval);
+            Polar::resetProductsCache();
             $this->flash('success', 'Produit cree : ' . $p['name'] . ' (' . $p['id'] . ')');
         } catch (Throwable $e) {
             $this->flash('error', 'Erreur Polar : ' . $e->getMessage());
@@ -649,6 +650,7 @@ class AdminController {
         $this->requireAuth();
         try {
             Polar::archiveProduct($id);
+            Polar::resetProductsCache();
             $this->flash('success', 'Produit archive.');
         } catch (Throwable $e) {
             $this->flash('error', 'Erreur Polar : ' . $e->getMessage());

@@ -20,9 +20,34 @@ class RegisterController {
         $email = trim($_POST['owner_email'] ?? '');
         $phone = trim($_POST['owner_phone'] ?? '');
         $password = $_POST['password'] ?? '';
-        $plan = strtolower(trim($_POST['plan'] ?? 'starter'));
-        if (!in_array($plan, ['starter', 'pro', 'enterprise'], true)) {
-            $plan = 'starter';
+        // $_POST['plan'] can be either a legacy slug (starter/pro/enterprise)
+        // or a Polar product UUID coming from the dynamic landing cards.
+        $rawPlan = trim($_POST['plan'] ?? 'starter');
+        $isUuid = (bool)preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $rawPlan);
+
+        $productName = null;
+        if ($isUuid) {
+            // UUID path: validate against live Polar products and pick a sane
+            // tenants.plan tier (enum column) based on monthly-equivalent price.
+            $productId = null;
+            foreach (Polar::listProductsCached() as $p) {
+                if (($p['id'] ?? '') === $rawPlan) {
+                    $productId   = $rawPlan;
+                    $productName = (string)($p['name'] ?? '');
+                    $price = ($p['prices'][0] ?? [])['price_amount'] ?? 0;
+                    $interval = ($p['recurring_interval'] ?? 'month');
+                    $monthly = $interval === 'year' ? ($price / 12) : $price;
+                    $plan = $monthly <= 2000 ? 'starter' : ($monthly <= 5000 ? 'pro' : 'enterprise');
+                    break;
+                }
+            }
+            if (!$productId) $plan = 'starter';
+        } else {
+            $plan = strtolower($rawPlan);
+            if (!in_array($plan, ['starter', 'pro', 'enterprise'], true)) {
+                $plan = 'starter';
+            }
+            $productId = Polar::productIdForPlan($plan);
         }
 
         $errors = [];
@@ -36,7 +61,7 @@ class RegisterController {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Invalid email.';
         if (strlen($password) < 6) $errors[] = 'Password must be at least 6 characters.';
 
-        if (!Polar::isConfigured() || !Polar::productIdForPlan($plan)) {
+        if (!Polar::isConfigured() || !$productId) {
             $errors[] = 'Payment provider is not available. Please try again later.';
         }
 
@@ -68,15 +93,17 @@ class RegisterController {
             $successUrl = $scheme . '://' . $host . APP_BASE . '/' . $result['slug'] . '/pay/success?checkout_id={CHECKOUT_ID}';
 
             $checkout = Polar::createCheckout([
-                'products'       => [Polar::productIdForPlan($plan)],
+                'products'       => [$productId],
                 'customer_email' => $email,
                 'customer_name'  => $ownerName,
                 'success_url'    => $successUrl,
-                'metadata'       => [
+                'metadata'       => array_filter([
                     'tenant_id'   => (string)$result['tenant_id'],
                     'tenant_slug' => (string)$result['slug'],
                     'plan'        => $plan,
-                ],
+                    'product_id'  => $productId,
+                    'product_name' => $productName,
+                ], static fn($v) => $v !== null && $v !== ''),
             ]);
         } catch (Throwable $e) {
             error_log('Polar register checkout failed: ' . $e->getMessage());

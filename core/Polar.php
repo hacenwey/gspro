@@ -111,6 +111,42 @@ class Polar {
     }
 
     /**
+     * Cached products list. File-cached per mode for $ttl seconds. Falls back
+     * to stale cache on API failure, or an empty array if nothing usable.
+     */
+    public static function listProductsCached(int $ttl = 300): array {
+        $dir  = (defined('APP_ROOT') ? APP_ROOT : __DIR__ . '/..') . '/storage';
+        $file = $dir . '/polar_products_' . self::mode() . '.json';
+
+        if (is_file($file) && (time() - filemtime($file)) < $ttl) {
+            $cached = json_decode((string)file_get_contents($file), true);
+            if (is_array($cached)) return $cached;
+        }
+
+        try {
+            $items = self::listProducts(50);
+            if (!is_dir($dir)) @mkdir($dir, 0755, true);
+            @file_put_contents($file, json_encode($items));
+            return $items;
+        } catch (Throwable $e) {
+            if (is_file($file)) {
+                $cached = json_decode((string)file_get_contents($file), true);
+                if (is_array($cached)) return $cached;
+            }
+            return [];
+        }
+    }
+
+    /** Invalidate the cached products list (call after create/archive). */
+    public static function resetProductsCache(): void {
+        $dir = (defined('APP_ROOT') ? APP_ROOT : __DIR__ . '/..') . '/storage';
+        foreach (['sandbox', 'live'] as $m) {
+            $f = $dir . '/polar_products_' . $m . '.json';
+            if (is_file($f)) @unlink($f);
+        }
+    }
+
+    /**
      * Create a recurring product with a single fixed USD price.
      * $priceCents: amount in cents (e.g. 1200 for $12.00).
      */

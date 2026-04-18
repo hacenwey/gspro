@@ -13,6 +13,27 @@ try {
 
 $priceStarter = GeoCurrency::formatPrice('starter');
 $pricePro     = GeoCurrency::formatPrice('pro');
+
+// Pull live Polar products for the dynamic pricing grid. On failure or empty
+// response the view falls back to the hardcoded Starter + Pro cards below.
+$polarProducts = [];
+if (class_exists('Polar') && Polar::isConfigured()) {
+    foreach (Polar::listProductsCached() as $p) {
+        if (($p['is_archived'] ?? false) === true) continue;
+        $price = ($p['prices'][0] ?? null);
+        if (!$price || ($price['amount_type'] ?? '') !== 'fixed') continue;
+        $polarProducts[] = [
+            'id'       => (string)($p['id'] ?? ''),
+            'name'     => (string)($p['name'] ?? ''),
+            'desc'     => (string)($p['description'] ?? ''),
+            'amount'   => (int)($price['price_amount'] ?? 0), // cents
+            'currency' => strtoupper((string)($price['price_currency'] ?? 'USD')),
+            'interval' => (string)($p['recurring_interval'] ?? 'month'),
+        ];
+    }
+    // Cheapest first so the layout reads naturally.
+    usort($polarProducts, static fn($a, $b) => $a['amount'] <=> $b['amount']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -392,6 +413,31 @@ $pricePro     = GeoCurrency::formatPrice('pro');
         <p class="section-desc center">Start with a <strong>7-day free trial</strong> on any plan. Cancel before the trial ends and you won't be charged.</p>
 
         <div class="pricing-grid">
+        <?php if (!empty($polarProducts)):
+            $popularIdx = count($polarProducts) >= 2 ? 1 : 0; // second card, or the only one
+            foreach ($polarProducts as $i => $prod):
+                $priceStr  = '$' . number_format($prod['amount'] / 100, 0, ',', ' ');
+                $intervalL = $prod['interval'] === 'year' ? '/ year' : '/ month';
+                $billed    = $prod['interval'] === 'year' ? 'Billed yearly' : 'Billed monthly';
+                $isPopular = ($i === $popularIdx);
+                $btnClass  = $isPopular ? 'btn-price filled' : 'btn-price outline';
+        ?>
+            <div class="price-card<?= $isPopular ? ' popular' : '' ?>">
+                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7-day trial</div>
+                <div class="price-name"><?= htmlspecialchars($prod['name'], ENT_QUOTES) ?></div>
+                <div class="price-desc"><?= htmlspecialchars($prod['desc'] !== '' ? $prod['desc'] : 'Secure plan on Polar') ?></div>
+                <div class="price-amount"><?= $priceStr ?><span><?= $intervalL ?></span></div>
+                <div class="price-note"><?= $billed ?></div>
+                <ul class="price-list">
+                    <li><i class="fas fa-check"></i> POS + unlimited invoices</li>
+                    <li><i class="fas fa-check"></i> Products, stock, customers, suppliers</li>
+                    <li><i class="fas fa-check"></i> PDF invoices + CSV exports</li>
+                    <li><i class="fas fa-check"></i> Secure card checkout (Polar)</li>
+                    <li><i class="fas fa-check"></i> Cancel anytime during the trial</li>
+                </ul>
+                <button class="<?= $btnClass ?>" onclick="openRegister('<?= htmlspecialchars($prod['id'], ENT_QUOTES) ?>')">Start 7-day trial</button>
+            </div>
+        <?php endforeach; else: ?>
             <div class="price-card popular">
                 <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7-day trial</div>
                 <div class="price-name">Starter</div>
@@ -422,6 +468,7 @@ $pricePro     = GeoCurrency::formatPrice('pro');
                 </ul>
                 <button class="btn-price outline" onclick="openRegister('pro')">Start 7-day trial</button>
             </div>
+        <?php endif; ?>
         </div>
 
         <p class="pricing-note">

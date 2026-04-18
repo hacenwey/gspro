@@ -7,6 +7,7 @@ public/uploads/*
 .claude/
 *.log
 storage/geo_cache/
+storage/polar_products_*.json
 .phpunit.cache/
 /composer
 logs/
