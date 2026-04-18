@@ -20,6 +20,7 @@
             <?php endforeach; ?>
         </select>
         <div class="btn-group">
+            <a href="<?= url('/export/sales') ?>" class="btn btn-secondary" title="Export CSV"><i class="fas fa-file-csv"></i> CSV</a>
             <a href="<?= url('/invoices/create?type=quote') ?>" class="btn btn-secondary"><i class="fas fa-plus"></i> <?= __('invoices.new_quote') ?></a>
             <a href="<?= url('/invoices/create?type=invoice') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> <?= __('invoices.new_invoice') ?></a>
         </div>

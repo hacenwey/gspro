@@ -1,5 +1,14 @@
 <?php
 return [
+    // Admin panel
+    'admin.role' => 'Super Admin',
+    'admin.logout' => 'Deconnexion',
+    'admin.nav.dashboard' => 'Tableau de bord',
+    'admin.nav.tenants' => 'Clients',
+    'admin.nav.connections' => 'Connexions',
+    'admin.nav.polar' => 'Polar.sh',
+    'admin.nav.tickets' => 'Tickets',
+
     // Navigation
     'nav.main' => 'Principal',
     'nav.dashboard' => 'Tableau de bord',
@@ -254,6 +263,8 @@ return [
     'pos.cart' => 'Panier',
     'pos.cart_empty' => 'Panier vide',
     'pos.search' => 'Rechercher ou scanner un code-barres...',
+    'pos.catalog_hint' => 'produits affiches (tapez pour chercher dans tout le catalogue)',
+    'pos.no_results' => 'Aucun produit trouve',
     'pos.client_search' => 'Rechercher client (optionnel)...',
     'pos.all' => 'Tout',
     'pos.hold' => 'Attente',

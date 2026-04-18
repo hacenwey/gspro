@@ -11,6 +11,8 @@
     <?php if (Lang::isRtl()): ?>
     <link rel="stylesheet" href="<?= asset('css/rtl.css') ?>">
     <?php endif; ?>
+    <link rel="manifest" href="<?= APP_BASE ?>/manifest.json">
+    <meta name="theme-color" content="#4F46E5">
     <?php if (isset($extraCss)): ?>
     <style><?= $extraCss ?></style>
     <?php endif; ?>
@@ -130,20 +132,12 @@
                 <h2><?= e($pageTitle ?? __('dash.title')) ?></h2>
             </div>
             <div class="header-right">
-                <div class="lang-toggle" style="display:inline-flex;gap:4px;align-items:center;background:var(--surface,#fff);border:1px solid var(--border,#E2E8F0);border-radius:8px;padding:2px;">
+                <div class="lang-toggle">
                     <?php
                     $__currentLang = Lang::locale();
-                    $__langs = [
-                        'en' => 'EN',
-                        'fr' => 'FR',
-                        'ar' => 'AR',
-                    ];
-                    foreach ($__langs as $__code => $__label):
-                        $__active = $__code === $__currentLang;
+                    foreach (['en' => 'EN', 'fr' => 'FR', 'ar' => 'AR'] as $__code => $__label):
                     ?>
-                        <a href="?lang=<?= $__code ?>"
-                           style="padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;<?= $__active ? 'background:var(--primary,#4F46E5);color:#fff;' : 'color:var(--text-muted,#64748B);' ?>"
-                           title="<?= $__code ?>"><?= $__label ?></a>
+                        <a href="?lang=<?= $__code ?>" class="<?= $__code === $__currentLang ? 'active' : '' ?>" title="<?= $__code ?>"><?= $__label ?></a>
                     <?php endforeach; ?>
                 </div>
                 <button class="btn btn-sm btn-secondary theme-toggle" onclick="toggleTheme()" title="Theme">
@@ -159,17 +153,13 @@
             if ($__trial['status'] === 'warning'):
                 $daysLeft = $__trial['days_left'];
             ?>
-            <div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1px solid #F59E0B;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
-                <i class="fas fa-triangle-exclamation" style="font-size:22px;color:#D97706;"></i>
+            <div class="trial-banner">
+                <i class="fas fa-triangle-exclamation icon"></i>
                 <div style="flex:1;">
-                    <div style="font-weight:700;color:#92400E;font-size:14px;">
-                        <?= str_replace('{n}', (string)$daysLeft, __('trial.banner.days_left')) ?>
-                    </div>
-                    <div style="font-size:12px;color:#78350F;margin-top:2px;">
-                        <?= __('trial.banner.subtitle') ?>
-                    </div>
+                    <div class="title"><?= str_replace('{n}', (string)$daysLeft, __('trial.banner.days_left')) ?></div>
+                    <div class="subtitle"><?= __('trial.banner.subtitle') ?></div>
                 </div>
-                <a href="<?= url('/trial-expired') ?>" style="background:#D97706;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;">
+                <a href="<?= url('/trial-expired') ?>" class="cta">
                     <i class="fas fa-credit-card"></i> <?= __('trial.banner.activate') ?>
                 </a>
             </div>
@@ -190,6 +180,7 @@
 </div>
 
 <script>
+    const APP_BASE = '<?= APP_BASE ?>';
     const APP_CURRENCY = '<?= CURRENCY ?>';
     const APP_CURRENCY_SYMBOL = '<?= addslashes(CURRENCY_SYMBOL) ?>';
     const APP_LANG = '<?= Lang::locale() ?>';

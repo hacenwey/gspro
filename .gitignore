@@ -7,3 +7,8 @@ public/uploads/*
 .claude/
 *.log
 storage/geo_cache/
+.phpunit.cache/
+/composer
+logs/
+vendor/
+

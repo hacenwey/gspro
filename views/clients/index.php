@@ -12,6 +12,7 @@
             <option value="regular" <?= $categoryFilter === 'regular' ? 'selected' : '' ?>><?= __('clients.cat.regular') ?></option>
             <option value="occasional" <?= $categoryFilter === 'occasional' ? 'selected' : '' ?>><?= __('clients.cat.occasional') ?></option>
         </select>
+        <a href="<?= url('/export/clients') ?>" class="btn btn-secondary" title="Export CSV"><i class="fas fa-file-csv"></i> CSV</a>
         <a href="<?= url('/clients/create') ?>" class="btn btn-primary"><i class="fas fa-plus"></i> <?= __('clients.new') ?></a>
     </div>
 </div>

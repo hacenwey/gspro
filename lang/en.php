@@ -1,5 +1,14 @@
 <?php
 return [
+    // Admin panel
+    'admin.role' => 'Super Admin',
+    'admin.logout' => 'Logout',
+    'admin.nav.dashboard' => 'Dashboard',
+    'admin.nav.tenants' => 'Customers',
+    'admin.nav.connections' => 'Logins',
+    'admin.nav.polar' => 'Polar.sh',
+    'admin.nav.tickets' => 'Tickets',
+
     // Navigation
     'nav.main' => 'Main',
     'nav.dashboard' => 'Dashboard',
@@ -254,6 +263,8 @@ return [
     'pos.cart' => 'Cart',
     'pos.cart_empty' => 'Empty cart',
     'pos.search' => 'Search or scan a barcode...',
+    'pos.catalog_hint' => 'products shown (type to search the full catalog)',
+    'pos.no_results' => 'No product found',
     'pos.client_search' => 'Search client (optional)...',
     'pos.all' => 'All',
     'pos.hold' => 'Hold',

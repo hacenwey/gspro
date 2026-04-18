@@ -74,27 +74,48 @@ class DashboardController extends Controller {
         $this->requireAuth();
         $period = $_GET['period'] ?? '7d';
 
-        $data = [];
-        if ($period === '7d') {
-            for ($i = 6; $i >= 0; $i--) {
-                $date = date('Y-m-d', strtotime("-$i days"));
-                $label = date('d/m', strtotime($date));
-                $amount = $this->db->query("SELECT COALESCE(SUM(total), 0) FROM invoices WHERE type = 'invoice' AND status IN ('paid','partial') AND issue_date = '$date'")->fetchColumn();
-                $data[] = ['label' => $label, 'amount' => (float)$amount];
+        if ($period === '7d' || $period === '30d') {
+            $days = $period === '7d' ? 7 : 30;
+            $from = date('Y-m-d', strtotime('-' . ($days - 1) . ' days'));
+            $stmt = $this->db->prepare("
+                SELECT issue_date AS bucket, COALESCE(SUM(total), 0) AS amount
+                FROM invoices
+                WHERE type = 'invoice' AND status IN ('paid','partial') AND issue_date >= ?
+                GROUP BY issue_date
+            ");
+            $stmt->execute([$from]);
+            $map = [];
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                $map[$r['bucket']] = (float)$r['amount'];
             }
-        } elseif ($period === '30d') {
-            for ($i = 29; $i >= 0; $i--) {
+            $data = [];
+            for ($i = $days - 1; $i >= 0; $i--) {
                 $date = date('Y-m-d', strtotime("-$i days"));
-                $label = date('d/m', strtotime($date));
-                $amount = $this->db->query("SELECT COALESCE(SUM(total), 0) FROM invoices WHERE type = 'invoice' AND status IN ('paid','partial') AND issue_date = '$date'")->fetchColumn();
-                $data[] = ['label' => $label, 'amount' => (float)$amount];
+                $data[] = [
+                    'label'  => date('d/m', strtotime($date)),
+                    'amount' => $map[$date] ?? 0.0,
+                ];
             }
         } else {
+            $from = date('Y-m-01', strtotime('-11 months'));
+            $stmt = $this->db->prepare("
+                SELECT DATE_FORMAT(issue_date, '%Y-%m') AS bucket, COALESCE(SUM(total), 0) AS amount
+                FROM invoices
+                WHERE type = 'invoice' AND status IN ('paid','partial') AND issue_date >= ?
+                GROUP BY bucket
+            ");
+            $stmt->execute([$from]);
+            $map = [];
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                $map[$r['bucket']] = (float)$r['amount'];
+            }
+            $data = [];
             for ($i = 11; $i >= 0; $i--) {
                 $month = date('Y-m', strtotime("-$i months"));
-                $label = date('M Y', strtotime($month . '-01'));
-                $amount = $this->db->query("SELECT COALESCE(SUM(total), 0) FROM invoices WHERE type = 'invoice' AND status IN ('paid','partial') AND issue_date LIKE '$month%'")->fetchColumn();
-                $data[] = ['label' => $label, 'amount' => (float)$amount];
+                $data[] = [
+                    'label'  => date('M Y', strtotime($month . '-01')),
+                    'amount' => $map[$month] ?? 0.0,
+                ];
             }
         }
 

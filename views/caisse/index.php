@@ -30,6 +30,12 @@
             <button class="btn btn-sm btn-secondary cat-filter" data-cat="<?= $cat['id'] ?>"><?= e($cat['name']) ?></button>
             <?php endforeach; ?>
         </div>
+        <?php if (!empty($totalProducts) && $totalProducts > $productsShown): ?>
+        <div class="pos-catalog-hint mb-2 text-sm text-muted">
+            <i class="fas fa-circle-info"></i>
+            <?= $productsShown ?> / <?= $totalProducts ?> <?= __('pos.catalog_hint') ?>
+        </div>
+        <?php endif; ?>
         <div class="pos-grid" id="posGrid">
             <?php foreach ($products as $p): ?>
             <div class="pos-product-card" data-id="<?= $p['id'] ?>" data-name="<?= e($p['name']) ?>" data-price="<?= $p['selling_price'] ?>" data-tax="<?= $p['tax_rate'] ?>" data-stock="<?= $p['current_stock'] ?>" data-cat="<?= $p['category_id'] ?>" data-ref="<?= e($p['reference']) ?>" data-barcode="<?= e($p['barcode'] ?? '') ?>">
@@ -38,6 +44,10 @@
                 <div class="stock"><?= __('pos.stock_label') ?>: <?= $p['current_stock'] ?></div>
             </div>
             <?php endforeach; ?>
+        </div>
+        <div id="posGridEmpty" class="empty-state hidden" style="padding:40px 20px;">
+            <div class="icon"><i class="fas fa-magnifying-glass"></i></div>
+            <p class="mb-0"><?= __('pos.no_results') ?></p>
         </div>
     </div>
 
@@ -167,41 +177,100 @@ const POS_LANG = {
 };
 
 // Product click
-document.querySelectorAll('.pos-product-card').forEach(card => {
-    card.addEventListener('click', () => {
-        const id = card.dataset.id;
-        const existing = cart.find(i => i.id === id);
-        const stock = parseInt(card.dataset.stock);
+function addToCart(card) {
+    const id = card.dataset.id;
+    const existing = cart.find(i => i.id === id);
+    const stock = parseInt(card.dataset.stock);
+    if (existing) {
+        if (existing.qty < stock) existing.qty++;
+    } else {
+        cart.push({
+            id: id,
+            name: card.dataset.name,
+            price: parseFloat(card.dataset.price),
+            tax: parseFloat(card.dataset.tax),
+            qty: 1,
+            stock: stock
+        });
+    }
+    renderCart();
+}
 
-        if (existing) {
-            if (existing.qty < stock) existing.qty++;
-        } else {
-            cart.push({
-                id: id,
-                name: card.dataset.name,
-                price: parseFloat(card.dataset.price),
-                tax: parseFloat(card.dataset.tax),
-                qty: 1,
-                stock: stock
-            });
-        }
-        renderCart();
-    });
+document.querySelectorAll('.pos-product-card').forEach(card => {
+    card.addEventListener('click', () => addToCart(card));
 });
 
-// Search
-document.getElementById('posSearch').addEventListener('input', function() {
-    const q = this.value.toLowerCase();
+// Search (hybride : client-side d'abord, fallback serveur si 0 match sur catalogue partiel)
+const POS_TOTAL_PRODUCTS = <?= (int)($totalProducts ?? 0) ?>;
+const POS_SHOWN = <?= (int)($productsShown ?? 0) ?>;
+const posGrid = document.getElementById('posGrid');
+const posGridEmpty = document.getElementById('posGridEmpty');
+let searchTimer;
+
+function filterClientSide(q) {
+    let visible = 0;
     document.querySelectorAll('.pos-product-card').forEach(card => {
-        const match = card.dataset.name.toLowerCase().includes(q) ||
+        // Only filter cards that originated server-side; remote-fetched cards we leave.
+        const remote = card.dataset.remote === '1';
+        if (remote && q === '') { card.remove(); return; }
+        const match = q === '' ||
+                     card.dataset.name.toLowerCase().includes(q) ||
                      card.dataset.ref.toLowerCase().includes(q) ||
                      card.dataset.barcode === q;
         card.style.display = match ? '' : 'none';
+        if (match) visible++;
     });
-    // Auto-add if barcode match
-    if (q.length >= 8) {
-        const barcodeMatch = document.querySelector(`.pos-product-card[data-barcode="${this.value}"]`);
-        if (barcodeMatch) { barcodeMatch.click(); this.value = ''; }
+    return visible;
+}
+
+function appendRemoteProduct(p) {
+    const card = document.createElement('div');
+    card.className = 'pos-product-card';
+    card.dataset.id = p.id;
+    card.dataset.name = p.name;
+    card.dataset.price = p.selling_price;
+    card.dataset.tax = p.tax_rate;
+    card.dataset.stock = p.current_stock;
+    card.dataset.ref = p.reference || '';
+    card.dataset.barcode = p.barcode || '';
+    card.dataset.remote = '1';
+    card.innerHTML = `<div class="name">${p.name}</div><div class="price">${p.selling_price}</div><div class="stock"><?= __('pos.stock_label') ?>: ${p.current_stock}</div>`;
+    card.addEventListener('click', () => addToCart(card));
+    posGrid.appendChild(card);
+}
+
+async function remoteSearch(q) {
+    try {
+        const res = await fetch('<?= url('/caisse/search') ?>?q=' + encodeURIComponent(q));
+        const rows = await res.json();
+        // Remove previous remote cards
+        document.querySelectorAll('.pos-product-card[data-remote="1"]').forEach(c => c.remove());
+        const existingIds = new Set([...document.querySelectorAll('.pos-product-card')].map(c => c.dataset.id));
+        rows.forEach(p => { if (!existingIds.has(p.id)) appendRemoteProduct(p); });
+        return rows.length + filterClientSide(q.toLowerCase());
+    } catch (e) { return 0; }
+}
+
+document.getElementById('posSearch').addEventListener('input', function() {
+    clearTimeout(searchTimer);
+    const raw = this.value;
+    const q = raw.toLowerCase();
+
+    // Auto-add if exact barcode match
+    if (raw.length >= 8) {
+        const barcodeMatch = document.querySelector(`.pos-product-card[data-barcode="${raw}"]`);
+        if (barcodeMatch) { barcodeMatch.click(); this.value = ''; filterClientSide(''); posGridEmpty.classList.add('hidden'); return; }
+    }
+
+    const visible = filterClientSide(q);
+    if (visible === 0 && q.length >= 2 && POS_TOTAL_PRODUCTS > POS_SHOWN) {
+        // Delay server hit slightly
+        searchTimer = setTimeout(async () => {
+            const count = await remoteSearch(q);
+            posGridEmpty.classList.toggle('hidden', count > 0);
+        }, 180);
+    } else {
+        posGridEmpty.classList.toggle('hidden', visible > 0 || q === '');
     }
 });
 

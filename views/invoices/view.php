@@ -2,6 +2,8 @@
     <a href="<?= url('/invoices') ?>" style="color:var(--text-muted);font-size:13px;"><i class="fas fa-arrow-left"></i> <?= __('common.back') ?></a>
     <div class="btn-group">
         <a href="<?= url('/invoices/pdf/' . $invoice['id']) ?>" target="_blank" class="btn btn-sm btn-secondary"><i class="fas fa-file-pdf"></i> <?= __('invoices.print') ?></a>
+        <a href="<?= url('/invoices/pdf/' . $invoice['id'] . '?download=1') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-download"></i> PDF</a>
+        <button type="button" class="btn btn-sm btn-primary" onclick="var p=document.getElementById('email-panel');p.style.display=p.style.display==='none'?'block':'none';"><i class="fas fa-envelope"></i> Email</button>
         <?php if ($invoice['type'] === 'quote' && !in_array($invoice['status'], ['accepted','cancelled'])): ?>
         <form method="POST" action="<?= url('/invoices/convert/' . $invoice['id']) ?>" style="display:inline;"><?= csrf_field() ?>
             <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-exchange-alt"></i> <?= __('invoices.convert') ?></button>
@@ -12,6 +14,32 @@
             <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(this.parentNode)"><i class="fas fa-trash"></i> <?= __('common.delete') ?></button>
         </form>
         <?php endif; ?>
+    </div>
+</div>
+
+<div id="email-panel" class="card mb-3" style="display:none;">
+    <div class="card-header">
+        <h3><i class="fas fa-paper-plane"></i> Envoyer le document par email</h3>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="<?= url('/invoices/email/' . $invoice['id']) ?>">
+            <?= csrf_field() ?>
+            <div class="form-row">
+                <div class="form-group" style="flex:2;">
+                    <label>Destinataire</label>
+                    <input type="email" name="to" class="form-control" required placeholder="client@example.com"
+                           value="<?= e($invoice['email'] ?? '') ?>">
+                </div>
+                <div class="form-group" style="flex:0 0 auto;align-self:flex-end;">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Message (optionnel)</label>
+                <textarea name="message" class="form-control" rows="3" placeholder="Bonjour, veuillez trouver ci-joint le document..."></textarea>
+            </div>
+            <p style="color:var(--text-muted);font-size:12px;margin:0;">Le PDF sera joint automatiquement.</p>
+        </form>
     </div>
 </div>
 

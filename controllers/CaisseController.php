@@ -10,13 +10,27 @@ class CaisseController extends Controller {
         $session = $session->fetch();
 
         $categories = $this->db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
-        $products = $this->db->query("SELECT id, name, reference, barcode, selling_price, tax_rate, current_stock, unit, category_id FROM products WHERE is_active = 1 AND current_stock > 0 ORDER BY name")->fetchAll();
+        // Pagination POS : ne charge que les 120 produits les plus "utilises" (ventes recentes),
+        // puis fallback alphabetique. Le reste est accessible via recherche serveur (/caisse/search).
+        $products = $this->db->query("
+            SELECT p.id, p.name, p.reference, p.barcode, p.selling_price, p.tax_rate, p.current_stock, p.unit, p.category_id,
+                   COALESCE(SUM(CASE WHEN sm.reason = 'sale' AND sm.created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY) THEN sm.quantity ELSE 0 END), 0) AS recent_sold
+            FROM products p
+            LEFT JOIN stock_movements sm ON sm.product_id = p.id AND sm.type = 'out'
+            WHERE p.is_active = 1 AND p.current_stock > 0
+            GROUP BY p.id
+            ORDER BY recent_sold DESC, p.name ASC
+            LIMIT 120
+        ")->fetchAll();
+        $totalProducts = (int)$this->db->query("SELECT COUNT(*) FROM products WHERE is_active = 1 AND current_stock > 0")->fetchColumn();
 
         $this->render('caisse/index', [
             'pageTitle' => 'Caisse (POS)',
             'session' => $session,
             'categories' => $categories,
-            'products' => $products
+            'products' => $products,
+            'totalProducts' => $totalProducts,
+            'productsShown' => count($products),
         ]);
     }
 
@@ -53,7 +67,7 @@ class CaisseController extends Controller {
         $stmt = $this->db->prepare("UPDATE cash_sessions SET closed_at = NOW(), closing_balance = ?, expected_balance = ?, difference = ?, status = 'closed', notes = ? WHERE id = ?");
         $stmt->execute([$closingBalance, $expectedBalance, $difference, $this->input('notes'), $sessionId]);
 
-        $this->flash('success', 'Caisse cloturee. Ecart: ' . number_format($difference, 2) . ' DA');
+        $this->flash('success', 'Caisse cloturee. Ecart: ' . formatMoney($difference));
         $this->redirect('/caisse');
     }
 
@@ -78,38 +92,13 @@ class CaisseController extends Controller {
 
         $this->db->beginTransaction();
         try {
-            // Calculate totals
-            $subtotal = 0;
-            $taxAmount = 0;
-            $invoiceItems = [];
+            $svc = new \App\Services\SellService($this->db);
+            $priced = $svc->priceAndLock($items);
+            $subtotal     = $priced['subtotal'];
+            $taxAmount    = $priced['tax'];
+            $total        = $priced['total'];
+            $invoiceItems = $priced['lines'];
 
-            foreach ($items as $item) {
-                $product = $this->db->prepare("SELECT * FROM products WHERE id = ?");
-                $product->execute([$item['id']]);
-                $product = $product->fetch();
-
-                if (!$product || $product['current_stock'] < $item['qty']) {
-                    throw new Exception("Stock insuffisant pour: " . ($product['name'] ?? 'inconnu'));
-                }
-
-                $lineSubtotal = $product['selling_price'] * $item['qty'];
-                $lineTax = $lineSubtotal * ($product['tax_rate'] / 100);
-                $lineTotal = $lineSubtotal + $lineTax;
-
-                $subtotal += $lineSubtotal;
-                $taxAmount += $lineTax;
-
-                $invoiceItems[] = [
-                    'product_id' => $product['id'],
-                    'description' => $product['name'],
-                    'quantity' => $item['qty'],
-                    'unit_price' => $product['selling_price'],
-                    'tax_rate' => $product['tax_rate'],
-                    'line_total' => $lineTotal
-                ];
-            }
-
-            $total = $subtotal + $taxAmount;
             $invoiceId = $this->generateUUID();
             $invoiceNumber = $this->generateNumber(INVOICE_PREFIX, 'invoices');
 
@@ -126,8 +115,8 @@ class CaisseController extends Controller {
                 $this->db->prepare("INSERT INTO invoice_items (id, invoice_id, product_id, description, quantity, unit_price, tax_rate, line_total) VALUES (?,?,?,?,?,?,?,?)")
                     ->execute([$this->generateUUID(), $invoiceId, $item['product_id'], $item['description'], $item['quantity'], $item['unit_price'], $item['tax_rate'], $item['line_total']]);
 
-                // Update stock
-                $this->db->prepare("UPDATE products SET current_stock = current_stock - ? WHERE id = ?")->execute([$item['quantity'], $item['product_id']]);
+                // Atomic stock decrement with guard (defense in depth vs the FOR UPDATE above)
+                $svc->decrementStock($item['product_id'], (int)$item['quantity']);
 
                 // Stock movement
                 $this->db->prepare("INSERT INTO stock_movements (id, product_id, type, reason, quantity, unit_cost, reference_type, reference_id, user_id) VALUES (?,?,'out','sale',?,?,'invoice',?,?)")
@@ -136,8 +125,8 @@ class CaisseController extends Controller {
 
             // Record payment
             if ($paid > 0) {
-                $this->db->prepare("INSERT INTO payments (id, type, invoice_id, customer_id, cash_session_id, amount, method, payment_date, user_id) VALUES (?,?,?,?,?,?,?,CURDATE(),?)")
-                    ->execute([$this->generateUUID(), 'incoming', $invoiceId, $customerId, $sessionId, $paid, $paymentMethod, $_SESSION['user_id']]);
+                $paySvc = new \App\Services\PaymentService($this->db);
+                $paySvc->recordSalePayment($invoiceId, $customerId, $sessionId, (float)$paid, $paymentMethod, $_SESSION['user_id']);
             }
 
             // Create debt if credit sale

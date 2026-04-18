@@ -130,6 +130,20 @@ class Tenant {
     }
 
     /**
+     * Open a standalone PDO connection to the tenant DB identified by slug.
+     * Does NOT touch the statically-cached current-tenant connection.
+     */
+    public static function connectTo(string $slug): PDO {
+        $row = self::getMasterDB()->prepare("SELECT db_name FROM tenants WHERE slug = ?");
+        $row->execute([$slug]);
+        $dbName = $row->fetchColumn();
+        if (!$dbName) {
+            throw new RuntimeException("Tenant $slug not found");
+        }
+        return new PDO(db_dsn($dbName), DB_USER, DB_PASS, db_pdo_options());
+    }
+
+    /**
      * Provision a new tenant: create database, run schema, create admin user.
      */
     public static function provision(array $data): array {

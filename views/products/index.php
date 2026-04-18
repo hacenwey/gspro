@@ -20,6 +20,9 @@
             <option value="low" <?= $stockFilter === 'low' ? 'selected' : '' ?>><?= __('products.low_stock') ?></option>
             <option value="out" <?= $stockFilter === 'out' ? 'selected' : '' ?>><?= __('products.out_of_stock') ?></option>
         </select>
+        <a href="<?= url('/export/products') ?>" class="btn btn-secondary" title="Export CSV">
+            <i class="fas fa-file-csv"></i> CSV
+        </a>
         <a href="<?= url('/products/create') ?>" class="btn btn-primary">
             <i class="fas fa-plus"></i> <?= __('products.new') ?>
         </a>

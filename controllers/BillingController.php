@@ -53,7 +53,7 @@ class BillingController {
                 ],
             ]);
         } catch (Throwable $e) {
-            error_log('Polar checkout failed: ' . $e->getMessage());
+            \App\Logging\Logger::exception($e, ['op' => 'polar_checkout_start', 'plan' => $plan, 'tenant_id' => $tenant['id'] ?? null]);
             http_response_code(502);
             echo 'Impossible de creer la session de paiement. Reessayez dans une minute.'; return;
         }
@@ -107,7 +107,7 @@ class BillingController {
             ]);
             $this->redirectFlash($tenant['slug'], 'Abonnement annule. Aucun prelevement ne sera effectue. Vous gardez l\'acces jusqu\'a la fin de la periode en cours.', 'success');
         } catch (Throwable $e) {
-            error_log('Polar cancel failed: ' . $e->getMessage());
+            \App\Logging\Logger::exception($e, ['op' => 'polar_cancel', 'tenant_id' => $tenant['id'], 'sub_id' => $subId]);
             $this->redirectFlash($tenant['slug'], 'Impossible d\'annuler l\'abonnement. Contactez le support.');
         }
     }
@@ -130,7 +130,7 @@ class BillingController {
         $headers = Polar::requestHeaders();
 
         if (!Polar::verifyWebhook($raw, $headers)) {
-            error_log('Polar webhook: invalid signature');
+            \App\Logging\Logger::warn('Polar webhook: invalid signature', ['headers' => array_intersect_key($headers, array_flip(['webhook-id','webhook-timestamp']))]);
             http_response_code(401);
             echo 'invalid signature'; return;
         }
@@ -163,7 +163,7 @@ class BillingController {
                     break;
             }
         } catch (Throwable $e) {
-            error_log('Polar webhook handler error: ' . $e->getMessage());
+            \App\Logging\Logger::exception($e, ['op' => 'polar_webhook', 'type' => $type]);
             http_response_code(500);
             echo 'handler error'; return;
         }

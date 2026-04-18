@@ -5,7 +5,7 @@ defined('APP_BASE')           || define('APP_BASE', '');
 defined('APP_ROOT')           || define('APP_ROOT', dirname(__DIR__));
 defined('CURRENCY')           || define('CURRENCY', 'USD');
 defined('CURRENCY_SYMBOL')    || define('CURRENCY_SYMBOL', '$');
-defined('TAX_RATE_DEFAULT')   || define('TAX_RATE_DEFAULT', 16.00);
+defined('TAX_RATE_DEFAULT')   || define('TAX_RATE_DEFAULT', 0.00);
 defined('DATE_FORMAT')        || define('DATE_FORMAT', 'd/m/Y');
 defined('DATETIME_FORMAT')    || define('DATETIME_FORMAT', 'd/m/Y H:i');
 defined('ITEMS_PER_PAGE')     || define('ITEMS_PER_PAGE', 20);

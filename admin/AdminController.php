@@ -200,6 +200,95 @@ class AdminController {
         $this->redirect('/tenants');
     }
 
+    // ===================== MIGRATIONS =====================
+
+    public function migrations(): void {
+        $this->requireAuth();
+        $masterRunner = new \App\Database\MigrationRunner(
+            Tenant::getMasterDB(),
+            APP_ROOT . '/database/migrations/master'
+        );
+        $tenants = $this->db->query("SELECT id, slug, company_name FROM tenants ORDER BY slug")->fetchAll();
+        $tenantsStatus = [];
+        foreach ($tenants as $t) {
+            try {
+                $tdb = Tenant::connectTo($t['slug']);
+                $runner = new \App\Database\MigrationRunner($tdb, APP_ROOT . '/database/migrations/tenant');
+                $tenantsStatus[] = $t + ['pending' => $runner->pending(), 'error' => null];
+            } catch (\Throwable $e) {
+                $tenantsStatus[] = $t + ['pending' => [], 'error' => $e->getMessage()];
+            }
+        }
+        $this->render('migrations', [
+            'masterPending' => $masterRunner->pending(),
+            'tenants'       => $tenantsStatus,
+        ]);
+    }
+
+    public function runMigrations(): void {
+        $this->requireAuth();
+        $scope = $_GET['scope'] ?? 'master';
+        try {
+            if ($scope === 'master') {
+                $ran = (new \App\Database\MigrationRunner(
+                    Tenant::getMasterDB(),
+                    APP_ROOT . '/database/migrations/master'
+                ))->run();
+                $this->flash('success', count($ran) ? 'Master: ' . implode(', ', $ran) : 'Master deja a jour.');
+            } elseif ($scope === 'tenant' && !empty($_GET['slug'])) {
+                $slug = $_GET['slug'];
+                $tdb = Tenant::connectTo($slug);
+                $ran = (new \App\Database\MigrationRunner($tdb, APP_ROOT . '/database/migrations/tenant'))->run();
+                $this->flash('success', "$slug: " . (count($ran) ? implode(', ', $ran) : 'deja a jour.'));
+            } elseif ($scope === 'all_tenants') {
+                $total = 0; $errs = [];
+                foreach ($this->db->query("SELECT slug FROM tenants WHERE is_active = 1")->fetchAll() as $t) {
+                    try {
+                        $tdb = Tenant::connectTo($t['slug']);
+                        $ran = (new \App\Database\MigrationRunner($tdb, APP_ROOT . '/database/migrations/tenant'))->run();
+                        $total += count($ran);
+                    } catch (\Throwable $e) {
+                        $errs[] = $t['slug'] . ': ' . $e->getMessage();
+                    }
+                }
+                $msg = "$total migration(s) executee(s).";
+                if ($errs) $msg .= ' Erreurs: ' . implode(' | ', $errs);
+                $this->flash($errs ? 'error' : 'success', $msg);
+            }
+        } catch (\Throwable $e) {
+            \App\Logging\Logger::exception($e, ['action' => 'admin.migrations.run', 'scope' => $scope]);
+            $this->flash('error', 'Erreur migration: ' . $e->getMessage());
+        }
+        $this->redirect('/migrations');
+    }
+
+    public function baselineMigrations(): void {
+        $this->requireAuth();
+        $scope = $_GET['scope'] ?? '';
+        try {
+            if ($scope === 'master') {
+                $marked = (new \App\Database\MigrationRunner(
+                    Tenant::getMasterDB(),
+                    APP_ROOT . '/database/migrations/master'
+                ))->baseline();
+                $this->flash('success', 'Master baseline: ' . count($marked) . ' marquees.');
+            } elseif ($scope === 'all_tenants') {
+                $total = 0;
+                foreach ($this->db->query("SELECT slug FROM tenants")->fetchAll() as $t) {
+                    try {
+                        $tdb = Tenant::connectTo($t['slug']);
+                        $marked = (new \App\Database\MigrationRunner($tdb, APP_ROOT . '/database/migrations/tenant'))->baseline();
+                        $total += count($marked);
+                    } catch (\Throwable $e) { /* skip */ }
+                }
+                $this->flash('success', "Baseline tenants: $total marquees.");
+            }
+        } catch (\Throwable $e) {
+            $this->flash('error', 'Erreur baseline: ' . $e->getMessage());
+        }
+        $this->redirect('/migrations');
+    }
+
     // ===================== SUPPORT TICKETS =====================
 
     public function tickets(): void {

@@ -2,6 +2,15 @@
 // GestionPro - Main JavaScript
 // ============================================
 
+// Service worker registration (PWA offline shell)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        const swPath = (window.APP_BASE || '') + '/sw.js';
+        navigator.serviceWorker.register(swPath, { scope: (window.APP_BASE || '') + '/' })
+            .catch(() => {});
+    });
+}
+
 // Theme Toggle with icon swap
 function toggleTheme() {
     const html = document.documentElement;

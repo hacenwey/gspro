@@ -42,44 +42,30 @@ class InvoiceController extends Controller {
 
         $this->db->beginTransaction();
         try {
-            $id = $this->generateUUID();
-            $number = $this->generateNumber($prefix, 'invoices');
-            $items = json_decode($this->input('items_json', '[]'), true);
-
-            $subtotal = 0; $taxAmount = 0;
-            foreach ($items as &$item) {
-                $lineSubtotal = $item['unit_price'] * $item['quantity'] * (1 - ($item['discount_pct'] ?? 0) / 100);
-                $lineTax = $lineSubtotal * ($item['tax_rate'] / 100);
-                $item['line_total'] = $lineSubtotal + $lineTax;
-                $subtotal += $lineSubtotal;
-                $taxAmount += $lineTax;
-            }
-
+            $svc = new \App\Services\InvoiceService($this->db);
+            $rawItems = json_decode($this->input('items_json', '[]'), true) ?: [];
             $discountAmount = (float)$this->input('discount_amount', 0);
-            $total = $subtotal + $taxAmount - $discountAmount;
+            $totals = $svc->totalize($rawItems, $discountAmount);
 
-            $stmt = $this->db->prepare("INSERT INTO invoices (id, number, type, status, customer_id, user_id, issue_date, due_date, validity_date, subtotal, tax_amount, discount_amount, total, notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            $stmt->execute([
-                $id, $number, $type, 'draft',
-                $this->input('customer_id'),
-                $_SESSION['user_id'],
-                $this->input('issue_date', date('Y-m-d')),
-                $this->input('due_date') ?: null,
-                $this->input('validity_date') ?: null,
-                $subtotal, $taxAmount, $discountAmount, $total,
-                $this->input('notes')
-            ]);
-
-            foreach ($items as $item) {
-                $this->db->prepare("INSERT INTO invoice_items (id, invoice_id, product_id, description, quantity, unit_price, tax_rate, discount_pct, line_total) VALUES (?,?,?,?,?,?,?,?,?)")
-                    ->execute([$this->generateUUID(), $id, $item['product_id'] ?? null, $item['description'], $item['quantity'], $item['unit_price'], $item['tax_rate'], $item['discount_pct'] ?? 0, $item['line_total']]);
-            }
+            $id = $svc->createDraft([
+                'id'            => $this->generateUUID(),
+                'number'        => $svc->nextNumber($prefix),
+                'type'          => $type,
+                'status'        => 'draft',
+                'customer_id'   => $this->input('customer_id'),
+                'user_id'       => $_SESSION['user_id'],
+                'issue_date'    => $this->input('issue_date', date('Y-m-d')),
+                'due_date'      => $this->input('due_date') ?: null,
+                'validity_date' => $this->input('validity_date') ?: null,
+                'notes'         => $this->input('notes'),
+            ], $totals['lines'], $totals);
 
             $this->db->commit();
             $this->flash('success', $type === 'quote' ? 'Devis cree.' : 'Facture creee.');
             $this->redirect('/invoices/view/' . $id);
         } catch (Exception $e) {
             $this->db->rollBack();
+            \App\Logging\Logger::exception($e, ['action' => 'invoice.store', 'type' => $type]);
             $this->flash('error', 'Erreur: ' . $e->getMessage());
             $this->redirect('/invoices/create');
         }
@@ -150,17 +136,85 @@ class InvoiceController extends Controller {
         $this->redirect('/invoices');
     }
 
-    public function pdf(string $id): void {
+    public function email(string $id): void {
         $this->requireAuth();
-        $stmt = $this->db->prepare("SELECT i.*, c.first_name, c.last_name, c.phone, c.email, c.address, c.tax_id as client_tax_id FROM invoices i LEFT JOIN customers c ON i.customer_id = c.id WHERE i.id = ?");
+        if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/invoices/view/' . $id); }
+
+        $stmt = $this->db->prepare("SELECT i.*, c.first_name, c.last_name, c.email FROM invoices i LEFT JOIN customers c ON i.customer_id = c.id WHERE i.id = ?");
         $stmt->execute([$id]); $invoice = $stmt->fetch();
-        $items = $this->db->prepare("SELECT * FROM invoice_items WHERE invoice_id = ?"); $items->execute([$id]);
+        if (!$invoice) { $this->redirect('/invoices'); }
+
+        $to = trim((string)($this->input('to') ?: $invoice['email'] ?? ''));
+        if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            $this->flash('error', 'Email destinataire invalide.');
+            $this->redirect('/invoices/view/' . $id);
+        }
+
+        $items = $this->db->prepare("SELECT * FROM invoice_items WHERE invoice_id = ?");
+        $items->execute([$id]); $items = $items->fetchAll();
 
         $settings = [];
         foreach ($this->db->query("SELECT * FROM settings")->fetchAll() as $s) { $settings[$s['setting_key']] = $s['setting_value']; }
 
-        header('Content-Type: text/html; charset=utf-8');
-        require APP_ROOT . '/views/invoices/pdf.php';
+        try {
+            $pdfSvc = new \App\Services\InvoicePdfService();
+            $pdfBinary = $pdfSvc->toBinary($invoice, $items, $settings);
+
+            $docType = match($invoice['type']) { 'quote' => 'devis', 'credit_note' => 'avoir', default => 'facture' };
+            $companyName = $settings['company_name'] ?? 'GestionPro';
+            $subject = ucfirst($docType) . ' ' . $invoice['number'] . ' - ' . $companyName;
+            $note = trim((string)$this->input('message', ''));
+
+            $html = '<p>Bonjour ' . e(trim(($invoice['first_name'] ?? '') . ' ' . ($invoice['last_name'] ?? ''))) . ',</p>'
+                  . '<p>Veuillez trouver ci-joint votre ' . $docType . ' <strong>' . e($invoice['number']) . '</strong> d\'un montant de <strong>' . e(formatMoney($invoice['total'])) . '</strong>.</p>'
+                  . ($note !== '' ? '<p>' . nl2br(e($note)) . '</p>' : '')
+                  . '<p>Cordialement,<br>' . e($companyName) . '</p>';
+
+            $mailer = new \App\Services\Mailer();
+            $mailer->send(
+                $to, $subject, $html, '',
+                [['content' => $pdfBinary, 'filename' => $pdfSvc->filename($invoice), 'mime' => 'application/pdf']],
+                trim(($invoice['first_name'] ?? '') . ' ' . ($invoice['last_name'] ?? '')) ?: null
+            );
+
+            // Mark as sent if it was draft
+            if (($invoice['status'] ?? '') === 'draft') {
+                $next = $invoice['type'] === 'invoice' ? 'sent' : 'sent';
+                $this->db->prepare("UPDATE invoices SET status = ? WHERE id = ?")->execute([$next, $id]);
+            }
+
+            $this->flash('success', 'Document envoye a ' . $to);
+        } catch (\Throwable $e) {
+            \App\Logging\Logger::exception($e, ['op' => 'invoice_email', 'invoice_id' => $id]);
+            $this->flash('error', 'Envoi impossible: ' . $e->getMessage());
+        }
+        $this->redirect('/invoices/view/' . $id);
+    }
+
+    public function pdf(string $id): void {
+        $this->requireAuth();
+        $stmt = $this->db->prepare("SELECT i.*, c.first_name, c.last_name, c.phone, c.email, c.address, c.tax_id as client_tax_id FROM invoices i LEFT JOIN customers c ON i.customer_id = c.id WHERE i.id = ?");
+        $stmt->execute([$id]); $invoice = $stmt->fetch();
+        if (!$invoice) { $this->redirect('/invoices'); }
+        $items = $this->db->prepare("SELECT * FROM invoice_items WHERE invoice_id = ?"); $items->execute([$id]);
+        $items = $items->fetchAll();
+
+        $settings = [];
+        foreach ($this->db->query("SELECT * FROM settings")->fetchAll() as $s) { $settings[$s['setting_key']] = $s['setting_value']; }
+
+        // ?format=html  -> preview in browser (legacy behavior)
+        // ?download=1   -> attachment
+        // default       -> inline PDF (opens in browser reader)
+        $format = $this->input('format', 'pdf');
+        if ($format === 'html') {
+            header('Content-Type: text/html; charset=utf-8');
+            require APP_ROOT . '/views/invoices/pdf.php';
+            exit;
+        }
+
+        $attachment = $this->input('download') === '1';
+        $svc = new \App\Services\InvoicePdfService();
+        $svc->stream($invoice, $items, $settings, $attachment);
         exit;
     }
 }

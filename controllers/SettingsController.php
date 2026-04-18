@@ -29,6 +29,52 @@ class SettingsController extends Controller {
         ]);
     }
 
+    // ==================== API Tokens ====================
+
+    public function apiTokens(): void {
+        $this->requireRole([ROLE_ADMIN]);
+        $tokens = $this->db->query("
+            SELECT t.id, t.name, t.last_used_at, t.expires_at, t.created_at, t.revoked_at, u.full_name AS issued_to
+            FROM api_tokens t JOIN users u ON u.id = t.user_id
+            ORDER BY t.created_at DESC
+        ")->fetchAll();
+
+        $newToken = $_SESSION['new_api_token'] ?? null;
+        unset($_SESSION['new_api_token']);
+
+        $this->render('settings/api_tokens', [
+            'pageTitle' => 'Jetons API',
+            'tokens'    => $tokens,
+            'newToken'  => $newToken,
+        ]);
+    }
+
+    public function createApiToken(): void {
+        $this->requireRole([ROLE_ADMIN]);
+        if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/settings/api-tokens'); }
+        $name = trim((string)$this->input('name', ''));
+        if ($name === '') {
+            $this->flash('error', 'Nom requis.');
+            $this->redirect('/settings/api-tokens');
+        }
+        $expiresDays = (int)$this->input('expires_days', 365);
+        $expiresAt = $expiresDays > 0 ? date('Y-m-d H:i:s', strtotime("+$expiresDays days")) : null;
+
+        $auth = new \App\Api\TokenAuth($this->db);
+        $raw = $auth->issue($_SESSION['user_id'], $name, $expiresAt);
+        $_SESSION['new_api_token'] = $raw;
+        $this->flash('success', 'Token cree. Copiez-le maintenant — il ne sera plus affiche.');
+        $this->redirect('/settings/api-tokens');
+    }
+
+    public function revokeApiToken(string $id): void {
+        $this->requireRole([ROLE_ADMIN]);
+        if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/settings/api-tokens'); }
+        (new \App\Api\TokenAuth($this->db))->revoke($id);
+        $this->flash('success', 'Token revoque.');
+        $this->redirect('/settings/api-tokens');
+    }
+
     public function update(): void {
         $this->requireRole([ROLE_ADMIN]);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/settings'); }

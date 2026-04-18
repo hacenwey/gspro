@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
+
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/core/Tenant.php';
@@ -172,6 +176,7 @@ Router::post('/invoices/update/{id}', 'InvoiceController', 'update');
 Router::post('/invoices/convert/{id}', 'InvoiceController', 'convertToInvoice');
 Router::post('/invoices/delete/{id}', 'InvoiceController', 'delete');
 Router::get('/invoices/pdf/{id}', 'InvoiceController', 'pdf');
+Router::post('/invoices/email/{id}', 'InvoiceController', 'email');
 
 // Debts & Credits
 Router::get('/debts', 'DebtController', 'index');
@@ -198,9 +203,26 @@ Router::get('/onboarding', 'OnboardingController', 'index');
 Router::post('/onboarding/company', 'OnboardingController', 'saveCompany');
 Router::get('/onboarding/skip', 'OnboardingController', 'skip');
 
-// API endpoints
+// API endpoints (legacy — session-based, same-origin)
 Router::get('/api/clients/search', 'ClientController', 'search');
 Router::get('/api/products/list', 'ProductController', 'apiList');
+
+// REST API v1 (bearer token)
+Router::get('/api/v1/health',        'ApiController', 'health');
+Router::get('/api/v1/products',      'ApiController', 'listProducts');
+Router::get('/api/v1/invoices',      'ApiController', 'listInvoices');
+Router::get('/api/v1/invoices/{id}', 'ApiController', 'getInvoice');
+Router::get('/api/v1/customers',     'ApiController', 'listCustomers');
+
+// API tokens management (UI)
+Router::get('/settings/api-tokens',          'SettingsController', 'apiTokens');
+Router::post('/settings/api-tokens/create',  'SettingsController', 'createApiToken');
+Router::post('/settings/api-tokens/revoke/{id}', 'SettingsController', 'revokeApiToken');
+
+// CSV exports
+Router::get('/export/products', 'ExportController', 'products');
+Router::get('/export/clients',  'ExportController', 'clients');
+Router::get('/export/sales',    'ExportController', 'sales');
 
 // Dispatch
 Router::dispatch();

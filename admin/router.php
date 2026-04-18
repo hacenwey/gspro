@@ -27,6 +27,9 @@ $routes = [
         '/tickets/view/{id}' => 'viewTicket',
         '/connections'  => 'connections',
         '/polar'        => 'polar',
+        '/migrations'   => 'migrations',
+        '/migrations/run' => 'runMigrations',
+        '/migrations/baseline' => 'baselineMigrations',
     ],
     'POST' => [
         '/login'          => 'login',

@@ -40,11 +40,7 @@
     </style>
 </head>
 <body>
-    <div class="no-print" style="margin-bottom:20px;text-align:right;">
-        <button onclick="window.print()" style="padding:10px 20px;background:#1B4F72;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;">Imprimer / PDF</button>
-    </div>
-
-    <div class="header">
+<div class="header">
         <div>
             <div class="company"><?= e($settings['company_name'] ?? 'Mon Entreprise') ?></div>
             <div class="company-info">
@@ -98,12 +94,12 @@
     </table>
 
     <div class="totals">
-        <div class="total-row"><span>Sous-total HT</span><span class="text-mono"><?= number_format($invoice['subtotal'], 2, ',', ' ') ?> DA</span></div>
-        <div class="total-row"><span>TVA</span><span class="text-mono"><?= number_format($invoice['tax_amount'], 2, ',', ' ') ?> DA</span></div>
+        <div class="total-row"><span>Sous-total HT</span><span class="text-mono"><?= formatMoney($invoice['subtotal']) ?></span></div>
+        <div class="total-row"><span>TVA</span><span class="text-mono"><?= formatMoney($invoice['tax_amount']) ?></span></div>
         <?php if ($invoice['discount_amount'] > 0): ?>
-        <div class="total-row"><span>Remise</span><span class="text-mono" style="color:#c00;">-<?= number_format($invoice['discount_amount'], 2, ',', ' ') ?> DA</span></div>
+        <div class="total-row"><span>Remise</span><span class="text-mono" style="color:#c00;">-<?= formatMoney($invoice['discount_amount']) ?></span></div>
         <?php endif; ?>
-        <div class="total-row grand"><span>Total TTC</span><span class="text-mono"><?= number_format($invoice['total'], 2, ',', ' ') ?> DA</span></div>
+        <div class="total-row grand"><span>Total TTC</span><span class="text-mono"><?= formatMoney($invoice['total']) ?></span></div>
     </div>
 
     <?php if ($invoice['notes']): ?>

@@ -59,35 +59,13 @@ class DebtController extends Controller {
 
         $this->db->beginTransaction();
         try {
-            $newPaid = $debt['paid_amount'] + $amount;
-            $newStatus = $newPaid >= $debt['total_amount'] ? 'paid' : 'partial';
-
-            $this->db->prepare("UPDATE debts SET paid_amount = ?, status = ? WHERE id = ?")
-                ->execute([$newPaid, $newStatus, $id]);
-
-            // Record payment
-            $paymentType = $debt['type'] === 'receivable' ? 'incoming' : 'outgoing';
-            $this->db->prepare("INSERT INTO payments (id, type, invoice_id, customer_id, supplier_id, amount, method, payment_date, notes, user_id) VALUES (?,?,?,?,?,?,?,CURDATE(),?,?)")
-                ->execute([$this->generateUUID(), $paymentType, $debt['invoice_id'], $debt['customer_id'], $debt['supplier_id'], $amount, $method, $this->input('notes'), $_SESSION['user_id']]);
-
-            // Update invoice if linked
-            if ($debt['invoice_id']) {
-                $this->db->prepare("UPDATE invoices SET amount_paid = amount_paid + ?, status = CASE WHEN amount_paid + ? >= total THEN 'paid' ELSE 'partial' END WHERE id = ?")
-                    ->execute([$amount, $amount, $debt['invoice_id']]);
-            }
-
-            // Update customer/supplier balance
-            if ($debt['customer_id']) {
-                $this->db->prepare("UPDATE customers SET balance = balance + ? WHERE id = ?")->execute([$amount, $debt['customer_id']]);
-            }
-            if ($debt['supplier_id']) {
-                $this->db->prepare("UPDATE suppliers SET balance = balance + ? WHERE id = ?")->execute([$amount, $debt['supplier_id']]);
-            }
-
+            $svc = new \App\Services\PaymentService($this->db);
+            $svc->applyDebtPayment($debt, $amount, $method, $this->input('notes'), $_SESSION['user_id']);
             $this->db->commit();
             $this->flash('success', 'Paiement de ' . formatMoney($amount) . ' enregistre.');
         } catch (Exception $e) {
             $this->db->rollBack();
+            \App\Logging\Logger::exception($e, ['action' => 'debt.pay', 'debt_id' => $id]);
             $this->flash('error', 'Erreur: ' . $e->getMessage());
         }
 

@@ -1,5 +1,14 @@
 <?php
 return [
+    // Admin panel
+    'admin.role' => 'المسؤول العام',
+    'admin.logout' => 'تسجيل الخروج',
+    'admin.nav.dashboard' => 'لوحة التحكم',
+    'admin.nav.tenants' => 'العملاء',
+    'admin.nav.connections' => 'الاتصالات',
+    'admin.nav.polar' => 'Polar.sh',
+    'admin.nav.tickets' => 'التذاكر',
+
     // Navigation
     'nav.main' => 'الرئيسية',
     'nav.dashboard' => 'لوحة التحكم',
@@ -254,6 +263,8 @@ return [
     'pos.cart' => 'السلة',
     'pos.cart_empty' => 'السلة فارغة',
     'pos.search' => 'ابحث أو امسح الباركود...',
+    'pos.catalog_hint' => 'منتجات معروضة (ابحث في الكتالوج الكامل)',
+    'pos.no_results' => 'لا توجد منتجات',
     'pos.client_search' => 'ابحث عن زبون...',
     'pos.all' => 'الكل',
     'pos.hold' => 'انتظار',

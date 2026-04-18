@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr" data-theme="light">
+<html lang="<?= Lang::locale() ?>" dir="<?= Lang::dir() ?>" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,24 +60,27 @@
             <div class="logo">SA</div>
             <div>
                 <h2>GestionPro</h2>
-                <small>Super Admin</small>
+                <small><?= __('admin.role') ?></small>
             </div>
         </div>
         <nav class="admin-nav">
             <a href="<?= adminUrl('/') ?>" class="<?= Tenant::extractAdminPath() === '/' ? 'active' : '' ?>">
-                <i class="fas fa-chart-pie"></i> Tableau de bord
+                <i class="fas fa-chart-pie"></i> <?= __('admin.nav.dashboard') ?>
             </a>
             <a href="<?= adminUrl('/tenants') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/tenants') ? 'active' : '' ?>">
-                <i class="fas fa-building"></i> Clients
+                <i class="fas fa-building"></i> <?= __('admin.nav.tenants') ?>
             </a>
             <a href="<?= adminUrl('/connections') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/connections') ? 'active' : '' ?>">
-                <i class="fas fa-right-to-bracket"></i> Connexions
+                <i class="fas fa-right-to-bracket"></i> <?= __('admin.nav.connections') ?>
             </a>
             <a href="<?= adminUrl('/polar') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/polar') ? 'active' : '' ?>">
-                <i class="fas fa-credit-card"></i> Polar.sh
+                <i class="fas fa-credit-card"></i> <?= __('admin.nav.polar') ?>
+            </a>
+            <a href="<?= adminUrl('/migrations') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/migrations') ? 'active' : '' ?>">
+                <i class="fas fa-database"></i> Migrations
             </a>
             <a href="<?= adminUrl('/tickets') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/tickets') ? 'active' : '' ?>" style="position:relative;">
-                <i class="fas fa-headset"></i> Tickets
+                <i class="fas fa-headset"></i> <?= __('admin.nav.tickets') ?>
                 <?php
                 try {
                     $__openCount = Tenant::getMasterDB()->query("SELECT COUNT(*) FROM tickets WHERE status IN ('open','in_progress')")->fetchColumn();
@@ -92,7 +95,7 @@
                 <i class="fas fa-user-shield"></i> <?= e($_SESSION['super_admin_name'] ?? 'Admin') ?>
             </div>
             <a href="<?= adminUrl('/logout') ?>" style="color: var(--danger); font-size: 12px;">
-                <i class="fas fa-sign-out-alt"></i> Deconnexion
+                <i class="fas fa-sign-out-alt"></i> <?= __('admin.logout') ?>
             </a>
         </div>
     </aside>

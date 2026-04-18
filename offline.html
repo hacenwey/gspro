@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hors ligne — GestionPro</title>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #F8FAFC; color: #0F172A; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .card { background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 48px 40px; max-width: 420px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        h1 { font-size: 22px; font-weight: 700; margin: 16px 0 8px; }
+        p { color: #64748B; font-size: 14px; line-height: 1.5; margin: 0 0 24px; }
+        .icon { font-size: 48px; color: #DC2626; }
+        button { background: #4F46E5; color: #fff; border: 0; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        button:hover { background: #6366F1; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">&#128268;</div>
+        <h1>Hors ligne</h1>
+        <p>La connexion reseau n'est pas disponible.<br>Verifiez votre connexion et reessayez.</p>
+        <button onclick="location.reload()">Reessayer</button>
+    </div>
+</body>
+</html>

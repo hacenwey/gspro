@@ -1174,6 +1174,103 @@ textarea.form-control {
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
+.hidden, .d-none { display: none !important; }
+.d-block { display: block !important; }
+.d-inline-block { display: inline-block !important; }
+.d-grid { display: grid !important; }
+.flex-column { flex-direction: column; }
+.align-start { align-items: flex-start; }
+.align-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.gap-0 { gap: 0; }
+.gap-3 { gap: 24px; }
+.gap-4 { gap: 32px; }
+.mb-4 { margin-bottom: 32px !important; }
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: 8px !important; }
+.mt-4 { margin-top: 32px !important; }
+.p-0 { padding: 0 !important; }
+.p-2 { padding: 16px !important; }
+.p-3 { padding: 24px !important; }
+.pl-0 { padding-left: 0 !important; }
+.pr-0 { padding-right: 0 !important; }
+.w-auto { width: auto !important; }
+.text-sm { font-size: 12px; }
+.text-xs { font-size: 11px; }
+.position-relative { position: relative; }
+.cursor-pointer { cursor: pointer; }
+.overflow-auto { overflow: auto; }
+.nowrap { white-space: nowrap; }
+
+/* === Language toggle === */
+.lang-toggle {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2px;
+}
+.lang-toggle a {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--text-muted);
+}
+.lang-toggle a.active {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* === Trial banner === */
+.trial-banner {
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    border: 1px solid #F59E0B;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.trial-banner .icon { font-size: 22px; color: #D97706; }
+.trial-banner .title { font-weight: 700; color: #92400E; font-size: 14px; }
+.trial-banner .subtitle { font-size: 12px; color: #78350F; margin-top: 2px; }
+.trial-banner .cta {
+    background: #D97706;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* === Page header (generic view head: title + toolbar actions) === */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+.page-header h1, .page-header h2, .page-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+.page-header .page-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 /* === Stats Grid === */
 .stats-list { list-style: none; }
 .stats-list li {
