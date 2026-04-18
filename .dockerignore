@@ -4,6 +4,9 @@
 .idea
 .vscode
 node_modules
+vendor
+.phpunit.cache
+tests
 *.log
 *.swp
 *.bak
@@ -11,6 +14,9 @@ docker-compose.yml
 .dockerignore
 .env
 .env.example
+.env.prod
+.env.prod.example
 README.md
+AUDIT_V2.md
 public/uploads/*
 !public/uploads/.gitkeep

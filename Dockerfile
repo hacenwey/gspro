@@ -44,7 +44,12 @@ COPY docker/apache/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/entrypoint.sh
 
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
 WORKDIR /var/www/html/gestion_commerciale
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --optimize-autoloader --no-scripts --prefer-dist
 
 COPY . /var/www/html/gestion_commerciale
 
