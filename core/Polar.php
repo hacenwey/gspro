@@ -183,20 +183,30 @@ class Polar {
         $ts  = self::header($headers, 'webhook-timestamp');
         $sig = self::header($headers, 'webhook-signature');
         if ($id === '' || $ts === '' || $sig === '') return false;
+        // Replay window: 5 minutes
         if (abs(time() - (int)$ts) > 300) return false;
 
-        $key = $secret;
+        // Build candidate HMAC keys. Different Standard Webhooks implementations
+        // interpret the prefixed secret differently, so we try all plausible forms.
+        $keys = [];
+        $stripped = $secret;
         foreach (['polar_whs_', 'whsec_'] as $prefix) {
-            if (str_starts_with($key, $prefix)) { $key = substr($key, strlen($prefix)); break; }
+            if (str_starts_with($stripped, $prefix)) {
+                $stripped = substr($stripped, strlen($prefix));
+                break;
+            }
         }
-        $decoded = base64_decode($key, true);
-        if ($decoded === false) $decoded = $key;
+        $keys[] = $stripped;                    // raw string (post-prefix)
+        $keys[] = $secret;                      // raw string (full, with prefix)
+        $decoded = base64_decode($stripped, true);
+        if ($decoded !== false) $keys[] = $decoded;  // base64-decoded bytes
 
         $signed = $id . '.' . $ts . '.' . $rawBody;
-        $expected = 'v1,' . base64_encode(hash_hmac('sha256', $signed, $decoded, true));
-
-        foreach (explode(' ', $sig) as $candidate) {
-            if (hash_equals($expected, $candidate)) return true;
+        foreach ($keys as $k) {
+            $expected = 'v1,' . base64_encode(hash_hmac('sha256', $signed, $k, true));
+            foreach (explode(' ', $sig) as $candidate) {
+                if (hash_equals($expected, $candidate)) return true;
+            }
         }
         return false;
     }
