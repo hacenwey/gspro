@@ -46,6 +46,7 @@ $routes = [
         '/polar/products/create' => 'createPolarProduct',
         '/polar/products/archive/{id}' => 'archivePolarProduct',
         '/polar/products/assign' => 'assignPolarProduct',
+        '/polar/products/features' => 'saveProductFeatures',
     ]
 ];
 

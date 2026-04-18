@@ -2,7 +2,11 @@
 /** @var array $cfg */
 /** @var array $products */
 /** @var string $productsError */
+/** @var array $features */
+/** @var array $defaultFeatures */
 $mode   = $cfg['mode'] ?? 'sandbox';
+$features        = $features        ?? [];
+$defaultFeatures = $defaultFeatures ?? [];
 $isLive = $mode === 'live';
 $mask   = fn(string $v): string => $v === '' ? '' : str_repeat('*', max(6, strlen($v) - 4)) . substr($v, -4);
 
@@ -98,6 +102,25 @@ foreach ($products as $p) {
 .copy-input span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .muted-hint { font-size: 12px; color: var(--text-muted); }
+
+.feat-toggle {
+    background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.feat-toggle:hover { border-color: var(--primary); color: var(--primary); }
+.feat-toggle.has-custom { border-color: #10B981; color: #10B981; }
+.feat-editor {
+    display: none; padding: 16px 20px; background: var(--bg-subtle);
+    border-bottom: 1px solid var(--border);
+}
+.feat-editor.open { display: block; }
+.feat-editor textarea {
+    width: 100%; min-height: 140px; font-family: var(--font-mono); font-size: 12.5px;
+    padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); color: var(--text); resize: vertical;
+}
+.feat-editor .hint { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
 </style>
 
 <!-- Hero -->
@@ -287,6 +310,12 @@ foreach ($products as $p) {
                 if ($pid === ($cfg[$mode.'_'.$plan.'_product_id'] ?? '')) { $assignedAs = $plan; break; }
             }
         ?>
+        <?php
+            $custom     = $features[$pid] ?? [];
+            $hasCustom  = !empty($custom);
+            $textarea   = $hasCustom ? implode("\n", $custom) : implode("\n", $defaultFeatures);
+            $editorId   = 'feat-' . md5($pid);
+        ?>
         <div class="product-row <?= $archived ? 'archived' : '' ?>">
             <div class="product-thumb"><?= e($initial) ?></div>
             <div style="flex:1;min-width:0;">
@@ -306,6 +335,13 @@ foreach ($products as $p) {
                 <div class="product-cycle"><?= e($interval) ?></div>
             </div>
             <?php if (!$archived): ?>
+            <button type="button"
+                    class="feat-toggle <?= $hasCustom ? 'has-custom' : '' ?>"
+                    data-target="<?= $editorId ?>"
+                    title="<?= $hasCustom ? 'Fonctionnalites personnalisees' : 'Utilise les valeurs par defaut' ?>">
+                <i class="fas fa-list-check"></i>
+                <?= count($hasCustom ? $custom : $defaultFeatures) ?>
+            </button>
             <div class="assign-pills">
                 <?php foreach (['starter' => 'S', 'pro' => 'P', 'enterprise' => 'E'] as $plan => $letter): ?>
                 <form method="POST" action="<?= adminUrl('/polar/products/assign') ?>" style="margin:0;">
@@ -325,6 +361,31 @@ foreach ($products as $p) {
             </form>
             <?php endif; ?>
         </div>
+        <?php if (!$archived): ?>
+        <div class="feat-editor" id="<?= $editorId ?>">
+            <form method="POST" action="<?= adminUrl('/polar/products/features') ?>">
+                <input type="hidden" name="product_id" value="<?= e($pid) ?>">
+                <label class="form-label" style="font-weight:700;margin-bottom:6px;display:block;">
+                    Fonctionnalites affichees sur la landing
+                    <?php if (!$hasCustom): ?>
+                    <span class="badge badge-secondary" style="font-size:10px;margin-left:6px;">Valeurs par defaut</span>
+                    <?php endif; ?>
+                </label>
+                <textarea name="features" placeholder="Une ligne = un bullet..."><?= e($textarea) ?></textarea>
+                <div class="hint">Une ligne par bullet. Laissez vide pour retomber sur la liste par defaut. Max 10 bullets.</div>
+                <div style="margin-top:10px;display:flex;gap:8px;">
+                    <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+                    <?php if ($hasCustom): ?>
+                    <button type="submit" class="btn btn-sm btn-ghost" style="color:#DC2626;"
+                            onclick="this.form.features.value='';return true;"
+                            title="Revenir aux valeurs par defaut">
+                        <i class="fas fa-rotate-left"></i> Reinitialiser
+                    </button>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
+        <?php endif; ?>
         <?php endforeach; ?>
         <?php endif; ?>
     </div>
@@ -358,6 +419,13 @@ document.querySelectorAll('#polar-tabs .polar-tab').forEach(tab => {
         const env = tab.dataset.env;
         document.querySelectorAll('#polar-tabs .polar-tab').forEach(t => t.classList.toggle('active', t === tab));
         document.querySelectorAll('.polar-pane').forEach(p => p.classList.toggle('active', p.dataset.env === env));
+    });
+});
+
+document.querySelectorAll('.feat-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        if (target) target.classList.toggle('open');
     });
 });
 </script>

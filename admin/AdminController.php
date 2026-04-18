@@ -592,7 +592,26 @@ class AdminController {
         }
 
         $flash = $this->getFlash();
-        $this->render('polar', compact('cfg', 'products', 'productsError', 'flash'));
+        $features = ProductFeatures::all();
+        $defaultFeatures = ProductFeatures::defaults();
+        $this->render('polar', compact('cfg', 'products', 'productsError', 'flash', 'features', 'defaultFeatures'));
+    }
+
+    public function saveProductFeatures(): void {
+        $this->requireAuth();
+        $productId = trim((string)($_POST['product_id'] ?? ''));
+        $raw       = (string)($_POST['features'] ?? '');
+        if ($productId === '') {
+            $this->flash('error', 'Produit manquant.');
+            $this->redirect('/polar');
+        }
+        try {
+            ProductFeatures::save($productId, $raw);
+            $this->flash('success', 'Fonctionnalites mises a jour.');
+        } catch (Throwable $e) {
+            $this->flash('error', 'Erreur : ' . $e->getMessage());
+        }
+        $this->redirect('/polar');
     }
 
     public function savePolar(): void {

@@ -18,17 +18,21 @@ $pricePro     = GeoCurrency::formatPrice('pro');
 // response the view falls back to the hardcoded Starter + Pro cards below.
 $polarProducts = [];
 if (class_exists('Polar') && Polar::isConfigured()) {
+    $featuresMap     = class_exists('ProductFeatures') ? ProductFeatures::all() : [];
+    $defaultFeatures = class_exists('ProductFeatures') ? ProductFeatures::defaults() : [];
     foreach (Polar::listProductsCached() as $p) {
         if (($p['is_archived'] ?? false) === true) continue;
         $price = ($p['prices'][0] ?? null);
         if (!$price || ($price['amount_type'] ?? '') !== 'fixed') continue;
+        $pid = (string)($p['id'] ?? '');
         $polarProducts[] = [
-            'id'       => (string)($p['id'] ?? ''),
+            'id'       => $pid,
             'name'     => (string)($p['name'] ?? ''),
             'desc'     => (string)($p['description'] ?? ''),
             'amount'   => (int)($price['price_amount'] ?? 0), // cents
             'currency' => strtoupper((string)($price['price_currency'] ?? 'USD')),
             'interval' => (string)($p['recurring_interval'] ?? 'month'),
+            'features' => !empty($featuresMap[$pid]) ? $featuresMap[$pid] : $defaultFeatures,
         ];
     }
     // Cheapest first so the layout reads naturally.
@@ -429,11 +433,9 @@ if (class_exists('Polar') && Polar::isConfigured()) {
                 <div class="price-amount"><?= $priceStr ?><span><?= $intervalL ?></span></div>
                 <div class="price-note"><?= $billed ?></div>
                 <ul class="price-list">
-                    <li><i class="fas fa-check"></i> POS + unlimited invoices</li>
-                    <li><i class="fas fa-check"></i> Products, stock, customers, suppliers</li>
-                    <li><i class="fas fa-check"></i> PDF invoices + CSV exports</li>
-                    <li><i class="fas fa-check"></i> Secure card checkout (Polar)</li>
-                    <li><i class="fas fa-check"></i> Cancel anytime during the trial</li>
+                    <?php foreach ($prod['features'] as $bullet): ?>
+                    <li><i class="fas fa-check"></i> <?= htmlspecialchars($bullet, ENT_QUOTES) ?></li>
+                    <?php endforeach; ?>
                 </ul>
                 <button class="<?= $btnClass ?>" onclick="openRegister('<?= htmlspecialchars($prod['id'], ENT_QUOTES) ?>')">Start 7-day trial</button>
             </div>
