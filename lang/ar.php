@@ -408,6 +408,11 @@ return [
     'onboarding.feat.cash_report' => 'تقرير الصندوق',
     'onboarding.feat.cash_report_desc' => 'ملخص نهاية اليوم',
 
+    // Trial banner
+    'trial.banner.days_left' => 'تبقى لديك {n} يوم من الفترة التجريبية المجانية',
+    'trial.banner.subtitle' => 'فعّل اشتراكك لتجنب انقطاع الخدمة.',
+    'trial.banner.activate' => 'تفعيل',
+
     // Support Tickets
     'tickets.title' => 'الدعم الفني',
     'tickets.subtitle' => 'طلبات الدعم الفني الخاصة بك',

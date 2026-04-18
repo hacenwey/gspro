@@ -149,7 +149,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label"><?= __('onboarding.company_address') ?></label>
-                    <input type="text" name="company_address" class="form-control" value="<?= e($settings['company_address'] ?? '') ?>" placeholder="Nouakchott, Mauritanie">
+                    <input type="text" name="company_address" class="form-control" value="<?= e($settings['company_address'] ?? '') ?>">
                 </div>
             </form>
         </div>
@@ -163,29 +163,29 @@
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'إدارة المخزون' : 'Gestion de stock' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'تتبع المدخلات والمخرجات تلقائياً' : 'Entrees/sorties automatiques' ?></p>
+                        <h4><?= __('onboarding.feat.stock') ?></h4>
+                        <p><?= __('onboarding.feat.stock_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'رمز البار' : 'Code-barres' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'مسح سريع للمنتجات' : 'Scan rapide des produits' ?></p>
+                        <h4><?= __('onboarding.feat.barcode') ?></h4>
+                        <p><?= __('onboarding.feat.barcode_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'تنبيهات المخزون' : 'Alertes stock' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'إشعار عند انخفاض المخزون' : 'Notification stock bas' ?></p>
+                        <h4><?= __('onboarding.feat.alerts') ?></h4>
+                        <p><?= __('onboarding.feat.alerts_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'الأصناف' : 'Categories' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'تنظيم المنتجات حسب الصنف' : 'Organisez vos produits' ?></p>
+                        <h4><?= __('onboarding.feat.categories') ?></h4>
+                        <p><?= __('onboarding.feat.categories_desc') ?></p>
                     </div>
                 </div>
             </div>
@@ -200,29 +200,29 @@
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'إدارة الديون' : 'Suivi des credits' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'اعرف من يدين لك بالضبط' : 'Sachez qui vous doit combien' ?></p>
+                        <h4><?= __('onboarding.feat.credits') ?></h4>
+                        <p><?= __('onboarding.feat.credits_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'فئات الزبائن' : 'Categories VIP' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'عادي، مميز، عابر' : 'Regular, VIP, Occasionnel' ?></p>
+                        <h4><?= __('onboarding.feat.vip') ?></h4>
+                        <p><?= __('onboarding.feat.vip_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'سجل المشتريات' : 'Historique achats' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'كل عمليات الزبون' : 'Toutes les transactions' ?></p>
+                        <h4><?= __('onboarding.feat.history') ?></h4>
+                        <p><?= __('onboarding.feat.history_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'دفع موبايل' : 'Mobile Money' ?></h4>
-                        <p>Bankily, Masrivi, Sedad</p>
+                        <h4><?= __('payments.method.card') ?></h4>
+                        <p><?= __('payments.method.transfer') ?>, <?= __('payments.method.mobile') ?></p>
                     </div>
                 </div>
             </div>
@@ -237,29 +237,29 @@
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'بيع سريع' : 'Vente rapide' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'واجهة بسيطة وسريعة' : 'Interface simple et rapide' ?></p>
+                        <h4><?= __('onboarding.feat.fast_sale') ?></h4>
+                        <p><?= __('onboarding.feat.fast_sale_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'بيع بالدين' : 'Vente a credit' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'تتبع تلقائي للديون' : 'Suivi automatique des dettes' ?></p>
+                        <h4><?= __('onboarding.feat.credit_sale') ?></h4>
+                        <p><?= __('onboarding.feat.credit_sale_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'فواتير فورية' : 'Factures instantanees' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'فاتورة تلقائية عند كل بيع' : 'Facture auto a chaque vente' ?></p>
+                        <h4><?= __('onboarding.feat.instant_invoice') ?></h4>
+                        <p><?= __('onboarding.feat.instant_invoice_desc') ?></p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <i class="fas fa-check-circle"></i>
                     <div class="info">
-                        <h4><?= Lang::locale() === 'ar' ? 'تقرير الصندوق' : 'Rapport de caisse' ?></h4>
-                        <p><?= Lang::locale() === 'ar' ? 'ملخص نهاية اليوم' : 'Bilan fin de journee' ?></p>
+                        <h4><?= __('onboarding.feat.cash_report') ?></h4>
+                        <p><?= __('onboarding.feat.cash_report_desc') ?></p>
                     </div>
                 </div>
             </div>

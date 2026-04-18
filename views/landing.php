@@ -1,17 +1,4 @@
 <?php
-// Allow manual currency override via ?currency=MRU|USD (stored in session)
-if (isset($_GET['currency']) && in_array($_GET['currency'], ['MRU', 'USD'], true)) {
-    $_SESSION['geo_currency'] = [
-        'country'  => $_GET['currency'] === 'MRU' ? 'MR' : 'XX',
-        'currency' => $_GET['currency'],
-        'symbol'   => $_GET['currency'] === 'MRU' ? 'UM' : '$',
-    ];
-}
-
-$geo = GeoCurrency::detect();
-$cur = $geo['currency'];
-$sym = $geo['symbol'];
-
 // Stats for social proof
 try {
     $masterDb = Tenant::getMasterDB();
@@ -24,16 +11,16 @@ try {
     $activeTenants = 0;
 }
 
-$priceStarter = GeoCurrency::formatPrice('starter', $cur, $sym);
-$pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
+$priceStarter = GeoCurrency::formatPrice('starter');
+$pricePro     = GeoCurrency::formatPrice('pro');
 ?>
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GestionPro — Logiciel de gestion commerciale tout-en-un</title>
-    <meta name="description" content="Gerez stocks, factures, caisse POS et clients. 7 jours d'essai gratuit, annulable a tout moment. Adapte a la Mauritanie et l'Afrique francophone.">
+    <title>GestionPro — All-in-one business management software</title>
+    <meta name="description" content="Manage stock, invoices, POS and clients. 7-day free trial, cancel anytime.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -66,9 +53,6 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
         .nav-links a:hover{color:var(--text);background:var(--primary-50)}
         .nav-links .btn-nav{background:var(--primary);color:#fff;font-weight:600;padding:9px 18px;border-radius:10px;display:inline-flex;align-items:center;gap:6px}
         .nav-links .btn-nav:hover{background:var(--primary-dark);color:#fff}
-        .currency-switch{display:inline-flex;padding:3px;background:var(--primary-50);border:1px solid var(--primary-100);border-radius:100px;font-size:11px;font-weight:700;margin-right:4px}
-        .currency-switch a{padding:5px 11px;border-radius:100px;color:var(--text-muted);transition:all .2s}
-        .currency-switch a.on{background:var(--primary);color:#fff;box-shadow:0 1px 3px rgba(79,70,229,.3)}
 
         /* ===== HERO ===== */
         .hero{padding:130px 24px 80px;position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,var(--primary-50) 100%)}
@@ -113,13 +97,6 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
         .mockup-chart{height:140px;background:linear-gradient(180deg,rgba(79,70,229,.06) 0%,transparent 100%);border-radius:10px;border:1px solid var(--border);position:relative;overflow:hidden}
         .mockup-chart svg{position:absolute;bottom:0;left:0;width:100%}
 
-        /* ===== SOCIAL PROOF ROW ===== */
-        .logos-row{padding:40px 24px;background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-        .logos-row .lbl{text-align:center;font-size:13px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:20px}
-        .logos-grid{display:flex;justify-content:center;align-items:center;gap:40px;flex-wrap:wrap;opacity:.7}
-        .logo-chip{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;color:var(--text-secondary)}
-        .logo-chip i{font-size:20px;color:var(--primary)}
-
         /* ===== SECTION ===== */
         section.pad{padding:100px 24px}
         .section-label{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
@@ -155,11 +132,11 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 
         /* ===== PRICING ===== */
         .pricing-center{text-align:center}
-        .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px;text-align:left;max-width:1100px;margin-left:auto;margin-right:auto}
+        .pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:48px;text-align:left;max-width:760px;margin-left:auto;margin-right:auto}
         .price-card{padding:32px 28px;border-radius:18px;border:1px solid var(--border);background:var(--surface);position:relative;transition:all .25s}
         .price-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
         .price-card.popular{border-color:var(--primary);box-shadow:0 8px 32px rgba(79,70,229,.15);border-width:1.5px}
-        .price-card.popular::before{content:'⭐ Plus choisi';position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:5px 14px;background:var(--primary);color:#fff;border-radius:100px;font-size:11px;font-weight:700;white-space:nowrap}
+        .price-card.popular::before{content:'\2B50 Most popular';position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:5px 14px;background:var(--primary);color:#fff;border-radius:100px;font-size:11px;font-weight:700;white-space:nowrap}
         .trial-badge{display:inline-block;padding:3px 10px;background:rgba(16,185,129,.1);color:var(--success);font-size:11px;font-weight:700;border-radius:100px;margin-bottom:10px;letter-spacing:.3px}
         .price-name{font-size:19px;font-weight:700;margin-bottom:4px}
         .price-desc{font-size:13px;color:var(--text-muted);margin-bottom:20px}
@@ -188,17 +165,6 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
         .trust-item h4{font-size:14px;font-weight:700;margin-bottom:6px}
         .trust-item p{font-size:12px;color:#94A3B8;line-height:1.55}
 
-        /* ===== TESTIMONIALS ===== */
-        .testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
-        .testimonial{padding:28px;background:#fff;border:1px solid var(--border);border-radius:16px;position:relative}
-        .testimonial .quote{font-size:15px;color:var(--text);line-height:1.65;margin-bottom:18px}
-        .testimonial .author{display:flex;align-items:center;gap:12px}
-        .testimonial .avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
-        .testimonial .info{font-size:13px}
-        .testimonial .info strong{display:block;font-weight:700}
-        .testimonial .info span{color:var(--text-muted)}
-        .stars{color:#F59E0B;margin-bottom:12px;font-size:13px}
-
         /* ===== FAQ ===== */
         .faq-wrap{max-width:780px;margin:48px auto 0}
         .faq-item{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;transition:all .2s}
@@ -216,14 +182,6 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
         .cta-banner p{font-size:16px;opacity:.9;max-width:560px;margin:0 auto 32px}
         .cta-banner .btn-cta{background:#fff;color:var(--primary)}
         .cta-banner .btn-cta:hover{background:#fff;transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.2)}
-
-        /* ===== CLIENTS ===== */
-        .clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:24px}
-        .client-card{display:flex;align-items:center;gap:12px;padding:16px 18px;border:1px solid var(--border);border-radius:12px;background:var(--surface);transition:all .2s}
-        .client-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow-md)}
-        .client-avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-light));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
-        .client-card h4{font-size:14px;font-weight:600}
-        .client-card p{font-size:12px;color:var(--text-muted)}
 
         /* ===== FOOTER ===== */
         .footer{padding:48px 24px 24px;text-align:center;border-top:1px solid var(--border);background:#fff}
@@ -257,20 +215,11 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
         .btn-register:hover{background:var(--primary-dark)}
         .btn-register:disabled{opacity:.6;cursor:not-allowed}
         .register-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--danger);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
-        .register-success{text-align:center;padding:40px 28px}
-        .register-success .check{width:72px;height:72px;border-radius:50%;background:rgba(16,185,129,.1);display:inline-flex;align-items:center;justify-content:center;font-size:32px;color:var(--success);margin-bottom:18px}
-        .register-success h3{font-size:22px;font-weight:800;margin-bottom:8px}
-        .register-success p{font-size:14px;color:var(--text-secondary);margin-bottom:22px;line-height:1.65}
-        .register-success .creds{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 18px;text-align:left;margin-bottom:20px;font-size:14px}
-        .register-success .creds>div{margin-bottom:6px}
-        .register-success .creds>div:last-child{margin-bottom:0}
-        .register-success .creds strong{color:var(--primary)}
-        .btn-go{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none}
-        .btn-go:hover{background:var(--primary-dark)}
 
         /* ===== RESPONSIVE ===== */
         @media (max-width:900px){
-            .features-grid,.pricing-grid,.steps,.testimonials-grid,.trust-grid{grid-template-columns:1fr}
+            .features-grid,.steps,.trust-grid{grid-template-columns:1fr}
+            .pricing-grid{grid-template-columns:1fr}
             .trust-grid{grid-template-columns:repeat(2,1fr)}
             .hero-stats{grid-template-columns:repeat(2,1fr);gap:14px}
         }
@@ -296,15 +245,11 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
             <span>GestionPro</span>
         </div>
         <div class="nav-links">
-            <a href="#features" class="hide-mobile">Fonctionnalites</a>
-            <a href="#pricing" class="hide-mobile">Tarifs</a>
+            <a href="#features" class="hide-mobile">Features</a>
+            <a href="#pricing" class="hide-mobile">Pricing</a>
             <a href="#faq" class="hide-mobile">FAQ</a>
-            <span class="currency-switch hide-mobile" title="Devise d'affichage">
-                <a href="?currency=MRU#pricing" class="<?= $cur === 'MRU' ? 'on' : '' ?>">MRU</a>
-                <a href="?currency=USD#pricing" class="<?= $cur === 'USD' ? 'on' : '' ?>">USD</a>
-            </span>
             <a href="<?= APP_BASE ?>/admin/login" class="hide-mobile" style="font-size:13px;color:var(--text-muted);" title="Administration"><i class="fas fa-shield-halved"></i></a>
-            <a href="javascript:void(0)" class="btn-nav" onclick="openRegister()"><i class="fas fa-rocket"></i> Essayer gratuit</a>
+            <a href="javascript:void(0)" class="btn-nav" onclick="openRegister()"><i class="fas fa-rocket"></i> Start free trial</a>
         </div>
     </div>
 </nav>
@@ -313,51 +258,49 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <section class="hero">
     <div class="hero-inner">
         <div class="hero-badge">
-            <i class="fas fa-gift"></i> 7 jours d'essai — annulable a tout moment
+            <i class="fas fa-gift"></i> 7-day trial — cancel anytime
         </div>
-        <h1>Gerez votre commerce.<br>Simplifiez votre journee.</h1>
-        <p class="hero-sub">La solution tout-en-un pour commerces, PME et boutiques. Stocks, caisse POS, factures, clients et finances — dans un seul outil, pret en 30 secondes.</p>
+        <h1>Run your business.<br>Simplify your day.</h1>
+        <p class="hero-sub">The all-in-one platform for shops, SMBs and service businesses. Stock, POS, invoices, clients and finance — one tool, ready in 30 seconds.</p>
 
         <div class="hero-trust">
-            <span><i class="fas fa-check-circle"></i> 7 jours gratuits a l'essai</span>
-            <span><i class="fas fa-check-circle"></i> Annulez avant J+7 et rien ne sera debite</span>
-            <span><i class="fas fa-check-circle"></i> Support bilingue FR/AR</span>
+            <span><i class="fas fa-check-circle"></i> 7 days free</span>
+            <span><i class="fas fa-check-circle"></i> Cancel before day 7 — no charge</span>
+            <span><i class="fas fa-check-circle"></i> Available in English, French and Arabic</span>
         </div>
 
         <div class="hero-cta">
-            <button class="btn-cta btn-primary-cta" onclick="openRegister()"><i class="fas fa-rocket"></i> Creer mon espace gratuitement</button>
-            <a href="#features" class="btn-cta btn-secondary-cta"><i class="fas fa-play-circle"></i> Voir la demo</a>
+            <button class="btn-cta btn-primary-cta" onclick="openRegister()"><i class="fas fa-rocket"></i> Create my workspace</button>
+            <a href="#features" class="btn-cta btn-secondary-cta"><i class="fas fa-play-circle"></i> See the demo</a>
         </div>
 
-        <!-- Stats -->
         <div class="hero-stats">
-            <div class="hero-stat"><div class="v"><?= max($totalTenants, 50) ?>+</div><div class="l">Entreprises actives</div></div>
-            <div class="hero-stat"><div class="v">30<span style="font-size:.7em;">s</span></div><div class="l">Inscription</div></div>
-            <div class="hero-stat"><div class="v">99.9%</div><div class="l">Disponibilite</div></div>
-            <div class="hero-stat"><div class="v">24/7</div><div class="l">Acces</div></div>
+            <div class="hero-stat"><div class="v"><?= max($totalTenants, 50) ?>+</div><div class="l">Active businesses</div></div>
+            <div class="hero-stat"><div class="v">30<span style="font-size:.7em;">s</span></div><div class="l">Sign-up</div></div>
+            <div class="hero-stat"><div class="v">99.9%</div><div class="l">Uptime</div></div>
+            <div class="hero-stat"><div class="v">24/7</div><div class="l">Access</div></div>
         </div>
 
-        <!-- Mockup -->
         <div class="hero-mockup">
             <div class="mockup-toolbar">
                 <div class="mockup-dot r"></div><div class="mockup-dot y"></div><div class="mockup-dot g"></div>
-                <div style="flex:1;text-align:center;font-size:12px;color:var(--text-muted);">gestionpro.it.com/mon-entreprise/dashboard</div>
+                <div style="flex:1;text-align:center;font-size:12px;color:var(--text-muted);">gestionpro.it.com/my-business/dashboard</div>
             </div>
             <div class="mockup-body">
                 <div class="mockup-sidebar">
-                    <div class="m-item active"><i class="fas fa-chart-line"></i> Tableau de bord</div>
-                    <div class="m-item"><i class="fas fa-cash-register"></i> Caisse POS</div>
-                    <div class="m-item"><i class="fas fa-boxes-stacked"></i> Produits</div>
+                    <div class="m-item active"><i class="fas fa-chart-line"></i> Dashboard</div>
+                    <div class="m-item"><i class="fas fa-cash-register"></i> POS</div>
+                    <div class="m-item"><i class="fas fa-boxes-stacked"></i> Products</div>
                     <div class="m-item"><i class="fas fa-users"></i> Clients</div>
-                    <div class="m-item"><i class="fas fa-file-invoice-dollar"></i> Factures</div>
-                    <div class="m-item"><i class="fas fa-hand-holding-dollar"></i> Dettes</div>
-                    <div class="m-item"><i class="fas fa-money-bill-wave"></i> Paiements</div>
+                    <div class="m-item"><i class="fas fa-file-invoice-dollar"></i> Invoices</div>
+                    <div class="m-item"><i class="fas fa-hand-holding-dollar"></i> Debts</div>
+                    <div class="m-item"><i class="fas fa-money-bill-wave"></i> Payments</div>
                 </div>
                 <div class="mockup-main">
                     <div class="mockup-kpi">
-                        <div class="m-kpi"><div class="val green">847 500 <?= $sym ?></div><div class="lbl">CA du jour</div></div>
-                        <div class="m-kpi"><div class="val blue">2 340</div><div class="lbl">Produits en stock</div></div>
-                        <div class="m-kpi"><div class="val orange">12</div><div class="lbl">Alertes stock</div></div>
+                        <div class="m-kpi"><div class="val green">$8,475</div><div class="lbl">Today's revenue</div></div>
+                        <div class="m-kpi"><div class="val blue">2,340</div><div class="lbl">Products in stock</div></div>
+                        <div class="m-kpi"><div class="val orange">12</div><div class="lbl">Stock alerts</div></div>
                     </div>
                     <div class="mockup-chart">
                         <svg viewBox="0 0 500 100" preserveAspectRatio="none" style="height:100%;width:100%;">
@@ -375,40 +318,40 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <!-- FEATURES -->
 <section class="pad" id="features">
     <div class="container">
-        <div class="section-label"><i class="fas fa-bolt"></i> Fonctionnalites</div>
-        <div class="section-title">Tout pour gerer votre commerce</div>
-        <div class="section-desc">Une solution complete, conçue pour les commerces et PME de Mauritanie et d'Afrique francophone. Paiements mobiles, bilingue, TVA locale.</div>
+        <div class="section-label"><i class="fas fa-bolt"></i> Features</div>
+        <div class="section-title">Everything to run your business</div>
+        <div class="section-desc">A complete toolkit for shops and SMBs anywhere in the world. Multi-user, multilingual, ready out of the box.</div>
 
         <div class="features-grid">
             <div class="feat-card">
                 <div class="feat-icon i1"><i class="fas fa-cash-register"></i></div>
-                <h3>Caisse POS rapide</h3>
-                <p>Interface de vente intuitive avec scan code-barres, recherche produit instantanee et paiement en un clic.</p>
+                <h3>Fast POS</h3>
+                <p>Intuitive sales interface with barcode scan, instant product search and one-click checkout.</p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i2"><i class="fas fa-boxes-stacked"></i></div>
-                <h3>Gestion de stock</h3>
-                <p>Suivi en temps reel, alertes stock bas, entrees/sorties automatiques a chaque vente.</p>
+                <h3>Stock management</h3>
+                <p>Real-time tracking, low-stock alerts, automatic ins and outs with every sale.</p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i3"><i class="fas fa-file-invoice-dollar"></i></div>
-                <h3>Devis & Factures</h3>
-                <p>Creez des devis, convertissez-les en factures, generez des PDF professionnels en quelques clics.</p>
+                <h3>Quotes & Invoices</h3>
+                <p>Create quotes, convert them to invoices, generate professional PDFs in seconds.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon i4"><i class="fas fa-mobile-screen"></i></div>
-                <h3>Paiements mobiles</h3>
-                <p>Bankily, Masrivi, Sedad : acceptez tous les moyens de paiement mauritaniens.</p>
+                <div class="feat-icon i4"><i class="fas fa-hand-holding-dollar"></i></div>
+                <h3>Credit tracking</h3>
+                <p>Manage customer receivables and supplier payables. Know who owes you what, anytime.</p>
             </div>
             <div class="feat-card">
-                <div class="feat-icon i5"><i class="fas fa-hand-holding-dollar"></i></div>
-                <h3>Suivi des credits</h3>
-                <p>Gerez dettes clients et fournisseurs. Sachez qui vous doit combien, a tout moment.</p>
+                <div class="feat-icon i5"><i class="fas fa-chart-line"></i></div>
+                <h3>Dashboards & reports</h3>
+                <p>Revenue trends, top products, cash positions — clear insights at a glance.</p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i6"><i class="fas fa-language"></i></div>
-                <h3>Bilingue FR / عربي</h3>
-                <p>Interface complete en francais et arabe avec support RTL. Adaptee au marche local.</p>
+                <h3>3 languages</h3>
+                <p>Full interface in English, French and Arabic with native RTL support. Switch in one click.</p>
             </div>
         </div>
     </div>
@@ -417,25 +360,25 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <!-- HOW IT WORKS -->
 <section class="how-section">
     <div class="how-inner">
-        <div class="section-label"><i class="fas fa-wand-magic-sparkles"></i> Demarrage</div>
-        <div class="section-title" style="margin-bottom:0;">Pret en 30 secondes</div>
+        <div class="section-label"><i class="fas fa-wand-magic-sparkles"></i> Getting started</div>
+        <div class="section-title" style="margin-bottom:0;">Ready in 30 seconds</div>
         <div class="steps">
             <div class="step">
                 <div class="step-num">1</div>
-                <h3>Creez votre espace</h3>
-                <p>Choisissez un nom pour votre entreprise. C'est gratuit, sans carte bancaire.</p>
+                <h3>Create your workspace</h3>
+                <p>Pick a name for your business. Enter your card to start the 7-day trial.</p>
                 <span class="step-arrow"><i class="fas fa-chevron-right"></i></span>
             </div>
             <div class="step">
                 <div class="step-num">2</div>
-                <h3>Ajoutez vos produits</h3>
-                <p>Importez votre catalogue, definissez vos prix et stocks initiaux.</p>
+                <h3>Add your products</h3>
+                <p>Import your catalogue, set prices and opening stock levels.</p>
                 <span class="step-arrow"><i class="fas fa-chevron-right"></i></span>
             </div>
             <div class="step">
                 <div class="step-num">3</div>
-                <h3>Commencez a vendre</h3>
-                <p>Utilisez la caisse POS, facturez vos clients, suivez vos finances en temps reel.</p>
+                <h3>Start selling</h3>
+                <p>Use the POS, invoice clients, track your finances in real time.</p>
             </div>
         </div>
     </div>
@@ -444,46 +387,46 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <!-- PRICING -->
 <section class="pad pricing-center" id="pricing">
     <div class="container">
-        <div class="section-label"><i class="fas fa-tags"></i> Tarifs</div>
-        <div class="section-title">Un plan pour chaque entreprise</div>
-        <p class="section-desc center">Commencez avec <strong>7 jours gratuits</strong> sur n'importe quel plan. Annulez avant la fin de l'essai et rien ne sera debite.</p>
+        <div class="section-label"><i class="fas fa-tags"></i> Pricing</div>
+        <div class="section-title">A plan for every business</div>
+        <p class="section-desc center">Start with a <strong>7-day free trial</strong> on any plan. Cancel before the trial ends and you won't be charged.</p>
 
-        <div class="pricing-grid" style="grid-template-columns:repeat(2,1fr);max-width:760px;">
+        <div class="pricing-grid">
             <div class="price-card popular">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7 jours d'essai</div>
+                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7-day trial</div>
                 <div class="price-name">Starter</div>
-                <div class="price-desc">Pour les PME en croissance</div>
-                <div class="price-amount"><?= $priceStarter ?><span>/ mois</span></div>
-                <div class="price-note">Facture mensuellement</div>
+                <div class="price-desc">For growing SMBs</div>
+                <div class="price-amount"><?= $priceStarter ?><span>/ month</span></div>
+                <div class="price-note">Billed monthly</div>
                 <ul class="price-list">
-                    <li><i class="fas fa-check"></i> 5 utilisateurs</li>
-                    <li><i class="fas fa-check"></i> 500 produits</li>
-                    <li><i class="fas fa-check"></i> Caisse POS + factures illimitees</li>
-                    <li><i class="fas fa-check"></i> Support prioritaire</li>
-                    <li><i class="fas fa-check"></i> Annulable a tout moment durant l'essai</li>
+                    <li><i class="fas fa-check"></i> 5 users</li>
+                    <li><i class="fas fa-check"></i> 500 products</li>
+                    <li><i class="fas fa-check"></i> POS + unlimited invoices</li>
+                    <li><i class="fas fa-check"></i> Priority support</li>
+                    <li><i class="fas fa-check"></i> Cancel anytime during the trial</li>
                 </ul>
-                <button class="btn-price filled" onclick="openRegister('starter')">Demarrer mes 7 jours</button>
+                <button class="btn-price filled" onclick="openRegister('starter')">Start 7-day trial</button>
             </div>
             <div class="price-card">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7 jours d'essai</div>
+                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7-day trial</div>
                 <div class="price-name">Pro</div>
-                <div class="price-desc">Pour les grandes equipes</div>
-                <div class="price-amount"><?= $pricePro ?><span>/ mois</span></div>
-                <div class="price-note">Facture mensuellement</div>
+                <div class="price-desc">For larger teams</div>
+                <div class="price-amount"><?= $pricePro ?><span>/ month</span></div>
+                <div class="price-note">Billed monthly</div>
                 <ul class="price-list">
-                    <li><i class="fas fa-check"></i> 15 utilisateurs</li>
-                    <li><i class="fas fa-check"></i> 5 000 produits</li>
-                    <li><i class="fas fa-check"></i> Tout le plan Starter</li>
-                    <li><i class="fas fa-check"></i> Support 24/7</li>
-                    <li><i class="fas fa-check"></i> Rapports avances</li>
+                    <li><i class="fas fa-check"></i> 15 users</li>
+                    <li><i class="fas fa-check"></i> 5,000 products</li>
+                    <li><i class="fas fa-check"></i> Everything in Starter</li>
+                    <li><i class="fas fa-check"></i> 24/7 support</li>
+                    <li><i class="fas fa-check"></i> Advanced reports</li>
                 </ul>
-                <button class="btn-price outline" onclick="openRegister('pro')">Demarrer mes 7 jours</button>
+                <button class="btn-price outline" onclick="openRegister('pro')">Start 7-day trial</button>
             </div>
         </div>
 
         <p class="pricing-note">
             <i class="fas fa-circle-info"></i>
-            Devise : <strong><?= $cur ?></strong> (<?= $sym ?>) — <a href="?currency=<?= $cur === 'MRU' ? 'USD' : 'MRU' ?>#pricing" style="color:var(--primary);">afficher en <?= $cur === 'MRU' ? 'USD' : 'MRU' ?></a>
+            All prices in USD. Secure checkout by card — cancel anytime.
         </p>
     </div>
 </section>
@@ -491,72 +434,29 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <!-- TRUST / SECURITY -->
 <section class="trust-section">
     <div class="trust-inner">
-        <div class="section-label"><i class="fas fa-shield-halved"></i> Securite</div>
-        <div class="section-title">Vos donnees sont protegees</div>
-        <div class="section-desc">Chiffrement, sauvegardes et isolation des donnees — votre entreprise merite une infrastructure solide.</div>
+        <div class="section-label"><i class="fas fa-shield-halved"></i> Security</div>
+        <div class="section-title">Your data is protected</div>
+        <div class="section-desc">Encryption, backups and data isolation — your business deserves solid infrastructure.</div>
         <div class="trust-grid">
             <div class="trust-item">
                 <i class="fas fa-lock"></i>
-                <h4>HTTPS partout</h4>
-                <p>Connexion chiffree TLS 1.3 sur toutes les pages et API.</p>
+                <h4>HTTPS everywhere</h4>
+                <p>TLS 1.3 encrypted connections on every page and API call.</p>
             </div>
             <div class="trust-item">
                 <i class="fas fa-database"></i>
-                <h4>Base dediee</h4>
-                <p>Chaque client a sa propre base de donnees isolee.</p>
+                <h4>Dedicated database</h4>
+                <p>Every customer gets its own isolated database.</p>
             </div>
             <div class="trust-item">
                 <i class="fas fa-hard-drive"></i>
-                <h4>Sauvegardes</h4>
-                <p>Sauvegarde quotidienne automatique de vos donnees.</p>
+                <h4>Daily backups</h4>
+                <p>Automatic daily backups of your data.</p>
             </div>
             <div class="trust-item">
                 <i class="fas fa-user-shield"></i>
-                <h4>Mots de passe</h4>
-                <p>Hachage bcrypt, aucun mot de passe en clair.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section class="pad" style="background:var(--bg);">
-    <div class="container">
-        <div class="section-label"><i class="fas fa-quote-right"></i> Temoignages</div>
-        <div class="section-title">Ils ont simplifie leur gestion</div>
-        <div class="testimonials-grid">
-            <div class="testimonial">
-                <div class="stars">★★★★★</div>
-                <div class="quote">"Avant je notais les ventes sur un cahier. Maintenant je vois mon CA en temps reel et je sais exactement ce qui se vend."</div>
-                <div class="author">
-                    <div class="avatar">AM</div>
-                    <div class="info">
-                        <strong>Ahmed Mohamed</strong>
-                        <span>Boutique Salam, Nouakchott</span>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial">
-                <div class="stars">★★★★★</div>
-                <div class="quote">"Le plus utile : la gestion des dettes clients. Je sais qui doit me payer, sans me melanger."</div>
-                <div class="author">
-                    <div class="avatar">FB</div>
-                    <div class="info">
-                        <strong>Fatimetou Brahim</strong>
-                        <span>Epicerie El-Houda</span>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial">
-                <div class="stars">★★★★★</div>
-                <div class="quote">"Installation en 30 secondes, interface claire. Mes caissiers ont appris en 15 minutes."</div>
-                <div class="author">
-                    <div class="avatar">MK</div>
-                    <div class="info">
-                        <strong>Moustapha Kamara</strong>
-                        <span>Supermarche El-Medina</span>
-                    </div>
-                </div>
+                <h4>Secure passwords</h4>
+                <p>Bcrypt hashing — no plain-text passwords ever.</p>
             </div>
         </div>
     </div>
@@ -566,36 +466,32 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <section class="pad" id="faq" style="background:#fff;">
     <div class="container" style="text-align:center;">
         <div class="section-label"><i class="fas fa-circle-question"></i> Questions</div>
-        <div class="section-title">Tout ce que vous voulez savoir</div>
+        <div class="section-title">Everything you want to know</div>
 
         <div class="faq-wrap" style="text-align:left;">
             <details class="faq-item">
-                <summary>Comment fonctionne l'essai de 7 jours ?</summary>
-                <div class="faq-body">Pour les paiements par carte (USD), nous enregistrons votre moyen de paiement mais ne prelevons rien pendant 7 jours. Vous pouvez annuler a tout moment durant ces 7 jours et rien ne sera debite. Pour les paiements locaux (MRU), vous accedez directement a votre espace pour 7 jours, puis nous contactez pour activer l'abonnement.</div>
+                <summary>How does the 7-day trial work?</summary>
+                <div class="faq-body">We record your card at signup but do not charge anything for 7 days. You can cancel at any time during the trial and no charge will be made. Your card is only billed on day 8 if you haven't cancelled.</div>
             </details>
             <details class="faq-item">
-                <summary>Que se passe-t-il apres les 7 jours d'essai ?</summary>
-                <div class="faq-body">Si vous n'avez pas annule, votre abonnement mensuel est automatiquement active et la carte est prelevee. Sinon, votre espace est suspendu mais vos donnees sont conservees et vous pouvez reactiver quand vous voulez.</div>
+                <summary>What happens after the 7-day trial?</summary>
+                <div class="faq-body">If you haven't cancelled, your monthly subscription starts automatically and your card is charged. Otherwise, access is suspended, your data is kept and you can reactivate at any time.</div>
             </details>
             <details class="faq-item">
-                <summary>Puis-je annuler a tout moment ?</summary>
-                <div class="faq-body">Oui, sans engagement. Vous pouvez annuler en un clic depuis votre espace (Parametres > Abonnement). Si vous annulez pendant l'essai, rien n'est debite. Apres, vous continuez a avoir acces jusqu'a la fin de la periode deja payee.</div>
+                <summary>Can I cancel at any time?</summary>
+                <div class="faq-body">Yes, no commitment. You can cancel in one click from your workspace (Settings &gt; Subscription). If you cancel during the trial, nothing is charged. Afterwards you keep access until the end of the period you already paid for.</div>
             </details>
             <details class="faq-item">
-                <summary>Mes donnees sont-elles en securite ?</summary>
-                <div class="faq-body">Absolument. HTTPS chiffre, chaque client a sa propre base de donnees isolee, sauvegardes quotidiennes automatiques. Vos donnees vous appartiennent et sont exportables en tout temps.</div>
+                <summary>Is my data secure?</summary>
+                <div class="faq-body">Absolutely. HTTPS encryption, a dedicated isolated database per customer, automatic daily backups. Your data belongs to you and is exportable at any time.</div>
             </details>
             <details class="faq-item">
-                <summary>Puis-je utiliser GestionPro depuis un telephone ?</summary>
-                <div class="faq-body">Oui, l'interface est 100% responsive et fonctionne parfaitement sur telephone, tablette et ordinateur.</div>
+                <summary>Can I use GestionPro from a phone?</summary>
+                <div class="faq-body">Yes, the interface is fully responsive and works perfectly on phone, tablet and desktop.</div>
             </details>
             <details class="faq-item">
-                <summary>Comment puis-je payer mon abonnement ?</summary>
-                <div class="faq-body">Nous acceptons Bankily, Masrivi, Sedad et le virement bancaire. Contactez-nous et nous vous guidons — l'activation est immediate des reception du paiement.</div>
-            </details>
-            <details class="faq-item">
-                <summary>Y a-t-il une version en arabe ?</summary>
-                <div class="faq-body">Oui, l'interface complete est disponible en francais et en arabe avec support RTL natif. Changement de langue en un clic depuis votre espace.</div>
+                <summary>Which languages are supported?</summary>
+                <div class="faq-body">English (default), French and Arabic — with native RTL support. You can switch languages in one click from your workspace.</div>
             </details>
         </div>
     </div>
@@ -604,19 +500,19 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <!-- CTA BANNER -->
 <section class="cta-banner">
     <div class="container">
-        <h2>Pret a simplifier votre gestion ?</h2>
-        <p>Creez votre espace en 30 secondes. 7 jours gratuits, annulable a tout moment.</p>
-        <button class="btn-cta btn-primary-cta" onclick="openRegister()"><i class="fas fa-rocket"></i> Creer mon espace maintenant</button>
+        <h2>Ready to simplify your business?</h2>
+        <p>Create your workspace in 30 seconds. 7 days free, cancel anytime.</p>
+        <button class="btn-cta btn-primary-cta" onclick="openRegister()"><i class="fas fa-rocket"></i> Create my workspace</button>
     </div>
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
     <div class="footer-brand">GestionPro</div>
-    <p>&copy; <?= date('Y') ?> GestionPro — Solution de gestion commerciale</p>
+    <p>&copy; <?= date('Y') ?> GestionPro — Business management software</p>
     <div class="footer-links">
-        <a href="#features">Fonctionnalites</a>
-        <a href="#pricing">Tarifs</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
         <a href="<?= APP_BASE ?>/admin/login">Administration</a>
     </div>
@@ -628,9 +524,9 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
         <div id="registerForm">
             <div class="modal-header">
                 <div>
-                    <div class="trial-modal-badge"><i class="fas fa-gift" style="font-size:11px;"></i> 7 jours gratuits</div>
-                    <h2>Creer votre espace</h2>
-                    <p>Pret en 30 secondes, annulable a tout moment</p>
+                    <div class="trial-modal-badge"><i class="fas fa-gift" style="font-size:11px;"></i> 7-day free trial</div>
+                    <h2>Create your workspace</h2>
+                    <p>Ready in 30 seconds, cancel anytime</p>
                 </div>
                 <button class="modal-close" onclick="closeRegister()">&times;</button>
             </div>
@@ -638,67 +534,51 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
                 <div class="register-error" id="regError"></div>
 
                 <div class="fg">
-                    <label>Nom de votre entreprise *</label>
-                    <input type="text" id="regCompany" placeholder="Ex: Boutique Salam" required>
+                    <label>Business name *</label>
+                    <input type="text" id="regCompany" placeholder="e.g. Acme Shop" required>
                 </div>
                 <div class="fg">
-                    <label>Adresse de votre espace *</label>
+                    <label>Workspace address *</label>
                     <div class="slug-preview">
                         <span class="slug-prefix">gestionpro.it.com/</span>
-                        <input type="text" id="regSlug" placeholder="boutique-salam" pattern="[a-z0-9_-]+" required>
+                        <input type="text" id="regSlug" placeholder="acme-shop" pattern="[a-z0-9_-]+" required>
                     </div>
                 </div>
                 <div class="fg-row">
                     <div class="fg">
-                        <label>Votre nom *</label>
-                        <input type="text" id="regName" placeholder="Ahmed Mohamed">
+                        <label>Your name *</label>
+                        <input type="text" id="regName" placeholder="Jane Doe">
                     </div>
                     <div class="fg">
-                        <label>Telephone</label>
-                        <input type="text" id="regPhone" placeholder="+222 XX XX XX XX">
+                        <label>Phone</label>
+                        <input type="text" id="regPhone" placeholder="+1 555 123 4567">
                     </div>
                 </div>
                 <div class="fg">
                     <label>Email *</label>
-                    <input type="email" id="regEmail" placeholder="ahmed@exemple.com">
+                    <input type="email" id="regEmail" placeholder="you@example.com">
                 </div>
                 <div class="fg">
-                    <label>Mot de passe *</label>
-                    <input type="password" id="regPassword" placeholder="Minimum 6 caracteres">
+                    <label>Password *</label>
+                    <input type="password" id="regPassword" placeholder="At least 6 characters">
                 </div>
                 <input type="hidden" id="regPlan" value="starter">
                 <button class="btn-register" id="regSubmit" onclick="submitRegister()">
-                    <i class="fas fa-rocket"></i> Demarrer mon essai de 7 jours
+                    <i class="fas fa-rocket"></i> Continue to secure checkout
                 </button>
                 <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--text-muted);">
-                    7 jours gratuits. Annulez avant J+7 et rien ne sera debite.
+                    7 days free. Cancel before day 7 and you won't be charged.
                 </p>
-            </div>
-        </div>
-
-        <div id="registerSuccess" style="display:none;">
-            <div class="register-success">
-                <div class="check"><i class="fas fa-check"></i></div>
-                <h3>Votre espace est pret !</h3>
-                <p>Vos 7 jours d'essai gratuit commencent maintenant.<br>Connectez-vous pour decouvrir GestionPro.</p>
-                <div class="creds">
-                    <div><strong>URL :</strong> <span id="successUrl"></span></div>
-                    <div><strong>Identifiant :</strong> <span id="successUser">admin</span></div>
-                    <div><strong>Mot de passe :</strong> le mot de passe que vous avez choisi</div>
-                </div>
-                <a href="#" class="btn-go" id="successLink"><i class="fas fa-sign-in-alt"></i> Se connecter</a>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// Navbar scroll effect
 window.addEventListener('scroll', () => {
     document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
 });
 
-// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
         const target = document.querySelector(a.getAttribute('href'));
@@ -706,7 +586,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     });
 });
 
-// Auto-generate slug from company name
 document.getElementById('regCompany').addEventListener('input', function() {
     const slug = this.value.toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -721,7 +600,6 @@ function openRegister(plan) {
     document.getElementById('regPlan').value = plan || 'starter';
     document.getElementById('registerModal').classList.add('active');
     document.getElementById('registerForm').style.display = '';
-    document.getElementById('registerSuccess').style.display = 'none';
     document.getElementById('regError').style.display = 'none';
     setTimeout(() => document.getElementById('regCompany').focus(), 100);
 }
@@ -739,7 +617,7 @@ function submitRegister() {
     const errEl = document.getElementById('regError');
     errEl.style.display = 'none';
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creation en cours...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating your workspace...';
 
     const formData = new FormData();
     formData.append('slug', document.getElementById('regSlug').value);
@@ -753,32 +631,32 @@ function submitRegister() {
     fetch('<?= APP_BASE ?>/register', { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-rocket"></i> Demarrer mon essai de 7 jours';
-
             if (data.success) {
-                // USD path: redirect straight into Polar checkout (card + 7-day trial).
                 if (data.mode === 'polar_checkout' && data.checkout_url) {
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirection vers le paiement...';
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to checkout...';
                     window.location.href = data.checkout_url;
                     return;
                 }
-                // MRU path (or Polar fallback): show success modal with login URL.
-                const fullUrl = window.location.origin + data.url;
-                document.getElementById('successUrl').textContent = fullUrl;
-                document.getElementById('successUser').textContent = data.username;
-                document.getElementById('successLink').href = data.url;
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('registerSuccess').style.display = '';
+                if (data.url) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening your workspace...';
+                    window.location.href = data.url;
+                    return;
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-rocket"></i> Continue to secure checkout';
+                errEl.textContent = 'Workspace created but we could not continue automatically. Please sign in.';
+                errEl.style.display = 'block';
             } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-rocket"></i> Continue to secure checkout';
                 errEl.textContent = data.error;
                 errEl.style.display = 'block';
             }
         })
         .catch(e => {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-rocket"></i> Demarrer mon essai de 7 jours';
-            errEl.textContent = 'Erreur de connexion. Reessayez.';
+            btn.innerHTML = '<i class="fas fa-rocket"></i> Continue to secure checkout';
+            errEl.textContent = 'Connection error. Please try again.';
             errEl.style.display = 'block';
         });
 }

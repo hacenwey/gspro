@@ -201,18 +201,18 @@ class Tenant {
         $companyName = $data['company_name'] ?? 'Mon Entreprise';
         $defaultSettings = [
             ['company_name', $companyName],
-            ['company_address', $data['address'] ?? 'Nouakchott, Mauritanie'],
+            ['company_address', $data['address'] ?? ''],
             ['company_phone', $data['owner_phone'] ?? ''],
             ['company_email', $adminEmail],
             ['company_tax_id', ''],
             ['company_logo', ''],
-            ['invoice_prefix', 'FAC'],
-            ['quote_prefix', 'DEV'],
-            ['credit_note_prefix', 'AVO'],
-            ['po_prefix', 'BC'],
-            ['default_tax_rate', '16'],
-            ['currency', 'MRU'],
-            ['currency_symbol', 'UM'],
+            ['invoice_prefix', 'INV'],
+            ['quote_prefix', 'QUO'],
+            ['credit_note_prefix', 'CN'],
+            ['po_prefix', 'PO'],
+            ['default_tax_rate', '0'],
+            ['currency', 'USD'],
+            ['currency_symbol', '$'],
             ['default_payment_terms', '30'],
             ['default_quote_validity', '30'],
             ['low_stock_alert', '1'],
@@ -226,9 +226,9 @@ class Tenant {
 
         // Insert default categories
         $catStmt = $pdo->prepare("INSERT INTO categories (id, name, description) VALUES (UUID(), ?, ?)");
-        $catStmt->execute(['Alimentation', 'Produits alimentaires']);
-        $catStmt->execute(['Boissons', 'Boissons et rafraichissements']);
-        $catStmt->execute(['Divers', 'Articles divers']);
+        $catStmt->execute(['Food', 'Food products']);
+        $catStmt->execute(['Beverages', 'Drinks and refreshments']);
+        $catStmt->execute(['Misc', 'Miscellaneous items']);
 
         // Register tenant in master database
         $plan = $data['plan'] ?? 'starter';
@@ -246,9 +246,9 @@ class Tenant {
             default => 500
         };
 
-        // Caller can force a different subscription state. USD signups flip this to
+        // Caller can force the initial subscription state. Self-signup uses
         // 'pending_payment' so the tenant can't use the app until Polar confirms the
-        // checkout. MRU signups stick with the 7-day in-app trial.
+        // checkout. Admin-provisioned tenants may start in 'trial' instead.
         $status = $data['subscription_status'] ?? 'trial';
         if (!in_array($status, ['trial', 'pending_payment'], true)) {
             $status = 'trial';

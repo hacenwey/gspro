@@ -3,8 +3,8 @@ defined('APP_NAME')           || define('APP_NAME', 'GestionPro');
 defined('APP_VERSION')        || define('APP_VERSION', '2.0.0');
 defined('APP_BASE')           || define('APP_BASE', '');
 defined('APP_ROOT')           || define('APP_ROOT', dirname(__DIR__));
-defined('CURRENCY')           || define('CURRENCY', 'MRU');
-defined('CURRENCY_SYMBOL')    || define('CURRENCY_SYMBOL', 'UM');
+defined('CURRENCY')           || define('CURRENCY', 'USD');
+defined('CURRENCY_SYMBOL')    || define('CURRENCY_SYMBOL', '$');
 defined('TAX_RATE_DEFAULT')   || define('TAX_RATE_DEFAULT', 16.00);
 defined('DATE_FORMAT')        || define('DATE_FORMAT', 'd/m/Y');
 defined('DATETIME_FORMAT')    || define('DATETIME_FORMAT', 'd/m/Y H:i');
@@ -25,8 +25,8 @@ defined('CREDIT_NOTE_PREFIX') || define('CREDIT_NOTE_PREFIX', 'AVO');
 defined('PO_PREFIX')          || define('PO_PREFIX', 'BC');
 
 // Supported languages
-defined('SUPPORTED_LANGS')    || define('SUPPORTED_LANGS', ['fr', 'ar']);
-defined('DEFAULT_LANG')       || define('DEFAULT_LANG', 'fr');
+defined('SUPPORTED_LANGS')    || define('SUPPORTED_LANGS', ['en', 'fr', 'ar']);
+defined('DEFAULT_LANG')       || define('DEFAULT_LANG', 'en');
 
 // Multi-tenant mode
 defined('MULTI_TENANT')       || define('MULTI_TENANT', true);

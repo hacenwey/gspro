@@ -130,13 +130,21 @@
                 <h2><?= e($pageTitle ?? __('dash.title')) ?></h2>
             </div>
             <div class="header-right">
-                <!-- Language Toggle -->
-                <div class="lang-toggle">
-                    <?php $otherLang = Lang::locale() === 'fr' ? 'ar' : 'fr'; ?>
-                    <a href="?lang=<?= $otherLang ?>" class="btn btn-sm btn-secondary" title="<?= $otherLang === 'ar' ? 'العربية' : 'Francais' ?>">
-                        <i class="fas fa-language"></i>
-                        <?= $otherLang === 'ar' ? 'عربي' : 'FR' ?>
-                    </a>
+                <div class="lang-toggle" style="display:inline-flex;gap:4px;align-items:center;background:var(--surface,#fff);border:1px solid var(--border,#E2E8F0);border-radius:8px;padding:2px;">
+                    <?php
+                    $__currentLang = Lang::locale();
+                    $__langs = [
+                        'en' => 'EN',
+                        'fr' => 'FR',
+                        'ar' => 'AR',
+                    ];
+                    foreach ($__langs as $__code => $__label):
+                        $__active = $__code === $__currentLang;
+                    ?>
+                        <a href="?lang=<?= $__code ?>"
+                           style="padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;<?= $__active ? 'background:var(--primary,#4F46E5);color:#fff;' : 'color:var(--text-muted,#64748B);' ?>"
+                           title="<?= $__code ?>"><?= $__label ?></a>
+                    <?php endforeach; ?>
                 </div>
                 <button class="btn btn-sm btn-secondary theme-toggle" onclick="toggleTheme()" title="Theme">
                     <i class="fas fa-moon"></i>
@@ -155,14 +163,14 @@
                 <i class="fas fa-triangle-exclamation" style="font-size:22px;color:#D97706;"></i>
                 <div style="flex:1;">
                     <div style="font-weight:700;color:#92400E;font-size:14px;">
-                        Il vous reste <?= $daysLeft ?> jour<?= $daysLeft > 1 ? 's' : '' ?> d'essai gratuit
+                        <?= str_replace('{n}', (string)$daysLeft, __('trial.banner.days_left')) ?>
                     </div>
                     <div style="font-size:12px;color:#78350F;margin-top:2px;">
-                        Activez votre abonnement pour eviter l'interruption de service.
+                        <?= __('trial.banner.subtitle') ?>
                     </div>
                 </div>
                 <a href="<?= url('/trial-expired') ?>" style="background:#D97706;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;">
-                    <i class="fas fa-credit-card"></i> Activer
+                    <i class="fas fa-credit-card"></i> <?= __('trial.banner.activate') ?>
                 </a>
             </div>
             <?php endif; ?>
@@ -183,6 +191,7 @@
 
 <script>
     const APP_CURRENCY = '<?= CURRENCY ?>';
+    const APP_CURRENCY_SYMBOL = '<?= addslashes(CURRENCY_SYMBOL) ?>';
     const APP_LANG = '<?= Lang::locale() ?>';
     const APP_RTL = <?= Lang::isRtl() ? 'true' : 'false' ?>;
 </script>

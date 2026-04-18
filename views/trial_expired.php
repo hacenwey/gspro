@@ -2,72 +2,68 @@
 $tenant = Tenant::current();
 $slug = Tenant::slug();
 $state = Tenant::trialState();
-$geo = GeoCurrency::detect();
 $plan = $tenant['plan'] ?? 'starter';
-if ($plan === 'free') $plan = 'starter'; // legacy defensive fallback
-$price = GeoCurrency::formatPrice($plan, $geo['currency'], $geo['symbol']);
-$showPolar = ($geo['currency'] === 'USD') && Polar::isConfigured() && Polar::productIdForPlan($plan);
+if ($plan === 'free') $plan = 'starter';
+$price = GeoCurrency::formatPrice($plan);
+$polarReady = Polar::isConfigured() && Polar::productIdForPlan($plan);
 $subStatus = $tenant['subscription_status'] ?? 'trial';
 $pageTitle = match($subStatus) {
-    'pending_payment' => 'Activation du paiement',
-    'cancelled'       => 'Abonnement annule',
-    'expired'         => 'Abonnement expire',
-    default           => ($state['subscription_status'] === 'trial' ? 'Essai termine' : 'Abonnement requis'),
+    'pending_payment' => 'Complete your payment',
+    'cancelled'       => 'Subscription cancelled',
+    'expired'         => 'Subscription expired',
+    default           => ($state['subscription_status'] === 'trial' ? 'Trial ended' : 'Subscription required'),
 };
 $pageIntro = match($subStatus) {
-    'pending_payment' => 'Terminez votre paiement pour activer votre espace. 7 jours gratuits, annulable a tout moment.',
-    'cancelled'       => 'Votre abonnement a ete annule. Reactivez-le pour retrouver votre espace.',
-    default           => 'Pour continuer a utiliser GestionPro, activez votre abonnement.',
+    'pending_payment' => 'Finish your checkout to activate your workspace. 7 days free, cancel anytime.',
+    'cancelled'       => 'Your subscription was cancelled. Reactivate it to regain access to your workspace.',
+    default           => 'Activate your subscription to keep using GestionPro.',
 };
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Essai expire - <?= e($tenant['company_name'] ?? 'GestionPro') ?></title>
+    <title>Subscription required - <?= e($tenant['company_name'] ?? 'GestionPro') ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
-        .card{max-width:560px;width:100%;background:#fff;color:#0F172A;border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.4);overflow:hidden}
-        .card-top{background:linear-gradient(135deg,#DC2626,#F59E0B);padding:40px 32px;text-align:center;color:#fff}
+        .card{max-width:520px;width:100%;background:#fff;color:#0F172A;border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.4);overflow:hidden}
+        .card-top{background:linear-gradient(135deg,#4F46E5,#6366F1);padding:40px 32px;text-align:center;color:#fff}
         .icon-ring{width:80px;height:80px;margin:0 auto 16px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:34px}
         .card-top h1{font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:8px}
         .card-top p{font-size:15px;opacity:.9}
         .card-body{padding:32px}
-        .tenant-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:14px;padding:18px 20px;margin-bottom:24px}
+        .tenant-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:14px;padding:18px 20px;margin-bottom:20px}
         .tenant-box .lbl{font-size:12px;color:#94A3B8;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
         .tenant-box .name{font-size:18px;font-weight:700;margin-top:4px}
         .tenant-box .slug{font-size:13px;color:#475569;font-family:'Inter',monospace}
-        .plan-box{background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border:1px solid #C7D2FE;border-radius:14px;padding:20px;text-align:center;margin-bottom:24px}
+        .plan-box{background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border:1px solid #C7D2FE;border-radius:14px;padding:24px;text-align:center;margin-bottom:24px}
         .plan-box .pname{font-size:14px;font-weight:700;color:#4F46E5;text-transform:uppercase;letter-spacing:1px}
-        .plan-box .pprice{font-size:34px;font-weight:900;color:#0F172A;margin-top:4px;letter-spacing:-1px}
+        .plan-box .pprice{font-size:40px;font-weight:900;color:#0F172A;margin-top:6px;letter-spacing:-1px}
         .plan-box .pper{font-size:13px;color:#64748B}
-        h2.cta-title{font-size:17px;font-weight:700;margin-bottom:12px}
-        .pay-list{list-style:none;margin-bottom:24px}
-        .pay-list li{padding:10px 0;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:12px;font-size:14px}
-        .pay-list li:last-child{border-bottom:0}
-        .pay-list i{width:28px;height:28px;border-radius:8px;background:#EEF2FF;color:#4F46E5;display:flex;align-items:center;justify-content:center;font-size:13px}
-        .contact-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:#0F172A;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;margin-bottom:10px}
-        .contact-btn:hover{background:#1E293B;transform:translateY(-1px)}
-        .contact-btn.wa{background:#25D366}
-        .contact-btn.wa:hover{background:#1EBE57}
-        .logout-link{text-align:center;display:block;margin-top:16px;font-size:13px;color:#64748B;text-decoration:none}
+        .pay-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:linear-gradient(135deg,#4F46E5,#6366F1);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
+        .pay-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,70,229,.4)}
+        .trust-row{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:#64748B}
+        .trust-row span{display:inline-flex;align-items:center;gap:6px}
+        .trust-row i{color:#10B981}
+        .warn{background:#FEF3C7;border:1px solid #FCD34D;color:#78350F;padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:20px;line-height:1.55}
+        .logout-link{text-align:center;display:block;margin-top:20px;font-size:13px;color:#64748B;text-decoration:none}
         .logout-link:hover{color:#0F172A}
     </style>
 </head>
 <body>
     <div class="card">
         <div class="card-top">
-            <div class="icon-ring"><i class="fas fa-lock"></i></div>
+            <div class="icon-ring"><i class="fas fa-credit-card"></i></div>
             <h1><?= e($pageTitle) ?></h1>
             <p><?= e($pageIntro) ?></p>
         </div>
         <div class="card-body">
             <div class="tenant-box">
-                <div class="lbl">Votre espace</div>
+                <div class="lbl">Your workspace</div>
                 <div class="name"><?= e($tenant['company_name'] ?? '') ?></div>
                 <div class="slug">gestionpro.it.com/<?= e($slug) ?></div>
             </div>
@@ -75,41 +71,32 @@ $pageIntro = match($subStatus) {
             <div class="plan-box">
                 <div class="pname">Plan <?= strtoupper(e($plan)) ?></div>
                 <div class="pprice"><?= e($price) ?></div>
-                <div class="pper">par mois</div>
+                <div class="pper">per month</div>
             </div>
 
-            <?php if ($showPolar): ?>
-            <h2 class="cta-title"><i class="fas fa-credit-card" style="color:#4F46E5;"></i> Paiement par carte</h2>
-            <p style="font-size:13px;color:#64748B;margin-bottom:16px;">Activation immediate. Abonnement mensuel, resiliable a tout moment.</p>
-            <form method="POST" action="<?= APP_BASE . '/' . e($slug) . '/pay/start' ?>" style="margin-bottom:18px;">
-                <input type="hidden" name="plan" value="<?= e($plan) ?>">
-                <button type="submit" class="contact-btn" style="background:linear-gradient(135deg,#4F46E5,#6366F1);">
-                    <i class="fas fa-credit-card"></i> Payer <?= e($price) ?> par carte
-                </button>
-            </form>
-            <div style="display:flex;align-items:center;gap:12px;margin:20px 0;color:#94A3B8;font-size:12px;">
-                <div style="flex:1;height:1px;background:#E2E8F0;"></div>
-                <span>OU</span>
-                <div style="flex:1;height:1px;background:#E2E8F0;"></div>
-            </div>
+            <?php if ($polarReady): ?>
+                <form method="POST" action="<?= APP_BASE . '/' . e($slug) . '/pay/start' ?>">
+                    <input type="hidden" name="plan" value="<?= e($plan) ?>">
+                    <button type="submit" class="pay-btn">
+                        <i class="fas fa-credit-card"></i> Pay <?= e($price) ?> / month
+                    </button>
+                </form>
+                <div class="trust-row">
+                    <span><i class="fas fa-check-circle"></i> Secure checkout</span>
+                    <span><i class="fas fa-check-circle"></i> Cancel anytime</span>
+                </div>
+            <?php else: ?>
+                <div class="warn">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    The payment provider is temporarily unavailable. Please try again in a few minutes or contact support.
+                </div>
+                <a href="mailto:contact@gestionpro.it.com?subject=<?= urlencode('Subscription activation - ' . $slug) ?>" class="pay-btn">
+                    <i class="fas fa-envelope"></i> Contact support
+                </a>
             <?php endif; ?>
 
-            <h2 class="cta-title"><i class="fas fa-mobile-screen" style="color:#25D366;"></i> Paiement mobile / virement</h2>
-            <ul class="pay-list">
-                <li><i class="fas fa-mobile-screen"></i> Bankily, Masrivi ou Sedad</li>
-                <li><i class="fas fa-university"></i> Virement bancaire</li>
-                <li><i class="fas fa-headset"></i> Support pour vous guider</li>
-            </ul>
-
-            <a href="https://wa.me/22248586074?text=<?= urlencode('Bonjour, je souhaite activer mon abonnement GestionPro pour ' . ($tenant['company_name'] ?? '') . ' (' . $slug . ')') ?>" class="contact-btn wa" target="_blank">
-                <i class="fab fa-whatsapp"></i> Contacter via WhatsApp
-            </a>
-            <a href="mailto:contact@gestionpro.it.com?subject=<?= urlencode('Activation abonnement ' . $slug) ?>" class="contact-btn">
-                <i class="fas fa-envelope"></i> Envoyer un email
-            </a>
-
             <a href="<?= APP_BASE . '/' . e($slug) . '/logout' ?>" class="logout-link">
-                <i class="fas fa-sign-out-alt"></i> Se deconnecter
+                <i class="fas fa-sign-out-alt"></i> Sign out
             </a>
         </div>
     </div>

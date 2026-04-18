@@ -2,15 +2,12 @@
 /**
  * Public self-registration controller.
  *
- * Two signup flows depending on geo-detected currency:
- *   - USD tenants: card required up-front. Tenant is created with subscription_status
- *                  'pending_payment' (no app access yet), a Polar checkout is created
- *                  with customer_email/metadata, and the client JSON response carries
- *                  a `checkout_url` so the browser redirects into Polar. The 7-day free
- *                  trial + charge are managed by Polar; webhook flips the tenant to
- *                  'active' once Polar confirms.
- *   - MRU tenants: 7-day in-app trial, no card (no automated rail). After the trial
- *                  they see the paywall with manual-pay contact buttons.
+ * Card required up-front for every signup. Tenant is created with
+ * subscription_status = 'pending_payment' (no app access yet). A Polar
+ * checkout is created and the client JSON response carries a
+ * `checkout_url` so the browser redirects into Polar. The 7-day trial +
+ * recurring charge are managed by Polar; the webhook flips the tenant to
+ * 'active' once Polar confirms.
  */
 class RegisterController {
 
@@ -28,28 +25,25 @@ class RegisterController {
             $plan = 'starter';
         }
 
-        // Validation
         $errors = [];
-        if (strlen($slug) < 3) $errors[] = 'Le slug doit contenir au moins 3 caracteres.';
-        if (strlen($slug) > 30) $errors[] = 'Le slug ne doit pas depasser 30 caracteres.';
+        if (strlen($slug) < 3) $errors[] = 'Slug must be at least 3 characters.';
+        if (strlen($slug) > 30) $errors[] = 'Slug must be at most 30 characters.';
         if (in_array($slug, ['admin', 'api', 'public', 'database', 'register', 'www', 'app', 'mail', 'webhook', 'pay'])) {
-            $errors[] = 'Ce nom est reserve.';
+            $errors[] = 'This name is reserved.';
         }
-        if (empty($companyName)) $errors[] = 'Le nom de l\'entreprise est requis.';
-        if (empty($ownerName)) $errors[] = 'Votre nom est requis.';
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Email invalide.';
-        if (strlen($password) < 6) $errors[] = 'Le mot de passe doit contenir au moins 6 caracteres.';
+        if (empty($companyName)) $errors[] = 'Company name is required.';
+        if (empty($ownerName)) $errors[] = 'Your name is required.';
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Invalid email.';
+        if (strlen($password) < 6) $errors[] = 'Password must be at least 6 characters.';
+
+        if (!Polar::isConfigured() || !Polar::productIdForPlan($plan)) {
+            $errors[] = 'Payment provider is not available. Please try again later.';
+        }
 
         if (!empty($errors)) {
             echo json_encode(['success' => false, 'error' => implode(' ', $errors)]);
             return;
         }
-
-        // Decide billing rail from geo currency (USD -> Polar, MRU -> manual).
-        $geo = GeoCurrency::detect();
-        $usePolar = ($geo['currency'] === 'USD')
-            && Polar::isConfigured()
-            && Polar::productIdForPlan($plan);
 
         try {
             $result = Tenant::provision([
@@ -61,26 +55,13 @@ class RegisterController {
                 'admin_username' => 'admin',
                 'admin_password' => $password,
                 'plan' => $plan,
-                // USD signups must pay before getting access.
-                'subscription_status' => $usePolar ? 'pending_payment' : 'trial',
+                'subscription_status' => 'pending_payment',
             ]);
         } catch (RuntimeException $e) {
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             return;
         }
 
-        if (!$usePolar) {
-            echo json_encode([
-                'success'  => true,
-                'url'      => $result['url'],
-                'slug'     => $result['slug'],
-                'username' => $result['admin_username'],
-                'mode'     => 'trial',
-            ]);
-            return;
-        }
-
-        // USD path: create Polar checkout and hand the URL back so the browser redirects in.
         try {
             $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
             $host   = $_SERVER['HTTP_HOST'] ?? 'gestionpro.it.com';
@@ -98,8 +79,6 @@ class RegisterController {
                 ],
             ]);
         } catch (Throwable $e) {
-            // Checkout creation failed — tenant is already provisioned as pending_payment.
-            // User can retry from /{slug}/pay/start.
             error_log('Polar register checkout failed: ' . $e->getMessage());
             echo json_encode([
                 'success'      => true,
@@ -107,7 +86,7 @@ class RegisterController {
                 'slug'         => $result['slug'],
                 'url'          => APP_BASE . '/' . $result['slug'] . '/pay',
                 'username'     => $result['admin_username'],
-                'warning'      => 'Votre espace est cree. Impossible d\'ouvrir le paiement maintenant, reessayez depuis votre espace.',
+                'warning'      => 'Your workspace was created but the checkout could not be opened. Retry from your workspace.',
             ]);
             return;
         }

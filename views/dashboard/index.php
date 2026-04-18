@@ -235,7 +235,7 @@ function loadChart(period) {
                             beginAtZero: true,
                             grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
                             ticks: {
-                                callback: v => v.toLocaleString('fr-FR') + ' ' + APP_CURRENCY,
+                                callback: v => APP_CURRENCY_SYMBOL + v.toLocaleString(APP_LANG),
                                 font: { size: 11 }
                             }
                         },
@@ -364,7 +364,7 @@ loadChart('7d');
                     </div>
                     <div class="form-group">
                         <label class="form-label"><?= __('onboarding.company_address') ?></label>
-                        <input type="text" name="company_address" class="form-control" value="<?= e($companySettings['company_address'] ?? '') ?>" placeholder="Nouakchott, Mauritanie">
+                        <input type="text" name="company_address" class="form-control" value="<?= e($companySettings['company_address'] ?? '') ?>">
                     </div>
                 </form>
             </div>
@@ -391,7 +391,7 @@ loadChart('7d');
                     <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.credits') ?></h4><p><?= __('onboarding.feat.credits_desc') ?></p></div></div>
                     <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.vip') ?></h4><p><?= __('onboarding.feat.vip_desc') ?></p></div></div>
                     <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('onboarding.feat.history') ?></h4><p><?= __('onboarding.feat.history_desc') ?></p></div></div>
-                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4>Mobile Money</h4><p>Bankily, Masrivi, Sedad</p></div></div>
+                    <div class="ob-feat"><i class="fas fa-check-circle"></i><div><h4><?= __('payments.method.card') ?></h4><p><?= __('payments.method.transfer') ?>, <?= __('payments.method.mobile') ?></p></div></div>
                 </div>
             </div>
 

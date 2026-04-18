@@ -84,7 +84,7 @@
             </div>
             <div class="form-group">
                 <label class="form-label">Adresse</label>
-                <input type="text" name="address" class="form-control" placeholder="Nouakchott, Mauritanie">
+                <input type="text" name="address" class="form-control">
             </div>
             <?php endif; ?>
 

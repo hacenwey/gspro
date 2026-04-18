@@ -159,8 +159,9 @@ function calcTotals() {
 }
 
 function formatM(v) {
-    const currency = (typeof APP_CURRENCY !== 'undefined') ? APP_CURRENCY : 'MRU';
-    return new Intl.NumberFormat('fr-FR', {minimumFractionDigits:2}).format(v) + ' ' + currency;
+    const symbol = (typeof APP_CURRENCY_SYMBOL !== 'undefined') ? APP_CURRENCY_SYMBOL : '$';
+    const locale = (typeof APP_LANG !== 'undefined') ? APP_LANG : 'en';
+    return symbol + new Intl.NumberFormat(locale, {minimumFractionDigits:2}).format(v);
 }
 
 addLine();

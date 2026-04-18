@@ -131,9 +131,9 @@ function confirmDelete(form, message) {
 
 // Format number as currency
 function formatMoney(amount) {
-    const currency = (typeof APP_CURRENCY !== 'undefined') ? APP_CURRENCY : 'MRU';
-    const locale = (typeof APP_LANG !== 'undefined' && APP_LANG === 'ar') ? 'ar-MR' : 'fr-FR';
-    return new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount) + ' ' + currency;
+    const symbol = (typeof APP_CURRENCY_SYMBOL !== 'undefined') ? APP_CURRENCY_SYMBOL : '$';
+    const locale = (typeof APP_LANG !== 'undefined') ? APP_LANG : 'en';
+    return symbol + new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
 }
 
 // Ripple effect on buttons

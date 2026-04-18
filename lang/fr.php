@@ -410,6 +410,11 @@ return [
     'onboarding.feat.cash_report' => 'Rapport de caisse',
     'onboarding.feat.cash_report_desc' => 'Bilan fin de journee',
 
+    // Trial banner
+    'trial.banner.days_left' => 'Il vous reste {n} jour(s) d\'essai gratuit',
+    'trial.banner.subtitle' => 'Activez votre abonnement pour eviter l\'interruption de service.',
+    'trial.banner.activate' => 'Activer',
+
     // Support Tickets
     'tickets.title' => 'Support',
     'tickets.subtitle' => 'Vos demandes de support technique',
