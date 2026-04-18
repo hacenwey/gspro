@@ -4,9 +4,21 @@ $slug = Tenant::slug();
 $state = Tenant::trialState();
 $geo = GeoCurrency::detect();
 $plan = $tenant['plan'] ?? 'starter';
-if ($plan === 'free') $plan = 'starter'; // nothing to pay for "free", upsell to starter
+if ($plan === 'free') $plan = 'starter'; // legacy defensive fallback
 $price = GeoCurrency::formatPrice($plan, $geo['currency'], $geo['symbol']);
 $showPolar = ($geo['currency'] === 'USD') && Polar::isConfigured() && Polar::productIdForPlan($plan);
+$subStatus = $tenant['subscription_status'] ?? 'trial';
+$pageTitle = match($subStatus) {
+    'pending_payment' => 'Activation du paiement',
+    'cancelled'       => 'Abonnement annule',
+    'expired'         => 'Abonnement expire',
+    default           => ($state['subscription_status'] === 'trial' ? 'Essai termine' : 'Abonnement requis'),
+};
+$pageIntro = match($subStatus) {
+    'pending_payment' => 'Terminez votre paiement pour activer votre espace. 7 jours gratuits, annulable a tout moment.',
+    'cancelled'       => 'Votre abonnement a ete annule. Reactivez-le pour retrouver votre espace.',
+    default           => 'Pour continuer a utiliser GestionPro, activez votre abonnement.',
+};
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -50,8 +62,8 @@ $showPolar = ($geo['currency'] === 'USD') && Polar::isConfigured() && Polar::pro
     <div class="card">
         <div class="card-top">
             <div class="icon-ring"><i class="fas fa-lock"></i></div>
-            <h1><?= $state['subscription_status'] === 'trial' ? 'Essai termine' : 'Abonnement requis' ?></h1>
-            <p>Pour continuer a utiliser GestionPro, activez votre abonnement.</p>
+            <h1><?= e($pageTitle) ?></h1>
+            <p><?= e($pageIntro) ?></p>
         </div>
         <div class="card-body">
             <div class="tenant-box">

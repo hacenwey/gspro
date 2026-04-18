@@ -78,6 +78,47 @@ class BillingController {
     }
 
     /**
+     * POST /{slug}/pay/cancel - tenant-initiated subscription cancellation.
+     * Calls Polar to cancel_at_period_end so the user keeps access until the current
+     * period (trial or paid) wraps up. Webhook will land later and flip us to 'cancelled'.
+     */
+    public function cancel(): void {
+        $tenant = Tenant::current();
+        if (!$tenant) { http_response_code(404); echo 'Tenant introuvable'; return; }
+
+        // Only a logged-in admin of this tenant can cancel.
+        if (empty($_SESSION['user_id']) || ($_SESSION['tenant_slug'] ?? null) !== $tenant['slug']) {
+            http_response_code(403); echo 'Non autorise'; return;
+        }
+        if (($_SESSION['user_role'] ?? '') !== 'admin') {
+            http_response_code(403); echo 'Reserve aux administrateurs'; return;
+        }
+
+        $subId = trim((string)($tenant['polar_subscription_id'] ?? ''));
+        if ($subId === '') {
+            $this->redirectFlash($tenant['slug'], 'Aucun abonnement Polar a annuler.');
+            return;
+        }
+
+        try {
+            Polar::cancelSubscription($subId, true);
+            $this->logEvent($tenant['id'], 'polar_subscription_cancel_requested', [
+                'polar_sub_id' => $subId,
+            ]);
+            $this->redirectFlash($tenant['slug'], 'Abonnement annule. Aucun prelevement ne sera effectue. Vous gardez l\'acces jusqu\'a la fin de la periode en cours.', 'success');
+        } catch (Throwable $e) {
+            error_log('Polar cancel failed: ' . $e->getMessage());
+            $this->redirectFlash($tenant['slug'], 'Impossible d\'annuler l\'abonnement. Contactez le support.');
+        }
+    }
+
+    private function redirectFlash(string $slug, string $msg, string $type = 'error'): void {
+        $_SESSION['flash'] = ['type' => $type, 'message' => $msg];
+        header('Location: ' . APP_BASE . '/' . $slug . '/settings');
+        exit;
+    }
+
+    /**
      * POST /webhook/polar - Polar.sh event receiver.
      * Events handled:
      *   subscription.active   -> activate tenant (paid_at=now, paid_until=current_period_end, plan=...)
@@ -106,7 +147,12 @@ class BillingController {
                     $this->handleSubscriptionActive($data);
                     break;
                 case 'subscription.canceled':
+                    // User asked to cancel - Polar keeps access until current_period_end.
+                    // We just log it and update paid_until (still honored by the gate).
+                    $this->handleSubscriptionCancelRequested($data);
+                    break;
                 case 'subscription.revoked':
+                    // Access actually ends now (trial lapsed without paying, charge failed, etc).
                     $this->handleSubscriptionCanceled($data);
                     break;
                 case 'order.paid':
@@ -178,22 +224,42 @@ class BillingController {
         ]);
     }
 
+    /** subscription.canceled - user requested cancel, access continues until period end. */
+    private function handleSubscriptionCancelRequested(array $sub): void {
+        $tenantId = $this->resolveTenantIdFromSub($sub);
+        if (!$tenantId) return;
+
+        $paidUntil = $sub['current_period_end'] ?? null;
+        $db = Tenant::getMasterDB();
+        // Keep subscription_status='active' until period end; just update paid_until.
+        if ($paidUntil) {
+            $stmt = $db->prepare("UPDATE tenants SET subscription_paid_until = ? WHERE id = ?");
+            $stmt->execute([date('Y-m-d H:i:s', strtotime($paidUntil)), $tenantId]);
+        }
+        $this->logEvent($tenantId, 'polar_subscription_cancel_pending', [
+            'polar_sub_id' => $sub['id'] ?? '', 'ends_at' => $paidUntil,
+        ]);
+    }
+
+    /** subscription.revoked - access actually ends now. */
     private function handleSubscriptionCanceled(array $sub): void {
-        $subId = (string)($sub['id'] ?? '');
-        if ($subId === '') return;
+        $tenantId = $this->resolveTenantIdFromSub($sub);
+        if (!$tenantId) return;
 
         $db = Tenant::getMasterDB();
-        $stmt = $db->prepare("
-            SELECT id FROM tenants WHERE polar_subscription_id = :sub_id LIMIT 1
-        ");
-        $stmt->execute(['sub_id' => $subId]);
-        $tenantId = $stmt->fetchColumn();
+        $db->prepare("UPDATE tenants SET subscription_status = 'cancelled' WHERE id = ?")
+           ->execute([$tenantId]);
+        $this->logEvent($tenantId, 'polar_subscription_revoked', ['polar_sub_id' => $sub['id'] ?? '']);
+    }
 
-        if ($tenantId) {
-            $db->prepare("UPDATE tenants SET subscription_status = 'cancelled' WHERE id = ?")
-               ->execute([$tenantId]);
-            $this->logEvent($tenantId, 'polar_subscription_canceled', ['polar_sub_id' => $subId]);
-        }
+    private function resolveTenantIdFromSub(array $sub): ?string {
+        $subId = (string)($sub['id'] ?? '');
+        if ($subId === '') return null;
+        $db = Tenant::getMasterDB();
+        $stmt = $db->prepare("SELECT id FROM tenants WHERE polar_subscription_id = ? LIMIT 1");
+        $stmt->execute([$subId]);
+        $id = $stmt->fetchColumn();
+        return $id ?: null;
     }
 
     private function logEvent($tenantId, string $action, array $details): void {

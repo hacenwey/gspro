@@ -11,10 +11,21 @@ class SettingsController extends Controller {
 
         $users = $this->db->query("SELECT id, username, email, full_name, role, is_active, last_login, created_at FROM users ORDER BY created_at")->fetchAll();
 
+        // Subscription info (master DB, per-tenant row)
+        $tenant = Tenant::current();
+        $subscription = [
+            'plan'       => $tenant['plan'] ?? 'starter',
+            'status'     => $tenant['subscription_status'] ?? 'trial',
+            'paid_until' => $tenant['subscription_paid_until'] ?? null,
+            'trial_ends' => $tenant['trial_ends_at'] ?? null,
+            'polar_sub'  => $tenant['polar_subscription_id'] ?? null,
+        ];
+
         $this->render('settings/index', [
-            'pageTitle' => 'Parametres',
-            'settings' => $settings,
-            'users' => $users
+            'pageTitle'    => 'Parametres',
+            'settings'     => $settings,
+            'users'        => $users,
+            'subscription' => $subscription,
         ]);
     }
 

@@ -10,7 +10,6 @@ class GeoCurrency {
     private const CACHE_TTL = 86400; // 24h
 
     public const PLANS = [
-        'free'    => ['MRU' => 0,     'USD' => 0],
         'starter' => ['MRU' => 5000,  'USD' => 12],
         'pro'     => ['MRU' => 15000, 'USD' => 35],
     ];

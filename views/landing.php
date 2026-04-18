@@ -24,7 +24,6 @@ try {
     $activeTenants = 0;
 }
 
-$priceFree    = GeoCurrency::formatPrice('free',    $cur, $sym);
 $priceStarter = GeoCurrency::formatPrice('starter', $cur, $sym);
 $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 ?>
@@ -34,7 +33,7 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GestionPro — Logiciel de gestion commerciale tout-en-un</title>
-    <meta name="description" content="Gerez stocks, factures, caisse POS et clients. 7 jours d'essai gratuit, sans carte bancaire. Adapte a la Mauritanie et l'Afrique francophone.">
+    <meta name="description" content="Gerez stocks, factures, caisse POS et clients. 7 jours d'essai gratuit, annulable a tout moment. Adapte a la Mauritanie et l'Afrique francophone.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -314,14 +313,14 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <section class="hero">
     <div class="hero-inner">
         <div class="hero-badge">
-            <i class="fas fa-gift"></i> 7 jours d'essai gratuit — sans carte bancaire
+            <i class="fas fa-gift"></i> 7 jours d'essai — annulable a tout moment
         </div>
         <h1>Gerez votre commerce.<br>Simplifiez votre journee.</h1>
         <p class="hero-sub">La solution tout-en-un pour commerces, PME et boutiques. Stocks, caisse POS, factures, clients et finances — dans un seul outil, pret en 30 secondes.</p>
 
         <div class="hero-trust">
-            <span><i class="fas fa-check-circle"></i> Aucune carte bancaire</span>
-            <span><i class="fas fa-check-circle"></i> Annulez quand vous voulez</span>
+            <span><i class="fas fa-check-circle"></i> 7 jours gratuits a l'essai</span>
+            <span><i class="fas fa-check-circle"></i> Annulez avant J+7 et rien ne sera debite</span>
             <span><i class="fas fa-check-circle"></i> Support bilingue FR/AR</span>
         </div>
 
@@ -447,25 +446,11 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
     <div class="container">
         <div class="section-label"><i class="fas fa-tags"></i> Tarifs</div>
         <div class="section-title">Un plan pour chaque entreprise</div>
-        <p class="section-desc center">Commencez avec <strong>7 jours gratuits</strong> sur n'importe quel plan. Aucune carte bancaire requise, annulez a tout moment.</p>
+        <p class="section-desc center">Commencez avec <strong>7 jours gratuits</strong> sur n'importe quel plan. Annulez avant la fin de l'essai et rien ne sera debite.</p>
 
-        <div class="pricing-grid">
-            <div class="price-card">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7 jours gratuits</div>
-                <div class="price-name">Gratuit</div>
-                <div class="price-desc">Pour demarrer</div>
-                <div class="price-amount"><?= $priceFree ?><span>/ mois</span></div>
-                <div class="price-note">Toujours gratuit</div>
-                <ul class="price-list">
-                    <li><i class="fas fa-check"></i> 2 utilisateurs</li>
-                    <li><i class="fas fa-check"></i> 100 produits</li>
-                    <li><i class="fas fa-check"></i> Caisse POS</li>
-                    <li><i class="fas fa-check"></i> Factures illimitees</li>
-                </ul>
-                <button class="btn-price outline" onclick="openRegister('free')">Commencer gratuitement</button>
-            </div>
+        <div class="pricing-grid" style="grid-template-columns:repeat(2,1fr);max-width:760px;">
             <div class="price-card popular">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7 jours gratuits</div>
+                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7 jours d'essai</div>
                 <div class="price-name">Starter</div>
                 <div class="price-desc">Pour les PME en croissance</div>
                 <div class="price-amount"><?= $priceStarter ?><span>/ mois</span></div>
@@ -473,14 +458,14 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
                 <ul class="price-list">
                     <li><i class="fas fa-check"></i> 5 utilisateurs</li>
                     <li><i class="fas fa-check"></i> 500 produits</li>
-                    <li><i class="fas fa-check"></i> Tout le plan Gratuit</li>
+                    <li><i class="fas fa-check"></i> Caisse POS + factures illimitees</li>
                     <li><i class="fas fa-check"></i> Support prioritaire</li>
-                    <li><i class="fas fa-check"></i> Multi-utilisateurs</li>
+                    <li><i class="fas fa-check"></i> Annulable a tout moment durant l'essai</li>
                 </ul>
-                <button class="btn-price filled" onclick="openRegister('starter')">Essayer 7 jours</button>
+                <button class="btn-price filled" onclick="openRegister('starter')">Demarrer mes 7 jours</button>
             </div>
             <div class="price-card">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7 jours gratuits</div>
+                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7 jours d'essai</div>
                 <div class="price-name">Pro</div>
                 <div class="price-desc">Pour les grandes equipes</div>
                 <div class="price-amount"><?= $pricePro ?><span>/ mois</span></div>
@@ -492,7 +477,7 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
                     <li><i class="fas fa-check"></i> Support 24/7</li>
                     <li><i class="fas fa-check"></i> Rapports avances</li>
                 </ul>
-                <button class="btn-price outline" onclick="openRegister('pro')">Essayer 7 jours</button>
+                <button class="btn-price outline" onclick="openRegister('pro')">Demarrer mes 7 jours</button>
             </div>
         </div>
 
@@ -585,16 +570,16 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 
         <div class="faq-wrap" style="text-align:left;">
             <details class="faq-item">
-                <summary>Ai-je besoin d'une carte bancaire pour commencer ?</summary>
-                <div class="faq-body">Non. L'essai de 7 jours est totalement gratuit, aucune carte bancaire requise. Vous decidez si vous voulez continuer apres.</div>
+                <summary>Comment fonctionne l'essai de 7 jours ?</summary>
+                <div class="faq-body">Pour les paiements par carte (USD), nous enregistrons votre moyen de paiement mais ne prelevons rien pendant 7 jours. Vous pouvez annuler a tout moment durant ces 7 jours et rien ne sera debite. Pour les paiements locaux (MRU), vous accedez directement a votre espace pour 7 jours, puis nous contactez pour activer l'abonnement.</div>
             </details>
             <details class="faq-item">
                 <summary>Que se passe-t-il apres les 7 jours d'essai ?</summary>
-                <div class="faq-body">Vous recevez une notification avant la fin de l'essai. Si vous ne payez pas, votre espace est suspendu mais vos donnees sont conservees. Vous pouvez reactiver a tout moment.</div>
+                <div class="faq-body">Si vous n'avez pas annule, votre abonnement mensuel est automatiquement active et la carte est prelevee. Sinon, votre espace est suspendu mais vos donnees sont conservees et vous pouvez reactiver quand vous voulez.</div>
             </details>
             <details class="faq-item">
                 <summary>Puis-je annuler a tout moment ?</summary>
-                <div class="faq-body">Oui, sans engagement. Vous payez mois par mois, vous annulez quand vous voulez. Vos donnees restent accessibles en lecture meme apres annulation.</div>
+                <div class="faq-body">Oui, sans engagement. Vous pouvez annuler en un clic depuis votre espace (Parametres > Abonnement). Si vous annulez pendant l'essai, rien n'est debite. Apres, vous continuez a avoir acces jusqu'a la fin de la periode deja payee.</div>
             </details>
             <details class="faq-item">
                 <summary>Mes donnees sont-elles en securite ?</summary>
@@ -620,7 +605,7 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
 <section class="cta-banner">
     <div class="container">
         <h2>Pret a simplifier votre gestion ?</h2>
-        <p>Creez votre espace en 30 secondes. 7 jours gratuits, aucun engagement.</p>
+        <p>Creez votre espace en 30 secondes. 7 jours gratuits, annulable a tout moment.</p>
         <button class="btn-cta btn-primary-cta" onclick="openRegister()"><i class="fas fa-rocket"></i> Creer mon espace maintenant</button>
     </div>
 </section>
@@ -645,7 +630,7 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
                 <div>
                     <div class="trial-modal-badge"><i class="fas fa-gift" style="font-size:11px;"></i> 7 jours gratuits</div>
                     <h2>Creer votre espace</h2>
-                    <p>Pret en 30 secondes, sans carte bancaire</p>
+                    <p>Pret en 30 secondes, annulable a tout moment</p>
                 </div>
                 <button class="modal-close" onclick="closeRegister()">&times;</button>
             </div>
@@ -686,7 +671,7 @@ $pricePro     = GeoCurrency::formatPrice('pro',     $cur, $sym);
                     <i class="fas fa-rocket"></i> Demarrer mon essai de 7 jours
                 </button>
                 <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--text-muted);">
-                    Aucune carte bancaire. Annulez a tout moment.
+                    7 jours gratuits. Annulez avant J+7 et rien ne sera debite.
                 </p>
             </div>
         </div>
@@ -772,6 +757,13 @@ function submitRegister() {
             btn.innerHTML = '<i class="fas fa-rocket"></i> Demarrer mon essai de 7 jours';
 
             if (data.success) {
+                // USD path: redirect straight into Polar checkout (card + 7-day trial).
+                if (data.mode === 'polar_checkout' && data.checkout_url) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirection vers le paiement...';
+                    window.location.href = data.checkout_url;
+                    return;
+                }
+                // MRU path (or Polar fallback): show success modal with login URL.
                 const fullUrl = window.location.origin + data.url;
                 document.getElementById('successUrl').textContent = fullUrl;
                 document.getElementById('successUser').textContent = data.username;

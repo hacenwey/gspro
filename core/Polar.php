@@ -87,6 +87,49 @@ class Polar {
     }
 
     /**
+     * Cancel a subscription. By default Polar cancels at period end so the
+     * customer keeps access until the current period (trial or paid) runs out.
+     * Returns the updated subscription payload.
+     */
+    public static function cancelSubscription(string $subscriptionId, bool $atPeriodEnd = true): array {
+        if (!self::isConfigured()) {
+            throw new RuntimeException('Polar access token is not configured');
+        }
+        if ($subscriptionId === '') {
+            throw new RuntimeException('Empty subscription id');
+        }
+
+        $body = ['cancel_at_period_end' => $atPeriodEnd];
+
+        $ch = curl_init(self::apiBase() . '/v1/subscriptions/' . rawurlencode($subscriptionId));
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST  => 'PATCH',
+            CURLOPT_POSTFIELDS     => json_encode($body),
+            CURLOPT_HTTPHEADER     => [
+                'Authorization: Bearer ' . self::accessToken(),
+                'Content-Type: application/json',
+                'Accept: application/json',
+            ],
+            CURLOPT_TIMEOUT        => 15,
+        ]);
+        $raw  = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err  = curl_error($ch);
+        curl_close($ch);
+
+        if ($raw === false) {
+            throw new RuntimeException('Polar cancel request failed: ' . $err);
+        }
+        $resp = json_decode($raw, true);
+        if ($code < 200 || $code >= 300) {
+            $msg = is_array($resp) ? json_encode($resp) : $raw;
+            throw new RuntimeException("Polar cancel HTTP $code: $msg");
+        }
+        return is_array($resp) ? $resp : [];
+    }
+
+    /**
      * Verify a webhook payload using the Standard Webhooks spec.
      * Polar sends these headers:
      *   webhook-id

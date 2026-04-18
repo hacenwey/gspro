@@ -78,7 +78,7 @@ Lang::init();
 // ===================== TRIAL / SUBSCRIPTION GATE =====================
 $__trialState = Tenant::trialState();
 $__tenantPath = '/' . trim(substr($pathAfterBase, strlen('/' . $tenantSlug)), '/');
-$__alwaysAllowed = ['/login', '/logout', '/pay/start', '/pay/success'];
+$__alwaysAllowed = ['/login', '/logout', '/pay/start', '/pay/success', '/pay/cancel'];
 
 // Direct route: /trial-expired and /pay show the paywall page.
 if ($__tenantPath === '/trial-expired' || $__tenantPath === '/pay') {
@@ -95,6 +95,11 @@ if ($__tenantPath === '/pay/start') {
 if ($__tenantPath === '/pay/success') {
     require_once __DIR__ . '/controllers/BillingController.php';
     (new BillingController())->success();
+    exit;
+}
+if ($__tenantPath === '/pay/cancel' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/controllers/BillingController.php';
+    (new BillingController())->cancel();
     exit;
 }
 

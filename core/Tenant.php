@@ -232,26 +232,34 @@ class Tenant {
 
         // Register tenant in master database
         $plan = $data['plan'] ?? 'starter';
+        if ($plan === 'free') $plan = 'starter';
         $maxUsers = match($plan) {
-            'free' => 2,
             'starter' => 5,
             'pro' => 15,
             'enterprise' => 100,
             default => 5
         };
         $maxProducts = match($plan) {
-            'free' => 100,
             'starter' => 500,
             'pro' => 5000,
             'enterprise' => 999999,
             default => 500
         };
 
+        // Caller can force a different subscription state. USD signups flip this to
+        // 'pending_payment' so the tenant can't use the app until Polar confirms the
+        // checkout. MRU signups stick with the 7-day in-app trial.
+        $status = $data['subscription_status'] ?? 'trial';
+        if (!in_array($status, ['trial', 'pending_payment'], true)) {
+            $status = 'trial';
+        }
+        $trialExpr = $status === 'trial' ? "DATE_ADD(NOW(), INTERVAL 7 DAY)" : "NULL";
+
         $stmt = $masterDb->prepare(
             "INSERT INTO tenants
                 (id, slug, company_name, owner_name, owner_email, owner_phone, db_name,
                  plan, max_users, max_products, trial_ends_at, subscription_status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), 'trial')"
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, $trialExpr, ?)"
         );
         $stmt->execute([
             $tenantId,
@@ -263,7 +271,8 @@ class Tenant {
             $dbName,
             $plan,
             $maxUsers,
-            $maxProducts
+            $maxProducts,
+            $status
         ]);
 
         // Log
@@ -353,7 +362,7 @@ class Tenant {
             return $out;
         }
 
-        if ($subStatus === 'cancelled' || $subStatus === 'expired') {
+        if ($subStatus === 'cancelled' || $subStatus === 'expired' || $subStatus === 'pending_payment') {
             $out['status'] = 'expired';
             return $out;
         }

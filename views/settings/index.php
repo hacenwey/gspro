@@ -1,3 +1,59 @@
+<?php
+$sub = $subscription ?? [];
+$subPlan = strtoupper($sub['plan'] ?? 'starter');
+$subStatus = $sub['status'] ?? 'trial';
+$paidUntil = !empty($sub['paid_until']) ? strtotime($sub['paid_until']) : null;
+$statusLabel = match($subStatus) {
+    'active'  => ['Actif',    'success'],
+    'trial'   => ['Essai',    'warning'],
+    'cancelled' => ['Annule', 'danger'],
+    'expired'   => ['Expire', 'danger'],
+    'pending_payment' => ['En attente de paiement', 'warning'],
+    default => [$subStatus, 'secondary'],
+};
+?>
+<!-- Subscription card -->
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-header"><h3><i class="fas fa-credit-card" style="color:var(--primary);"></i> Abonnement</h3></div>
+    <div class="card-body">
+        <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
+            <div>
+                <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;">Plan</div>
+                <div style="font-size:20px;font-weight:800;color:var(--primary);"><?= e($subPlan) ?></div>
+            </div>
+            <div>
+                <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;">Statut</div>
+                <span class="badge badge-<?= $statusLabel[1] ?>" style="font-size:13px;margin-top:4px;display:inline-block;"><?= e($statusLabel[0]) ?></span>
+            </div>
+            <?php if ($paidUntil): ?>
+            <div>
+                <div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;">Prochaine echeance</div>
+                <div style="font-size:15px;font-weight:600;"><?= date('d/m/Y', $paidUntil) ?></div>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <?php if (!empty($sub['polar_sub']) && $subStatus === 'active'): ?>
+            <form method="POST" action="<?= url('/pay/cancel') ?>" onsubmit="return confirm('Confirmer l\'annulation de l\'abonnement ? Vous garderez l\'acces jusqu\'au <?= $paidUntil ? date('d/m/Y', $paidUntil) : 'fin de la periode' ?>.');" style="margin-top:16px;">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-ban"></i> Annuler mon abonnement
+                </button>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
+                    Aucun prelevement ne sera effectue. Vous gardez l'acces jusqu'a la fin de la periode en cours.
+                </div>
+            </form>
+        <?php elseif ($subStatus === 'cancelled'): ?>
+            <form method="POST" action="<?= url('/pay/start') ?>" style="margin-top:16px;">
+                <input type="hidden" name="plan" value="<?= e($sub['plan'] ?? 'starter') ?>">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-credit-card"></i> Reactiver mon abonnement
+                </button>
+            </form>
+        <?php endif; ?>
+    </div>
+</div>
+
 <div class="grid-2">
     <!-- Company Settings -->
     <div class="card">
