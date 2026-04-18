@@ -26,6 +26,7 @@ $routes = [
         '/tickets'      => 'tickets',
         '/tickets/view/{id}' => 'viewTicket',
         '/connections'  => 'connections',
+        '/polar'        => 'polar',
     ],
     'POST' => [
         '/login'          => 'login',
@@ -38,6 +39,10 @@ $routes = [
         '/tenants/extend-trial/{id}' => 'extendTrial',
         '/tickets/reply/{id}' => 'replyTicket',
         '/tickets/status/{id}' => 'updateTicketStatus',
+        '/polar/save'            => 'savePolar',
+        '/polar/products/create' => 'createPolarProduct',
+        '/polar/products/archive/{id}' => 'archivePolarProduct',
+        '/polar/products/assign' => 'assignPolarProduct',
     ]
 ];
 

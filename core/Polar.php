@@ -2,35 +2,71 @@
 /**
  * Polar.sh API client + Standard Webhooks signature verifier.
  *
- * Two ways to authenticate API calls:
- *   POLAR_ACCESS_TOKEN   - Organization Access Token (server-side only, never ship to browsers)
- *
- * Three environment-driven product IDs:
- *   POLAR_STARTER_PRODUCT_ID
- *   POLAR_PRO_PRODUCT_ID
- *   POLAR_ENTERPRISE_PRODUCT_ID (optional)
- *
- * POLAR_API_BASE lets you point at sandbox.polar.sh while testing; defaults to prod.
+ * Config resolution order: master-DB polar_config row (id=1) first, then env vars.
+ * Two profiles live side-by-side: `sandbox` and `live`. The active profile is
+ * selected by the `mode` column.
  */
 class Polar {
 
-    public static function apiBase(): string {
-        return rtrim(getenv('POLAR_API_BASE') ?: 'https://api.polar.sh', '/');
+    private static ?array $cfg = null;
+
+    private static function cfg(): array {
+        if (self::$cfg !== null) return self::$cfg;
+
+        $row = null;
+        try {
+            if (class_exists('Tenant')) {
+                $db  = Tenant::getMasterDB();
+                $row = $db->query("SELECT * FROM polar_config WHERE id = 1")->fetch(PDO::FETCH_ASSOC) ?: null;
+            }
+        } catch (Throwable $e) {
+            $row = null;
+        }
+
+        if ($row) {
+            $mode = ($row['mode'] === 'live') ? 'live' : 'sandbox';
+            $p    = $mode . '_';
+            $base = $mode === 'live' ? 'https://api.polar.sh' : 'https://sandbox-api.polar.sh';
+            self::$cfg = [
+                'mode'           => $mode,
+                'api_base'       => $base,
+                'access_token'   => (string)($row[$p.'access_token']   ?? ''),
+                'webhook_secret' => (string)($row[$p.'webhook_secret'] ?? ''),
+                'products' => [
+                    'starter'    => (string)($row[$p.'starter_product_id']    ?? ''),
+                    'pro'        => (string)($row[$p.'pro_product_id']        ?? ''),
+                    'enterprise' => (string)($row[$p.'enterprise_product_id'] ?? ''),
+                ],
+            ];
+        } else {
+            $envBase = rtrim((string)(getenv('POLAR_API_BASE') ?: 'https://api.polar.sh'), '/');
+            self::$cfg = [
+                'mode'           => strpos($envBase, 'sandbox') !== false ? 'sandbox' : 'live',
+                'api_base'       => $envBase,
+                'access_token'   => (string)(getenv('POLAR_ACCESS_TOKEN')   ?: ''),
+                'webhook_secret' => (string)(getenv('POLAR_WEBHOOK_SECRET') ?: ''),
+                'products' => [
+                    'starter'    => (string)(getenv('POLAR_STARTER_PRODUCT_ID')    ?: ''),
+                    'pro'        => (string)(getenv('POLAR_PRO_PRODUCT_ID')        ?: ''),
+                    'enterprise' => (string)(getenv('POLAR_ENTERPRISE_PRODUCT_ID') ?: ''),
+                ],
+            ];
+        }
+        return self::$cfg;
     }
 
-    public static function accessToken(): string {
-        return (string)(getenv('POLAR_ACCESS_TOKEN') ?: '');
-    }
+    /** Force re-read on next access (call after saving config). */
+    public static function resetCache(): void { self::$cfg = null; }
 
-    public static function webhookSecret(): string {
-        return (string)(getenv('POLAR_WEBHOOK_SECRET') ?: '');
-    }
+    public static function mode(): string        { return self::cfg()['mode']; }
+    public static function apiBase(): string     { return self::cfg()['api_base']; }
+    public static function accessToken(): string { return self::cfg()['access_token']; }
+    public static function webhookSecret(): string { return self::cfg()['webhook_secret']; }
 
-    /** Map our internal plan slug to a Polar product UUID (from env). */
+    /** Map our internal plan slug to a Polar product UUID for the active mode. */
     public static function productIdForPlan(string $plan): ?string {
-        $envKey = 'POLAR_' . strtoupper($plan) . '_PRODUCT_ID';
-        $id = getenv($envKey);
-        return $id ? (string)$id : null;
+        $id = self::cfg()['products'][strtolower($plan)] ?? '';
+        return $id !== '' ? $id : null;
     }
 
     public static function isConfigured(): bool {
@@ -43,10 +79,6 @@ class Polar {
      * Throws RuntimeException on failure.
      */
     public static function createCheckout(array $params): array {
-        if (!self::isConfigured()) {
-            throw new RuntimeException('Polar access token is not configured');
-        }
-
         $body = array_filter([
             'products'        => $params['products']        ?? null,
             'customer_email'  => $params['customer_email']  ?? null,
@@ -55,114 +87,110 @@ class Polar {
             'metadata'        => $params['metadata']        ?? null,
         ], static fn($v) => $v !== null && $v !== '');
 
-        $ch = curl_init(self::apiBase() . '/v1/checkouts/');
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => json_encode($body),
-            CURLOPT_HTTPHEADER     => [
-                'Authorization: Bearer ' . self::accessToken(),
-                'Content-Type: application/json',
-                'Accept: application/json',
-            ],
-            CURLOPT_TIMEOUT        => 15,
-        ]);
-        $raw  = curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $err  = curl_error($ch);
-        curl_close($ch);
-
-        if ($raw === false) {
-            throw new RuntimeException('Polar checkout request failed: ' . $err);
-        }
-        $resp = json_decode($raw, true);
-        if ($code < 200 || $code >= 300) {
-            $msg = is_array($resp) ? json_encode($resp) : $raw;
-            throw new RuntimeException("Polar checkout HTTP $code: $msg");
-        }
+        $resp = self::request('POST', '/v1/checkouts/', $body);
         if (!isset($resp['id'], $resp['url'])) {
             throw new RuntimeException('Polar checkout response missing id/url');
         }
         return $resp;
     }
 
-    /**
-     * Cancel a subscription. By default Polar cancels at period end so the
-     * customer keeps access until the current period (trial or paid) runs out.
-     * Returns the updated subscription payload.
-     */
+    /** Cancel a subscription. Defaults to cancel-at-period-end. */
     public static function cancelSubscription(string $subscriptionId, bool $atPeriodEnd = true): array {
-        if (!self::isConfigured()) {
-            throw new RuntimeException('Polar access token is not configured');
-        }
         if ($subscriptionId === '') {
             throw new RuntimeException('Empty subscription id');
         }
+        return self::request('PATCH', '/v1/subscriptions/' . rawurlencode($subscriptionId), [
+            'cancel_at_period_end' => $atPeriodEnd,
+        ]);
+    }
 
-        $body = ['cancel_at_period_end' => $atPeriodEnd];
+    /** List products for the active organization. Returns the `items` array. */
+    public static function listProducts(int $limit = 50): array {
+        $resp = self::request('GET', '/v1/products/?limit=' . (int)$limit);
+        return $resp['items'] ?? [];
+    }
 
-        $ch = curl_init(self::apiBase() . '/v1/subscriptions/' . rawurlencode($subscriptionId));
-        curl_setopt_array($ch, [
+    /**
+     * Create a recurring product with a single fixed USD price.
+     * $priceCents: amount in cents (e.g. 1200 for $12.00).
+     */
+    public static function createProduct(string $name, int $priceCents, string $interval = 'month', string $description = ''): array {
+        $body = [
+            'name'               => $name,
+            'description'        => $description !== '' ? $description : $name,
+            'recurring_interval' => $interval,
+            'prices' => [[
+                'amount_type'    => 'fixed',
+                'price_amount'   => $priceCents,
+                'price_currency' => 'usd',
+            ]],
+        ];
+        return self::request('POST', '/v1/products/', $body);
+    }
+
+    /** Archive a product (Polar soft-delete). */
+    public static function archiveProduct(string $productId): array {
+        if ($productId === '') throw new RuntimeException('Empty product id');
+        return self::request('PATCH', '/v1/products/' . rawurlencode($productId), ['is_archived' => true]);
+    }
+
+    /** Shared HTTP helper. Throws on non-2xx. */
+    private static function request(string $method, string $path, ?array $body = null): array {
+        if (!self::isConfigured()) {
+            throw new RuntimeException('Polar access token is not configured');
+        }
+
+        $ch = curl_init(self::apiBase() . $path);
+        $opts = [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CUSTOMREQUEST  => 'PATCH',
-            CURLOPT_POSTFIELDS     => json_encode($body),
+            CURLOPT_CUSTOMREQUEST  => strtoupper($method),
             CURLOPT_HTTPHEADER     => [
                 'Authorization: Bearer ' . self::accessToken(),
                 'Content-Type: application/json',
                 'Accept: application/json',
             ],
             CURLOPT_TIMEOUT        => 15,
-        ]);
+        ];
+        if ($body !== null) {
+            $opts[CURLOPT_POSTFIELDS] = json_encode($body);
+        }
+        curl_setopt_array($ch, $opts);
         $raw  = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $err  = curl_error($ch);
         curl_close($ch);
 
         if ($raw === false) {
-            throw new RuntimeException('Polar cancel request failed: ' . $err);
+            throw new RuntimeException("Polar $method $path failed: $err");
         }
         $resp = json_decode($raw, true);
         if ($code < 200 || $code >= 300) {
             $msg = is_array($resp) ? json_encode($resp) : $raw;
-            throw new RuntimeException("Polar cancel HTTP $code: $msg");
+            throw new RuntimeException("Polar $method $path HTTP $code: $msg");
         }
         return is_array($resp) ? $resp : [];
     }
 
     /**
      * Verify a webhook payload using the Standard Webhooks spec.
-     * Polar sends these headers:
-     *   webhook-id
-     *   webhook-timestamp (unix seconds)
-     *   webhook-signature (space-separated list of "v1,<base64>")
-     *
-     * Returns true on valid signature, false otherwise.
+     * Polar sends: webhook-id, webhook-timestamp, webhook-signature.
      */
     public static function verifyWebhook(string $rawBody, array $headers): bool {
         $secret = self::webhookSecret();
         if ($secret === '') return false;
 
-        $id   = self::header($headers, 'webhook-id');
-        $ts   = self::header($headers, 'webhook-timestamp');
-        $sig  = self::header($headers, 'webhook-signature');
+        $id  = self::header($headers, 'webhook-id');
+        $ts  = self::header($headers, 'webhook-timestamp');
+        $sig = self::header($headers, 'webhook-signature');
         if ($id === '' || $ts === '' || $sig === '') return false;
-
-        // Reject replays older than 5 min
         if (abs(time() - (int)$ts) > 300) return false;
 
-        // Secrets can be prefixed: Polar uses "polar_whs_...", Standard Webhooks spec uses "whsec_...".
-        // After stripping prefix, the body is usually base64-encoded bytes; fall back to raw if not.
         $key = $secret;
         foreach (['polar_whs_', 'whsec_'] as $prefix) {
-            if (str_starts_with($key, $prefix)) {
-                $key = substr($key, strlen($prefix));
-                break;
-            }
+            if (str_starts_with($key, $prefix)) { $key = substr($key, strlen($prefix)); break; }
         }
         $decoded = base64_decode($key, true);
-        if ($decoded === false) {
-            $decoded = $key;
-        }
+        if ($decoded === false) $decoded = $key;
 
         $signed = $id . '.' . $ts . '.' . $rawBody;
         $expected = 'v1,' . base64_encode(hash_hmac('sha256', $signed, $decoded, true));
@@ -183,11 +211,8 @@ class Polar {
         return '';
     }
 
-    /** Fetch incoming request headers (case-insensitive). */
     public static function requestHeaders(): array {
-        if (function_exists('getallheaders')) {
-            return getallheaders();
-        }
+        if (function_exists('getallheaders')) return getallheaders();
         $out = [];
         foreach ($_SERVER as $k => $v) {
             if (strpos($k, 'HTTP_') === 0) {

@@ -484,4 +484,99 @@ class AdminController {
             $this->redirect('/tenants/edit/' . $id);
         }
     }
+
+    // ===================== POLAR =====================
+
+    public function polar(): void {
+        $this->requireAuth();
+        $this->db->exec("INSERT IGNORE INTO polar_config (id) VALUES (1)");
+        $cfg = $this->db->query("SELECT * FROM polar_config WHERE id = 1")->fetch() ?: [];
+
+        $products = [];
+        $productsError = '';
+        if (Polar::isConfigured()) {
+            try {
+                $products = Polar::listProducts(100);
+            } catch (Throwable $e) {
+                $productsError = $e->getMessage();
+            }
+        }
+
+        $flash = $this->getFlash();
+        $this->render('polar', compact('cfg', 'products', 'productsError', 'flash'));
+    }
+
+    public function savePolar(): void {
+        $this->requireAuth();
+        $mode = ($_POST['mode'] ?? 'sandbox') === 'live' ? 'live' : 'sandbox';
+
+        $fields = [
+            'sandbox_access_token', 'sandbox_webhook_secret',
+            'sandbox_starter_product_id', 'sandbox_pro_product_id', 'sandbox_enterprise_product_id',
+            'live_access_token', 'live_webhook_secret',
+            'live_starter_product_id', 'live_pro_product_id', 'live_enterprise_product_id',
+        ];
+        $set  = ['mode = ?'];
+        $vals = [$mode];
+        foreach ($fields as $f) {
+            if (array_key_exists($f, $_POST)) {
+                $v = trim((string)$_POST[$f]);
+                // empty secret/token submission = keep existing value (masked display)
+                if ($v === '' && (str_ends_with($f, '_access_token') || str_ends_with($f, '_webhook_secret'))) {
+                    continue;
+                }
+                $set[]  = "$f = ?";
+                $vals[] = $v;
+            }
+        }
+        $vals[] = 1;
+        $this->db->prepare("UPDATE polar_config SET " . implode(', ', $set) . " WHERE id = ?")->execute($vals);
+
+        Polar::resetCache();
+        $this->flash('success', 'Configuration Polar enregistree (mode = ' . $mode . ').');
+        $this->redirect('/polar');
+    }
+
+    public function createPolarProduct(): void {
+        $this->requireAuth();
+        $name     = trim((string)($_POST['name'] ?? ''));
+        $price    = (float)($_POST['price_usd'] ?? 0);
+        $interval = ($_POST['interval'] ?? 'month') === 'year' ? 'year' : 'month';
+
+        if ($name === '' || $price <= 0) {
+            $this->flash('error', 'Nom et prix requis.');
+            $this->redirect('/polar');
+        }
+        try {
+            $p = Polar::createProduct($name, (int)round($price * 100), $interval);
+            $this->flash('success', 'Produit cree : ' . $p['name'] . ' (' . $p['id'] . ')');
+        } catch (Throwable $e) {
+            $this->flash('error', 'Erreur Polar : ' . $e->getMessage());
+        }
+        $this->redirect('/polar');
+    }
+
+    public function archivePolarProduct(string $id): void {
+        $this->requireAuth();
+        try {
+            Polar::archiveProduct($id);
+            $this->flash('success', 'Produit archive.');
+        } catch (Throwable $e) {
+            $this->flash('error', 'Erreur Polar : ' . $e->getMessage());
+        }
+        $this->redirect('/polar');
+    }
+
+    public function assignPolarProduct(): void {
+        $this->requireAuth();
+        $plan      = ($_POST['plan'] ?? '') === 'pro' ? 'pro' : (($_POST['plan'] ?? '') === 'enterprise' ? 'enterprise' : 'starter');
+        $productId = trim((string)($_POST['product_id'] ?? ''));
+        $mode      = ($_POST['mode'] ?? 'sandbox') === 'live' ? 'live' : 'sandbox';
+
+        $col = $mode . '_' . $plan . '_product_id';
+        $this->db->prepare("UPDATE polar_config SET $col = ? WHERE id = 1")->execute([$productId]);
+        Polar::resetCache();
+        $this->flash('success', strtoupper($plan) . ' assigne a ' . $productId . ' (' . $mode . ').');
+        $this->redirect('/polar');
+    }
 }

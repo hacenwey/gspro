@@ -108,3 +108,22 @@ CREATE INDEX idx_login_logs_tenant ON login_logs(tenant_id);
 CREATE INDEX idx_login_logs_created ON login_logs(created_at);
 CREATE INDEX idx_login_logs_success ON login_logs(success);
 CREATE INDEX idx_login_logs_actor ON login_logs(actor_type);
+
+-- ===================== POLAR CONFIG (singleton, id=1) =====================
+CREATE TABLE polar_config (
+    id TINYINT UNSIGNED NOT NULL PRIMARY KEY,
+    mode ENUM('sandbox','live') NOT NULL DEFAULT 'sandbox',
+    sandbox_access_token   VARCHAR(255) NOT NULL DEFAULT '',
+    sandbox_webhook_secret VARCHAR(255) NOT NULL DEFAULT '',
+    sandbox_starter_product_id    VARCHAR(64) NOT NULL DEFAULT '',
+    sandbox_pro_product_id        VARCHAR(64) NOT NULL DEFAULT '',
+    sandbox_enterprise_product_id VARCHAR(64) NOT NULL DEFAULT '',
+    live_access_token   VARCHAR(255) NOT NULL DEFAULT '',
+    live_webhook_secret VARCHAR(255) NOT NULL DEFAULT '',
+    live_starter_product_id    VARCHAR(64) NOT NULL DEFAULT '',
+    live_pro_product_id        VARCHAR(64) NOT NULL DEFAULT '',
+    live_enterprise_product_id VARCHAR(64) NOT NULL DEFAULT '',
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+INSERT INTO polar_config (id) VALUES (1);

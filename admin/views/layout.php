@@ -73,6 +73,9 @@
             <a href="<?= adminUrl('/connections') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/connections') ? 'active' : '' ?>">
                 <i class="fas fa-right-to-bracket"></i> Connexions
             </a>
+            <a href="<?= adminUrl('/polar') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/polar') ? 'active' : '' ?>">
+                <i class="fas fa-credit-card"></i> Polar.sh
+            </a>
             <a href="<?= adminUrl('/tickets') ?>" class="<?= str_starts_with(Tenant::extractAdminPath(), '/tickets') ? 'active' : '' ?>" style="position:relative;">
                 <i class="fas fa-headset"></i> Tickets
                 <?php
