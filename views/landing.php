@@ -11,8 +11,281 @@ try {
     $activeTenants = 0;
 }
 
-$priceStarter = GeoCurrency::formatPrice('starter');
-$pricePro     = GeoCurrency::formatPrice('pro');
+// ===================== LANDING PAGE I18N =====================
+// The landing page is served before Lang::init() (see index.php), so it
+// handles locale selection on its own. Arabic is the default for the
+// Mauritanian market; French and English stay available via ?lang=.
+$landingLangs = ['ar', 'fr', 'en'];
+if (isset($_GET['lang']) && in_array($_GET['lang'], $landingLangs, true)) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+$lang = $_SESSION['lang'] ?? 'ar';
+if (!in_array($lang, $landingLangs, true)) { $lang = 'ar'; }
+$dir     = $lang === 'ar' ? 'rtl' : 'ltr';
+$isRtl   = $lang === 'ar';
+
+// Display currency: MRU (Mauritanian ouguiya). Subscription payments are
+// processed by Polar in USD; amounts are converted for display only.
+$USD_TO_MRU = 40;
+$fmtMru = static function ($usd) use ($USD_TO_MRU) {
+    return number_format((float)$usd * $USD_TO_MRU, 0, ',', ' ');
+};
+
+$TR = [
+    'ar' => [
+        'cur' => 'أوقية',
+        'page_title' => 'GestionPro — برنامج إدارة الأعمال المتكامل',
+        'page_desc' => 'أدِر المخزون والفواتير ونقاط البيع والعملاء. تجربة مجانية 7 أيام، ألغِ في أي وقت.',
+        'nav_features' => 'المميزات', 'nav_pricing' => 'الأسعار', 'nav_faq' => 'الأسئلة الشائعة',
+        'nav_admin_title' => 'الإدارة', 'nav_cta' => 'ابدأ الفترة المجانية',
+        'hero_badge' => 'تجربة 7 أيام — يمكنك الإلغاء في أي وقت',
+        'hero_h1_1' => 'أدِر تجارتك.', 'hero_h1_2' => 'بسّط يومك.',
+        'hero_sub' => 'المنصة المتكاملة للمتاجر والشركات الصغيرة والمتوسطة وأصحاب الخدمات. المخزون، نقاط البيع، الفواتير، العملاء والمالية — أداة واحدة، جاهزة في 30 ثانية.',
+        'hero_trust1' => '7 أيام مجاناً', 'hero_trust2' => 'ألغِ قبل اليوم السابع — بدون رسوم',
+        'hero_trust3' => 'متوفر بالعربية والفرنسية والإنجليزية',
+        'hero_cta1' => 'أنشئ مساحة عملي', 'hero_cta2' => 'شاهد العرض',
+        'stat_businesses' => 'شركات نشطة', 'stat_signup' => 'للتسجيل', 'stat_uptime' => 'التشغيل', 'stat_access' => 'الوصول',
+        'm_dashboard' => 'لوحة التحكم', 'm_pos' => 'نقاط البيع', 'm_products' => 'المنتجات', 'm_clients' => 'العملاء',
+        'm_invoices' => 'الفواتير', 'm_debts' => 'الديون', 'm_payments' => 'المدفوعات',
+        'kpi_revenue' => 'إيرادات اليوم', 'kpi_stock' => 'منتجات في المخزون', 'kpi_alerts' => 'تنبيهات المخزون',
+        'feat_label' => 'المميزات', 'feat_title' => 'كل ما تحتاجه لإدارة تجارتك',
+        'feat_desc' => 'مجموعة أدوات متكاملة للمتاجر والشركات الصغيرة والمتوسطة في أي مكان. متعدد المستخدمين واللغات، جاهز للاستخدام فوراً.',
+        'feat1_t' => 'نقاط بيع سريعة', 'feat1_d' => 'واجهة بيع سهلة مع قارئ الباركود، بحث فوري عن المنتجات ودفع بنقرة واحدة.',
+        'feat2_t' => 'إدارة المخزون', 'feat2_d' => 'تتبّع فوري، تنبيهات نفاد المخزون، إدخال وإخراج تلقائي مع كل عملية بيع.',
+        'feat3_t' => 'عروض الأسعار والفواتير', 'feat3_d' => 'أنشئ عروض أسعار، حوّلها إلى فواتير، وأصدر ملفات PDF احترافية في ثوانٍ.',
+        'feat4_t' => 'متابعة الديون', 'feat4_d' => 'أدِر مستحقات العملاء والموردين. اعرف من يدين لك وبماذا في أي وقت.',
+        'feat5_t' => 'لوحات معلومات وتقارير', 'feat5_d' => 'اتجاهات الإيرادات، أفضل المنتجات، وضع الخزينة — رؤى واضحة بنظرة واحدة.',
+        'feat6_t' => '3 لغات', 'feat6_d' => 'واجهة كاملة بالعربية والفرنسية والإنجليزية مع دعم أصلي للكتابة من اليمين لليسار. بدّل بنقرة واحدة.',
+        'how_label' => 'البدء', 'how_title' => 'جاهز في 30 ثانية',
+        'step1_t' => 'أنشئ مساحة عملك', 'step1_d' => 'اختر اسماً لتجارتك. أدخل بطاقتك لبدء تجربة الـ7 أيام.',
+        'step2_t' => 'أضف منتجاتك', 'step2_d' => 'استورد كتالوجك، حدّد الأسعار ومستويات المخزون الافتتاحية.',
+        'step3_t' => 'ابدأ البيع', 'step3_d' => 'استخدم نقاط البيع، أصدر فواتير للعملاء، وتابع أموالك في الوقت الفعلي.',
+        'price_label' => 'الأسعار', 'price_title' => 'خطة لكل نشاط تجاري',
+        'price_desc' => 'ابدأ بتجربة مجانية لمدة <strong>7 أيام</strong> على أي خطة. ألغِ قبل انتهاء التجربة ولن تُدفع أي رسوم.',
+        'trial_badge' => 'تجربة 7 أيام',
+        'plan_starter' => 'المبتدئ', 'plan_starter_d' => 'للشركات الصغيرة والمتوسطة النامية',
+        'plan_pro' => 'المحترف', 'plan_pro_d' => 'للفرق الأكبر',
+        'per_month' => '/ شهر', 'billed_monthly' => 'فوترة شهرية', 'per_year' => '/ سنة', 'billed_yearly' => 'فوترة سنوية',
+        'plan_secure' => 'خطة آمنة عبر Polar',
+        'starter_b1' => '5 مستخدمين', 'starter_b2' => '500 منتج', 'starter_b3' => 'نقاط بيع + فواتير غير محدودة',
+        'starter_b4' => 'دعم ذو أولوية', 'starter_b5' => 'ألغِ في أي وقت خلال التجربة',
+        'pro_b1' => '15 مستخدماً', 'pro_b2' => '5000 منتج', 'pro_b3' => 'كل ما في خطة المبتدئ',
+        'pro_b4' => 'دعم على مدار الساعة', 'pro_b5' => 'تقارير متقدمة',
+        'start_trial_btn' => 'ابدأ تجربة الـ7 أيام',
+        'pricing_note' => 'جميع الأسعار بالأوقية (MRU). دفع آمن بالبطاقة — ألغِ في أي وقت.',
+        'trust_label' => 'الأمان', 'trust_title' => 'بياناتك محميّة',
+        'trust_desc' => 'تشفير ونسخ احتياطي وعزل للبيانات — نشاطك يستحق بنية تحتية متينة.',
+        'trust1_t' => 'HTTPS في كل مكان', 'trust1_d' => 'اتصالات مشفّرة بـ TLS 1.3 على كل صفحة وكل طلب API.',
+        'trust2_t' => 'قاعدة بيانات مخصّصة', 'trust2_d' => 'كل عميل يحصل على قاعدة بيانات معزولة خاصة به.',
+        'trust3_t' => 'نسخ احتياطي يومي', 'trust3_d' => 'نسخ احتياطي تلقائي يومي لبياناتك.',
+        'trust4_t' => 'كلمات مرور آمنة', 'trust4_d' => 'تشفير Bcrypt — لا كلمات مرور نصية أبداً.',
+        'faq_label' => 'الأسئلة', 'faq_title' => 'كل ما تريد معرفته',
+        'faq1_q' => 'كيف تعمل تجربة الـ7 أيام؟',
+        'faq1_a' => 'نسجّل بطاقتك عند التسجيل لكن لا نخصم أي مبلغ لمدة 7 أيام. يمكنك الإلغاء في أي وقت خلال التجربة دون أي رسوم. تُخصم بطاقتك فقط في اليوم الثامن إذا لم تلغِ.',
+        'faq2_q' => 'ماذا يحدث بعد تجربة الـ7 أيام؟',
+        'faq2_a' => 'إذا لم تلغِ، يبدأ اشتراكك الشهري تلقائياً وتُخصم بطاقتك. وإلا يُعلّق الوصول، وتُحفظ بياناتك ويمكنك إعادة التفعيل في أي وقت.',
+        'faq3_q' => 'هل يمكنني الإلغاء في أي وقت؟',
+        'faq3_a' => 'نعم، دون التزام. يمكنك الإلغاء بنقرة واحدة من مساحة عملك (الإعدادات ← الاشتراك). إذا ألغيت خلال التجربة، لا يُخصم شيء. بعد ذلك تحتفظ بالوصول حتى نهاية الفترة المدفوعة.',
+        'faq4_q' => 'هل بياناتي آمنة؟',
+        'faq4_a' => 'بالتأكيد. تشفير HTTPS، قاعدة بيانات معزولة مخصّصة لكل عميل، نسخ احتياطي تلقائي يومي. بياناتك ملكك ويمكن تصديرها في أي وقت.',
+        'faq5_q' => 'هل يمكنني استخدام GestionPro من الهاتف؟',
+        'faq5_a' => 'نعم، الواجهة متجاوبة بالكامل وتعمل بشكل مثالي على الهاتف والجهاز اللوحي والحاسوب.',
+        'faq6_q' => 'ما اللغات المدعومة؟',
+        'faq6_a' => 'العربية (افتراضياً) والفرنسية والإنجليزية — مع دعم أصلي للكتابة من اليمين لليسار. يمكنك تبديل اللغة بنقرة واحدة من مساحة عملك.',
+        'cta_h2' => 'جاهز لتبسيط تجارتك؟', 'cta_p' => 'أنشئ مساحة عملك في 30 ثانية. 7 أيام مجاناً، ألغِ في أي وقت.',
+        'footer_tagline' => 'GestionPro — برنامج إدارة الأعمال',
+        'modal_badge' => 'تجربة مجانية 7 أيام', 'modal_title' => 'أنشئ مساحة عملك', 'modal_sub' => 'جاهزة في 30 ثانية، ألغِ في أي وقت',
+        'f_company' => 'اسم النشاط التجاري *', 'f_company_ph' => 'مثال: متجر النور',
+        'f_slug' => 'عنوان مساحة العمل *', 'f_slug_ph' => 'acme-shop',
+        'f_name' => 'اسمك *', 'f_name_ph' => 'محمد الأمين',
+        'f_phone' => 'الهاتف', 'f_phone_ph' => '+222 12 34 56 78',
+        'f_email' => 'البريد الإلكتروني *', 'f_email_ph' => 'you@example.com',
+        'f_password' => 'كلمة المرور *', 'f_password_ph' => '6 أحرف على الأقل',
+        'f_submit' => 'المتابعة إلى الدفع الآمن',
+        'modal_note' => '7 أيام مجاناً. ألغِ قبل اليوم السابع ولن تُدفع أي رسوم.',
+        'js_creating' => 'جارٍ إنشاء مساحة عملك...', 'js_redirect' => 'جارٍ التحويل إلى الدفع...', 'js_opening' => 'جارٍ فتح مساحة عملك...',
+        'js_created_err' => 'تم إنشاء مساحة العمل لكن تعذّر المتابعة تلقائياً. يرجى تسجيل الدخول.',
+        'js_conn_err' => 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.',
+        'popular' => '\2B50 الأكثر شيوعاً',
+        'wa_order' => 'اطلب عبر واتساب', 'wa_start' => 'ابدأ عبر واتساب', 'wa_contact' => 'تواصل معنا عبر واتساب',
+        'wa_msg_general' => 'مرحباً، أرغب في معرفة المزيد عن GestionPro.',
+        'wa_msg_plan' => 'مرحباً، أرغب في طلب باقة « %s » من GestionPro.',
+        'wa_note' => 'اطلب عبر واتساب وسيتواصل معك فريقنا لإتمام طلبك.',
+    ],
+    'fr' => [
+        'cur' => 'MRU',
+        'page_title' => 'GestionPro — Logiciel de gestion d\'entreprise tout-en-un',
+        'page_desc' => 'Gérez stock, factures, caisse et clients. Essai gratuit 7 jours, annulez à tout moment.',
+        'nav_features' => 'Fonctionnalités', 'nav_pricing' => 'Tarifs', 'nav_faq' => 'FAQ',
+        'nav_admin_title' => 'Administration', 'nav_cta' => 'Essai gratuit',
+        'hero_badge' => 'Essai 7 jours — annulez à tout moment',
+        'hero_h1_1' => 'Gérez votre activité.', 'hero_h1_2' => 'Simplifiez votre journée.',
+        'hero_sub' => 'La plateforme tout-en-un pour boutiques, PME et prestataires de services. Stock, caisse, factures, clients et finances — un seul outil, prêt en 30 secondes.',
+        'hero_trust1' => '7 jours gratuits', 'hero_trust2' => 'Annulez avant le 7e jour — sans frais',
+        'hero_trust3' => 'Disponible en arabe, français et anglais',
+        'hero_cta1' => 'Créer mon espace', 'hero_cta2' => 'Voir la démo',
+        'stat_businesses' => 'Entreprises actives', 'stat_signup' => 'Inscription', 'stat_uptime' => 'Disponibilité', 'stat_access' => 'Accès',
+        'm_dashboard' => 'Tableau de bord', 'm_pos' => 'Caisse', 'm_products' => 'Produits', 'm_clients' => 'Clients',
+        'm_invoices' => 'Factures', 'm_debts' => 'Dettes', 'm_payments' => 'Paiements',
+        'kpi_revenue' => 'Revenu du jour', 'kpi_stock' => 'Produits en stock', 'kpi_alerts' => 'Alertes de stock',
+        'feat_label' => 'Fonctionnalités', 'feat_title' => 'Tout pour gérer votre activité',
+        'feat_desc' => 'Une boîte à outils complète pour boutiques et PME partout dans le monde. Multi-utilisateurs, multilingue, prêt à l\'emploi.',
+        'feat1_t' => 'Caisse rapide', 'feat1_d' => 'Interface de vente intuitive avec scan de code-barres, recherche instantanée et encaissement en un clic.',
+        'feat2_t' => 'Gestion du stock', 'feat2_d' => 'Suivi en temps réel, alertes de stock bas, entrées et sorties automatiques à chaque vente.',
+        'feat3_t' => 'Devis & Factures', 'feat3_d' => 'Créez des devis, convertissez-les en factures, générez des PDF professionnels en quelques secondes.',
+        'feat4_t' => 'Suivi des crédits', 'feat4_d' => 'Gérez les créances clients et les dettes fournisseurs. Sachez qui vous doit quoi, à tout moment.',
+        'feat5_t' => 'Tableaux de bord & rapports', 'feat5_d' => 'Tendances du chiffre d\'affaires, meilleurs produits, situation de trésorerie — des analyses claires en un coup d\'œil.',
+        'feat6_t' => '3 langues', 'feat6_d' => 'Interface complète en arabe, français et anglais avec support RTL natif. Changez en un clic.',
+        'how_label' => 'Prise en main', 'how_title' => 'Prêt en 30 secondes',
+        'step1_t' => 'Créez votre espace', 'step1_d' => 'Choisissez un nom pour votre activité. Entrez votre carte pour démarrer l\'essai de 7 jours.',
+        'step2_t' => 'Ajoutez vos produits', 'step2_d' => 'Importez votre catalogue, définissez les prix et les stocks de départ.',
+        'step3_t' => 'Commencez à vendre', 'step3_d' => 'Utilisez la caisse, facturez vos clients, suivez vos finances en temps réel.',
+        'price_label' => 'Tarifs', 'price_title' => 'Une offre pour chaque activité',
+        'price_desc' => 'Commencez avec un <strong>essai gratuit de 7 jours</strong> sur toute offre. Annulez avant la fin de l\'essai et rien ne vous sera facturé.',
+        'trial_badge' => 'Essai 7 jours',
+        'plan_starter' => 'Starter', 'plan_starter_d' => 'Pour PME en croissance',
+        'plan_pro' => 'Pro', 'plan_pro_d' => 'Pour les grandes équipes',
+        'per_month' => '/ mois', 'billed_monthly' => 'Facturé mensuellement', 'per_year' => '/ an', 'billed_yearly' => 'Facturé annuellement',
+        'plan_secure' => 'Offre sécurisée sur Polar',
+        'starter_b1' => '5 utilisateurs', 'starter_b2' => '500 produits', 'starter_b3' => 'Caisse + factures illimitées',
+        'starter_b4' => 'Support prioritaire', 'starter_b5' => 'Annulez à tout moment pendant l\'essai',
+        'pro_b1' => '15 utilisateurs', 'pro_b2' => '5 000 produits', 'pro_b3' => 'Tout de Starter',
+        'pro_b4' => 'Support 24/7', 'pro_b5' => 'Rapports avancés',
+        'start_trial_btn' => 'Démarrer l\'essai 7 jours',
+        'pricing_note' => 'Tous les prix en MRU. Paiement sécurisé par carte — annulez à tout moment.',
+        'trust_label' => 'Sécurité', 'trust_title' => 'Vos données sont protégées',
+        'trust_desc' => 'Chiffrement, sauvegardes et isolation des données — votre activité mérite une infrastructure solide.',
+        'trust1_t' => 'HTTPS partout', 'trust1_d' => 'Connexions chiffrées TLS 1.3 sur chaque page et appel API.',
+        'trust2_t' => 'Base de données dédiée', 'trust2_d' => 'Chaque client dispose de sa propre base de données isolée.',
+        'trust3_t' => 'Sauvegardes quotidiennes', 'trust3_d' => 'Sauvegardes automatiques quotidiennes de vos données.',
+        'trust4_t' => 'Mots de passe sécurisés', 'trust4_d' => 'Hachage Bcrypt — jamais de mots de passe en clair.',
+        'faq_label' => 'Questions', 'faq_title' => 'Tout ce que vous voulez savoir',
+        'faq1_q' => 'Comment fonctionne l\'essai de 7 jours ?',
+        'faq1_a' => 'Nous enregistrons votre carte à l\'inscription mais ne prélevons rien pendant 7 jours. Vous pouvez annuler à tout moment pendant l\'essai sans aucun frais. Votre carte n\'est débitée qu\'au 8e jour si vous n\'avez pas annulé.',
+        'faq2_q' => 'Que se passe-t-il après l\'essai de 7 jours ?',
+        'faq2_a' => 'Si vous n\'avez pas annulé, votre abonnement mensuel démarre automatiquement et votre carte est débitée. Sinon, l\'accès est suspendu, vos données sont conservées et vous pouvez réactiver à tout moment.',
+        'faq3_q' => 'Puis-je annuler à tout moment ?',
+        'faq3_a' => 'Oui, sans engagement. Vous pouvez annuler en un clic depuis votre espace (Paramètres &gt; Abonnement). Si vous annulez pendant l\'essai, rien n\'est facturé. Ensuite, vous gardez l\'accès jusqu\'à la fin de la période déjà payée.',
+        'faq4_q' => 'Mes données sont-elles sécurisées ?',
+        'faq4_a' => 'Absolument. Chiffrement HTTPS, une base de données isolée dédiée par client, sauvegardes automatiques quotidiennes. Vos données vous appartiennent et sont exportables à tout moment.',
+        'faq5_q' => 'Puis-je utiliser GestionPro depuis un téléphone ?',
+        'faq5_a' => 'Oui, l\'interface est entièrement responsive et fonctionne parfaitement sur téléphone, tablette et ordinateur.',
+        'faq6_q' => 'Quelles langues sont prises en charge ?',
+        'faq6_a' => 'L\'arabe (par défaut), le français et l\'anglais — avec support RTL natif. Vous pouvez changer de langue en un clic depuis votre espace.',
+        'cta_h2' => 'Prêt à simplifier votre activité ?', 'cta_p' => 'Créez votre espace en 30 secondes. 7 jours gratuits, annulez à tout moment.',
+        'footer_tagline' => 'GestionPro — Logiciel de gestion d\'entreprise',
+        'modal_badge' => 'Essai gratuit 7 jours', 'modal_title' => 'Créez votre espace', 'modal_sub' => 'Prêt en 30 secondes, annulez à tout moment',
+        'f_company' => 'Nom de l\'entreprise *', 'f_company_ph' => 'ex. Boutique Acme',
+        'f_slug' => 'Adresse de l\'espace *', 'f_slug_ph' => 'acme-shop',
+        'f_name' => 'Votre nom *', 'f_name_ph' => 'Jean Dupont',
+        'f_phone' => 'Téléphone', 'f_phone_ph' => '+222 12 34 56 78',
+        'f_email' => 'E-mail *', 'f_email_ph' => 'vous@exemple.com',
+        'f_password' => 'Mot de passe *', 'f_password_ph' => 'Au moins 6 caractères',
+        'f_submit' => 'Continuer vers le paiement sécurisé',
+        'modal_note' => '7 jours gratuits. Annulez avant le 7e jour et rien ne sera facturé.',
+        'js_creating' => 'Création de votre espace...', 'js_redirect' => 'Redirection vers le paiement...', 'js_opening' => 'Ouverture de votre espace...',
+        'js_created_err' => 'Espace créé mais impossible de continuer automatiquement. Veuillez vous connecter.',
+        'js_conn_err' => 'Erreur de connexion. Veuillez réessayer.',
+        'popular' => '\2B50 Le plus populaire',
+        'wa_order' => 'Commander sur WhatsApp', 'wa_start' => 'Démarrer sur WhatsApp', 'wa_contact' => 'Nous contacter sur WhatsApp',
+        'wa_msg_general' => 'Bonjour, je souhaite en savoir plus sur GestionPro.',
+        'wa_msg_plan' => 'Bonjour, je souhaite commander le pack « %s » de GestionPro.',
+        'wa_note' => 'Commandez sur WhatsApp et notre équipe vous recontacte pour finaliser votre commande.',
+    ],
+    'en' => [
+        'cur' => 'MRU',
+        'page_title' => 'GestionPro — All-in-one business management software',
+        'page_desc' => 'Manage stock, invoices, POS and clients. 7-day free trial, cancel anytime.',
+        'nav_features' => 'Features', 'nav_pricing' => 'Pricing', 'nav_faq' => 'FAQ',
+        'nav_admin_title' => 'Administration', 'nav_cta' => 'Start free trial',
+        'hero_badge' => '7-day trial — cancel anytime',
+        'hero_h1_1' => 'Run your business.', 'hero_h1_2' => 'Simplify your day.',
+        'hero_sub' => 'The all-in-one platform for shops, SMBs and service businesses. Stock, POS, invoices, clients and finance — one tool, ready in 30 seconds.',
+        'hero_trust1' => '7 days free', 'hero_trust2' => 'Cancel before day 7 — no charge',
+        'hero_trust3' => 'Available in Arabic, French and English',
+        'hero_cta1' => 'Create my workspace', 'hero_cta2' => 'See the demo',
+        'stat_businesses' => 'Active businesses', 'stat_signup' => 'Sign-up', 'stat_uptime' => 'Uptime', 'stat_access' => 'Access',
+        'm_dashboard' => 'Dashboard', 'm_pos' => 'POS', 'm_products' => 'Products', 'm_clients' => 'Clients',
+        'm_invoices' => 'Invoices', 'm_debts' => 'Debts', 'm_payments' => 'Payments',
+        'kpi_revenue' => 'Today\'s revenue', 'kpi_stock' => 'Products in stock', 'kpi_alerts' => 'Stock alerts',
+        'feat_label' => 'Features', 'feat_title' => 'Everything to run your business',
+        'feat_desc' => 'A complete toolkit for shops and SMBs anywhere in the world. Multi-user, multilingual, ready out of the box.',
+        'feat1_t' => 'Fast POS', 'feat1_d' => 'Intuitive sales interface with barcode scan, instant product search and one-click checkout.',
+        'feat2_t' => 'Stock management', 'feat2_d' => 'Real-time tracking, low-stock alerts, automatic ins and outs with every sale.',
+        'feat3_t' => 'Quotes & Invoices', 'feat3_d' => 'Create quotes, convert them to invoices, generate professional PDFs in seconds.',
+        'feat4_t' => 'Credit tracking', 'feat4_d' => 'Manage customer receivables and supplier payables. Know who owes you what, anytime.',
+        'feat5_t' => 'Dashboards & reports', 'feat5_d' => 'Revenue trends, top products, cash positions — clear insights at a glance.',
+        'feat6_t' => '3 languages', 'feat6_d' => 'Full interface in Arabic, French and English with native RTL support. Switch in one click.',
+        'how_label' => 'Getting started', 'how_title' => 'Ready in 30 seconds',
+        'step1_t' => 'Create your workspace', 'step1_d' => 'Pick a name for your business. Enter your card to start the 7-day trial.',
+        'step2_t' => 'Add your products', 'step2_d' => 'Import your catalogue, set prices and opening stock levels.',
+        'step3_t' => 'Start selling', 'step3_d' => 'Use the POS, invoice clients, track your finances in real time.',
+        'price_label' => 'Pricing', 'price_title' => 'A plan for every business',
+        'price_desc' => 'Start with a <strong>7-day free trial</strong> on any plan. Cancel before the trial ends and you won\'t be charged.',
+        'trial_badge' => '7-day trial',
+        'plan_starter' => 'Starter', 'plan_starter_d' => 'For growing SMBs',
+        'plan_pro' => 'Pro', 'plan_pro_d' => 'For larger teams',
+        'per_month' => '/ month', 'billed_monthly' => 'Billed monthly', 'per_year' => '/ year', 'billed_yearly' => 'Billed yearly',
+        'plan_secure' => 'Secure plan on Polar',
+        'starter_b1' => '5 users', 'starter_b2' => '500 products', 'starter_b3' => 'POS + unlimited invoices',
+        'starter_b4' => 'Priority support', 'starter_b5' => 'Cancel anytime during the trial',
+        'pro_b1' => '15 users', 'pro_b2' => '5,000 products', 'pro_b3' => 'Everything in Starter',
+        'pro_b4' => '24/7 support', 'pro_b5' => 'Advanced reports',
+        'start_trial_btn' => 'Start 7-day trial',
+        'pricing_note' => 'All prices in MRU. Secure card checkout — cancel anytime.',
+        'trust_label' => 'Security', 'trust_title' => 'Your data is protected',
+        'trust_desc' => 'Encryption, backups and data isolation — your business deserves solid infrastructure.',
+        'trust1_t' => 'HTTPS everywhere', 'trust1_d' => 'TLS 1.3 encrypted connections on every page and API call.',
+        'trust2_t' => 'Dedicated database', 'trust2_d' => 'Every customer gets its own isolated database.',
+        'trust3_t' => 'Daily backups', 'trust3_d' => 'Automatic daily backups of your data.',
+        'trust4_t' => 'Secure passwords', 'trust4_d' => 'Bcrypt hashing — no plain-text passwords ever.',
+        'faq_label' => 'Questions', 'faq_title' => 'Everything you want to know',
+        'faq1_q' => 'How does the 7-day trial work?',
+        'faq1_a' => 'We record your card at signup but do not charge anything for 7 days. You can cancel at any time during the trial and no charge will be made. Your card is only billed on day 8 if you haven\'t cancelled.',
+        'faq2_q' => 'What happens after the 7-day trial?',
+        'faq2_a' => 'If you haven\'t cancelled, your monthly subscription starts automatically and your card is charged. Otherwise, access is suspended, your data is kept and you can reactivate at any time.',
+        'faq3_q' => 'Can I cancel at any time?',
+        'faq3_a' => 'Yes, no commitment. You can cancel in one click from your workspace (Settings &gt; Subscription). If you cancel during the trial, nothing is charged. Afterwards you keep access until the end of the period you already paid for.',
+        'faq4_q' => 'Is my data secure?',
+        'faq4_a' => 'Absolutely. HTTPS encryption, a dedicated isolated database per customer, automatic daily backups. Your data belongs to you and is exportable at any time.',
+        'faq5_q' => 'Can I use GestionPro from a phone?',
+        'faq5_a' => 'Yes, the interface is fully responsive and works perfectly on phone, tablet and desktop.',
+        'faq6_q' => 'Which languages are supported?',
+        'faq6_a' => 'Arabic (default), French and English — with native RTL support. You can switch languages in one click from your workspace.',
+        'cta_h2' => 'Ready to simplify your business?', 'cta_p' => 'Create your workspace in 30 seconds. 7 days free, cancel anytime.',
+        'footer_tagline' => 'GestionPro — Business management software',
+        'modal_badge' => '7-day free trial', 'modal_title' => 'Create your workspace', 'modal_sub' => 'Ready in 30 seconds, cancel anytime',
+        'f_company' => 'Business name *', 'f_company_ph' => 'e.g. Acme Shop',
+        'f_slug' => 'Workspace address *', 'f_slug_ph' => 'acme-shop',
+        'f_name' => 'Your name *', 'f_name_ph' => 'Jane Doe',
+        'f_phone' => 'Phone', 'f_phone_ph' => '+222 12 34 56 78',
+        'f_email' => 'Email *', 'f_email_ph' => 'you@example.com',
+        'f_password' => 'Password *', 'f_password_ph' => 'At least 6 characters',
+        'f_submit' => 'Continue to secure checkout',
+        'modal_note' => '7 days free. Cancel before day 7 and you won\'t be charged.',
+        'js_creating' => 'Creating your workspace...', 'js_redirect' => 'Redirecting to checkout...', 'js_opening' => 'Opening your workspace...',
+        'js_created_err' => 'Workspace created but we could not continue automatically. Please sign in.',
+        'js_conn_err' => 'Connection error. Please try again.',
+        'popular' => '\2B50 Most popular',
+        'wa_order' => 'Order on WhatsApp', 'wa_start' => 'Get started on WhatsApp', 'wa_contact' => 'Contact us on WhatsApp',
+        'wa_msg_general' => 'Hello, I\'d like to know more about GestionPro.',
+        'wa_msg_plan' => 'Hello, I\'d like to order the "%s" pack of GestionPro.',
+        'wa_note' => 'Order on WhatsApp and our team will get back to you to finalise your order.',
+    ],
+];
+$t = $TR[$lang];
+$cur = $t['cur'];
+
+// WhatsApp ordering links. No self-serve checkout on the landing page:
+// every call-to-action opens WhatsApp with a prefilled message.
+$waBase = 'https://wa.me/' . WHATSAPP_ORDER;
+$waLink = static function (string $message) use ($waBase) {
+    return $waBase . '?text=' . rawurlencode($message);
+};
+$waGeneral = $waLink($t['wa_msg_general']);
+
+$priceStarter = $fmtMru(GeoCurrency::PLANS['starter']['USD'] ?? 0) . ' ' . $cur;
+$pricePro     = $fmtMru(GeoCurrency::PLANS['pro']['USD'] ?? 0) . ' ' . $cur;
 
 // Pull live Polar products for the dynamic pricing grid. On failure or empty
 // response the view falls back to the hardcoded Starter + Pro cards below.
@@ -40,13 +313,13 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="<?= $lang ?>" dir="<?= $dir ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GestionPro — All-in-one business management software</title>
-    <meta name="description" content="Manage stock, invoices, POS and clients. 7-day free trial, cancel anytime.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title><?= e($t['page_title']) ?></title>
+    <meta name="description" content="<?= e($t['page_desc']) ?>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -259,6 +532,25 @@ if (class_exists('Polar') && Polar::isConfigured()) {
             .trust-grid{grid-template-columns:1fr}
         }
     </style>
+    <style>
+        /* Locale-specific: Arabic font + RTL adjustments */
+        <?php if ($isRtl): ?>
+        body{font-family:'Cairo','Inter',sans-serif}
+        .hero h1{letter-spacing:0}
+        .section-title,.hero-sub{letter-spacing:0}
+        .hero-badge{padding:6px 8px 6px 16px}
+        .price-amount span{margin-left:0;margin-right:4px}
+        .slug-prefix{border-radius:0 10px 10px 0;border-right:1.5px solid var(--border);border-left:0}
+        .slug-preview input{border-radius:10px 0 0 10px}
+        .step-arrow{right:auto;left:-20px;transform:scaleX(-1)}
+        <?php endif; ?>
+        .price-card.popular::before{content:'<?= $t['popular'] ?>'}
+        /* Language switcher */
+        .lang-switch{display:inline-flex;align-items:center;gap:2px;margin-<?= $isRtl ? 'right' : 'left' ?>:6px}
+        .lang-switch a{padding:5px 8px;border-radius:7px;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase}
+        .lang-switch a.active{background:var(--primary-50);color:var(--primary)}
+        .lang-switch a:hover{color:var(--text)}
+    </style>
 </head>
 <body>
 
@@ -270,11 +562,16 @@ if (class_exists('Polar') && Polar::isConfigured()) {
             <span>GestionPro</span>
         </div>
         <div class="nav-links">
-            <a href="#features" class="hide-mobile">Features</a>
-            <a href="#pricing" class="hide-mobile">Pricing</a>
-            <a href="#faq" class="hide-mobile">FAQ</a>
-            <a href="<?= APP_BASE ?>/admin/login" class="hide-mobile" style="font-size:13px;color:var(--text-muted);" title="Administration"><i class="fas fa-shield-halved"></i></a>
-            <a href="javascript:void(0)" class="btn-nav" onclick="openRegister()"><i class="fas fa-rocket"></i> Start free trial</a>
+            <a href="#features" class="hide-mobile"><?= e($t['nav_features']) ?></a>
+            <a href="#pricing" class="hide-mobile"><?= e($t['nav_pricing']) ?></a>
+            <a href="#faq" class="hide-mobile"><?= e($t['nav_faq']) ?></a>
+            <a href="<?= APP_BASE ?>/admin/login" class="hide-mobile" style="font-size:13px;color:var(--text-muted);" title="<?= e($t['nav_admin_title']) ?>"><i class="fas fa-shield-halved"></i></a>
+            <span class="lang-switch">
+                <a href="?lang=ar" class="<?= $lang === 'ar' ? 'active' : '' ?>">ع</a>
+                <a href="?lang=fr" class="<?= $lang === 'fr' ? 'active' : '' ?>">FR</a>
+                <a href="?lang=en" class="<?= $lang === 'en' ? 'active' : '' ?>">EN</a>
+            </span>
+            <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-nav"><i class="fab fa-whatsapp"></i> <?= e($t['nav_cta']) ?></a>
         </div>
     </div>
 </nav>
@@ -283,27 +580,27 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 <section class="hero">
     <div class="hero-inner">
         <div class="hero-badge">
-            <i class="fas fa-gift"></i> 7-day trial — cancel anytime
+            <i class="fas fa-gift"></i> <?= e($t['hero_badge']) ?>
         </div>
-        <h1>Run your business.<br>Simplify your day.</h1>
-        <p class="hero-sub">The all-in-one platform for shops, SMBs and service businesses. Stock, POS, invoices, clients and finance — one tool, ready in 30 seconds.</p>
+        <h1><?= e($t['hero_h1_1']) ?><br><?= e($t['hero_h1_2']) ?></h1>
+        <p class="hero-sub"><?= e($t['hero_sub']) ?></p>
 
         <div class="hero-trust">
-            <span><i class="fas fa-check-circle"></i> 7 days free</span>
-            <span><i class="fas fa-check-circle"></i> Cancel before day 7 — no charge</span>
-            <span><i class="fas fa-check-circle"></i> Available in English, French and Arabic</span>
+            <span><i class="fas fa-check-circle"></i> <?= e($t['hero_trust1']) ?></span>
+            <span><i class="fas fa-check-circle"></i> <?= e($t['hero_trust2']) ?></span>
+            <span><i class="fas fa-check-circle"></i> <?= e($t['hero_trust3']) ?></span>
         </div>
 
         <div class="hero-cta">
-            <button class="btn-cta btn-primary-cta" onclick="openRegister()"><i class="fas fa-rocket"></i> Create my workspace</button>
-            <a href="#features" class="btn-cta btn-secondary-cta"><i class="fas fa-play-circle"></i> See the demo</a>
+            <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-cta btn-primary-cta"><i class="fab fa-whatsapp"></i> <?= e($t['wa_start']) ?></a>
+            <a href="#features" class="btn-cta btn-secondary-cta"><i class="fas fa-play-circle"></i> <?= e($t['hero_cta2']) ?></a>
         </div>
 
         <div class="hero-stats">
-            <div class="hero-stat"><div class="v"><?= max($totalTenants, 50) ?>+</div><div class="l">Active businesses</div></div>
-            <div class="hero-stat"><div class="v">30<span style="font-size:.7em;">s</span></div><div class="l">Sign-up</div></div>
-            <div class="hero-stat"><div class="v">99.9%</div><div class="l">Uptime</div></div>
-            <div class="hero-stat"><div class="v">24/7</div><div class="l">Access</div></div>
+            <div class="hero-stat"><div class="v"><?= max($totalTenants, 50) ?>+</div><div class="l"><?= e($t['stat_businesses']) ?></div></div>
+            <div class="hero-stat"><div class="v">30<span style="font-size:.7em;">s</span></div><div class="l"><?= e($t['stat_signup']) ?></div></div>
+            <div class="hero-stat"><div class="v">99.9%</div><div class="l"><?= e($t['stat_uptime']) ?></div></div>
+            <div class="hero-stat"><div class="v">24/7</div><div class="l"><?= e($t['stat_access']) ?></div></div>
         </div>
 
         <div class="hero-mockup">
@@ -313,19 +610,19 @@ if (class_exists('Polar') && Polar::isConfigured()) {
             </div>
             <div class="mockup-body">
                 <div class="mockup-sidebar">
-                    <div class="m-item active"><i class="fas fa-chart-line"></i> Dashboard</div>
-                    <div class="m-item"><i class="fas fa-cash-register"></i> POS</div>
-                    <div class="m-item"><i class="fas fa-boxes-stacked"></i> Products</div>
-                    <div class="m-item"><i class="fas fa-users"></i> Clients</div>
-                    <div class="m-item"><i class="fas fa-file-invoice-dollar"></i> Invoices</div>
-                    <div class="m-item"><i class="fas fa-hand-holding-dollar"></i> Debts</div>
-                    <div class="m-item"><i class="fas fa-money-bill-wave"></i> Payments</div>
+                    <div class="m-item active"><i class="fas fa-chart-line"></i> <?= e($t['m_dashboard']) ?></div>
+                    <div class="m-item"><i class="fas fa-cash-register"></i> <?= e($t['m_pos']) ?></div>
+                    <div class="m-item"><i class="fas fa-boxes-stacked"></i> <?= e($t['m_products']) ?></div>
+                    <div class="m-item"><i class="fas fa-users"></i> <?= e($t['m_clients']) ?></div>
+                    <div class="m-item"><i class="fas fa-file-invoice-dollar"></i> <?= e($t['m_invoices']) ?></div>
+                    <div class="m-item"><i class="fas fa-hand-holding-dollar"></i> <?= e($t['m_debts']) ?></div>
+                    <div class="m-item"><i class="fas fa-money-bill-wave"></i> <?= e($t['m_payments']) ?></div>
                 </div>
                 <div class="mockup-main">
                     <div class="mockup-kpi">
-                        <div class="m-kpi"><div class="val green">$8,475</div><div class="lbl">Today's revenue</div></div>
-                        <div class="m-kpi"><div class="val blue">2,340</div><div class="lbl">Products in stock</div></div>
-                        <div class="m-kpi"><div class="val orange">12</div><div class="lbl">Stock alerts</div></div>
+                        <div class="m-kpi"><div class="val green"><?= $fmtMru(8475) ?> <?= e($cur) ?></div><div class="lbl"><?= e($t['kpi_revenue']) ?></div></div>
+                        <div class="m-kpi"><div class="val blue">2 340</div><div class="lbl"><?= e($t['kpi_stock']) ?></div></div>
+                        <div class="m-kpi"><div class="val orange">12</div><div class="lbl"><?= e($t['kpi_alerts']) ?></div></div>
                     </div>
                     <div class="mockup-chart">
                         <svg viewBox="0 0 500 100" preserveAspectRatio="none" style="height:100%;width:100%;">
@@ -343,40 +640,40 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 <!-- FEATURES -->
 <section class="pad" id="features">
     <div class="container">
-        <div class="section-label"><i class="fas fa-bolt"></i> Features</div>
-        <div class="section-title">Everything to run your business</div>
-        <div class="section-desc">A complete toolkit for shops and SMBs anywhere in the world. Multi-user, multilingual, ready out of the box.</div>
+        <div class="section-label"><i class="fas fa-bolt"></i> <?= e($t['feat_label']) ?></div>
+        <div class="section-title"><?= e($t['feat_title']) ?></div>
+        <div class="section-desc"><?= e($t['feat_desc']) ?></div>
 
         <div class="features-grid">
             <div class="feat-card">
                 <div class="feat-icon i1"><i class="fas fa-cash-register"></i></div>
-                <h3>Fast POS</h3>
-                <p>Intuitive sales interface with barcode scan, instant product search and one-click checkout.</p>
+                <h3><?= e($t['feat1_t']) ?></h3>
+                <p><?= e($t['feat1_d']) ?></p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i2"><i class="fas fa-boxes-stacked"></i></div>
-                <h3>Stock management</h3>
-                <p>Real-time tracking, low-stock alerts, automatic ins and outs with every sale.</p>
+                <h3><?= e($t['feat2_t']) ?></h3>
+                <p><?= e($t['feat2_d']) ?></p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i3"><i class="fas fa-file-invoice-dollar"></i></div>
-                <h3>Quotes & Invoices</h3>
-                <p>Create quotes, convert them to invoices, generate professional PDFs in seconds.</p>
+                <h3><?= e($t['feat3_t']) ?></h3>
+                <p><?= e($t['feat3_d']) ?></p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i4"><i class="fas fa-hand-holding-dollar"></i></div>
-                <h3>Credit tracking</h3>
-                <p>Manage customer receivables and supplier payables. Know who owes you what, anytime.</p>
+                <h3><?= e($t['feat4_t']) ?></h3>
+                <p><?= e($t['feat4_d']) ?></p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i5"><i class="fas fa-chart-line"></i></div>
-                <h3>Dashboards & reports</h3>
-                <p>Revenue trends, top products, cash positions — clear insights at a glance.</p>
+                <h3><?= e($t['feat5_t']) ?></h3>
+                <p><?= e($t['feat5_d']) ?></p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i6"><i class="fas fa-language"></i></div>
-                <h3>3 languages</h3>
-                <p>Full interface in English, French and Arabic with native RTL support. Switch in one click.</p>
+                <h3><?= e($t['feat6_t']) ?></h3>
+                <p><?= e($t['feat6_d']) ?></p>
             </div>
         </div>
     </div>
@@ -385,25 +682,25 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 <!-- HOW IT WORKS -->
 <section class="how-section">
     <div class="how-inner">
-        <div class="section-label"><i class="fas fa-wand-magic-sparkles"></i> Getting started</div>
-        <div class="section-title" style="margin-bottom:0;">Ready in 30 seconds</div>
+        <div class="section-label"><i class="fas fa-wand-magic-sparkles"></i> <?= e($t['how_label']) ?></div>
+        <div class="section-title" style="margin-bottom:0;"><?= e($t['how_title']) ?></div>
         <div class="steps">
             <div class="step">
                 <div class="step-num">1</div>
-                <h3>Create your workspace</h3>
-                <p>Pick a name for your business. Enter your card to start the 7-day trial.</p>
+                <h3><?= e($t['step1_t']) ?></h3>
+                <p><?= e($t['step1_d']) ?></p>
                 <span class="step-arrow"><i class="fas fa-chevron-right"></i></span>
             </div>
             <div class="step">
                 <div class="step-num">2</div>
-                <h3>Add your products</h3>
-                <p>Import your catalogue, set prices and opening stock levels.</p>
+                <h3><?= e($t['step2_t']) ?></h3>
+                <p><?= e($t['step2_d']) ?></p>
                 <span class="step-arrow"><i class="fas fa-chevron-right"></i></span>
             </div>
             <div class="step">
                 <div class="step-num">3</div>
-                <h3>Start selling</h3>
-                <p>Use the POS, invoice clients, track your finances in real time.</p>
+                <h3><?= e($t['step3_t']) ?></h3>
+                <p><?= e($t['step3_d']) ?></p>
             </div>
         </div>
     </div>
@@ -412,70 +709,72 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 <!-- PRICING -->
 <section class="pad pricing-center" id="pricing">
     <div class="container">
-        <div class="section-label"><i class="fas fa-tags"></i> Pricing</div>
-        <div class="section-title">A plan for every business</div>
-        <p class="section-desc center">Start with a <strong>7-day free trial</strong> on any plan. Cancel before the trial ends and you won't be charged.</p>
+        <div class="section-label"><i class="fas fa-tags"></i> <?= e($t['price_label']) ?></div>
+        <div class="section-title"><?= e($t['price_title']) ?></div>
+        <p class="section-desc center"><?= $t['price_desc'] ?></p>
 
         <div class="pricing-grid">
         <?php if (!empty($polarProducts)):
             $popularIdx = count($polarProducts) >= 2 ? 1 : 0; // second card, or the only one
             foreach ($polarProducts as $i => $prod):
-                $priceStr  = '$' . number_format($prod['amount'] / 100, 0, ',', ' ');
-                $intervalL = $prod['interval'] === 'year' ? '/ year' : '/ month';
-                $billed    = $prod['interval'] === 'year' ? 'Billed yearly' : 'Billed monthly';
+                $priceStr  = $fmtMru($prod['amount'] / 100) . ' ' . $cur;
+                $intervalL = $prod['interval'] === 'year' ? $t['per_year'] : $t['per_month'];
+                $billed    = $prod['interval'] === 'year' ? $t['billed_yearly'] : $t['billed_monthly'];
                 $isPopular = ($i === $popularIdx);
                 $btnClass  = $isPopular ? 'btn-price filled' : 'btn-price outline';
+                $waPlan    = $waLink(sprintf($t['wa_msg_plan'], $prod['name'] !== '' ? $prod['name'] : 'GestionPro'));
         ?>
             <div class="price-card<?= $isPopular ? ' popular' : '' ?>">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7-day trial</div>
+                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> <?= e($t['trial_badge']) ?></div>
                 <div class="price-name"><?= htmlspecialchars($prod['name'], ENT_QUOTES) ?></div>
-                <div class="price-desc"><?= htmlspecialchars($prod['desc'] !== '' ? $prod['desc'] : 'Secure plan on Polar') ?></div>
-                <div class="price-amount"><?= $priceStr ?><span><?= $intervalL ?></span></div>
-                <div class="price-note"><?= $billed ?></div>
+                <div class="price-desc"><?= htmlspecialchars($prod['desc'] !== '' ? $prod['desc'] : $t['plan_secure']) ?></div>
+                <div class="price-amount"><?= e($priceStr) ?><span><?= e($intervalL) ?></span></div>
+                <div class="price-note"><?= e($billed) ?></div>
                 <ul class="price-list">
                     <?php foreach ($prod['features'] as $bullet): ?>
                     <li><i class="fas fa-check"></i> <?= htmlspecialchars($bullet, ENT_QUOTES) ?></li>
                     <?php endforeach; ?>
                 </ul>
-                <button class="<?= $btnClass ?>" onclick="openRegister('<?= htmlspecialchars($prod['id'], ENT_QUOTES) ?>')">Start 7-day trial</button>
+                <a href="<?= e($waPlan) ?>" target="_blank" rel="noopener" class="<?= $btnClass ?>"><i class="fab fa-whatsapp"></i> <?= e($t['wa_order']) ?></a>
             </div>
         <?php endforeach; else: ?>
             <div class="price-card popular">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7-day trial</div>
-                <div class="price-name">Starter</div>
-                <div class="price-desc">For growing SMBs</div>
-                <div class="price-amount"><?= $priceStarter ?><span>/ month</span></div>
-                <div class="price-note">Billed monthly</div>
+                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> <?= e($t['trial_badge']) ?></div>
+                <div class="price-name"><?= e($t['plan_starter']) ?></div>
+                <div class="price-desc"><?= e($t['plan_starter_d']) ?></div>
+                <div class="price-amount"><?= e($priceStarter) ?><span><?= e($t['per_month']) ?></span></div>
+                <div class="price-note"><?= e($t['billed_monthly']) ?></div>
                 <ul class="price-list">
-                    <li><i class="fas fa-check"></i> 5 users</li>
-                    <li><i class="fas fa-check"></i> 500 products</li>
-                    <li><i class="fas fa-check"></i> POS + unlimited invoices</li>
-                    <li><i class="fas fa-check"></i> Priority support</li>
-                    <li><i class="fas fa-check"></i> Cancel anytime during the trial</li>
+                    <li><i class="fas fa-check"></i> <?= e($t['starter_b1']) ?></li>
+                    <li><i class="fas fa-check"></i> <?= e($t['starter_b2']) ?></li>
+                    <li><i class="fas fa-check"></i> <?= e($t['starter_b3']) ?></li>
+                    <li><i class="fas fa-check"></i> <?= e($t['starter_b4']) ?></li>
+                    <li><i class="fas fa-check"></i> <?= e($t['starter_b5']) ?></li>
                 </ul>
-                <button class="btn-price filled" onclick="openRegister('starter')">Start 7-day trial</button>
+                <a href="<?= e($waLink(sprintf($t['wa_msg_plan'], $t['plan_starter']))) ?>" target="_blank" rel="noopener" class="btn-price filled"><i class="fab fa-whatsapp"></i> <?= e($t['wa_order']) ?></a>
             </div>
             <div class="price-card">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> 7-day trial</div>
-                <div class="price-name">Pro</div>
-                <div class="price-desc">For larger teams</div>
-                <div class="price-amount"><?= $pricePro ?><span>/ month</span></div>
-                <div class="price-note">Billed monthly</div>
+                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> <?= e($t['trial_badge']) ?></div>
+                <div class="price-name"><?= e($t['plan_pro']) ?></div>
+                <div class="price-desc"><?= e($t['plan_pro_d']) ?></div>
+                <div class="price-amount"><?= e($pricePro) ?><span><?= e($t['per_month']) ?></span></div>
+                <div class="price-note"><?= e($t['billed_monthly']) ?></div>
                 <ul class="price-list">
-                    <li><i class="fas fa-check"></i> 15 users</li>
-                    <li><i class="fas fa-check"></i> 5,000 products</li>
-                    <li><i class="fas fa-check"></i> Everything in Starter</li>
-                    <li><i class="fas fa-check"></i> 24/7 support</li>
-                    <li><i class="fas fa-check"></i> Advanced reports</li>
+                    <li><i class="fas fa-check"></i> <?= e($t['pro_b1']) ?></li>
+                    <li><i class="fas fa-check"></i> <?= e($t['pro_b2']) ?></li>
+                    <li><i class="fas fa-check"></i> <?= e($t['pro_b3']) ?></li>
+                    <li><i class="fas fa-check"></i> <?= e($t['pro_b4']) ?></li>
+                    <li><i class="fas fa-check"></i> <?= e($t['pro_b5']) ?></li>
                 </ul>
-                <button class="btn-price outline" onclick="openRegister('pro')">Start 7-day trial</button>
+                <a href="<?= e($waLink(sprintf($t['wa_msg_plan'], $t['plan_pro']))) ?>" target="_blank" rel="noopener" class="btn-price outline"><i class="fab fa-whatsapp"></i> <?= e($t['wa_order']) ?></a>
             </div>
         <?php endif; ?>
         </div>
 
         <p class="pricing-note">
-            <i class="fas fa-circle-info"></i>
-            All prices in USD. Secure checkout by card — cancel anytime.
+            <i class="fab fa-whatsapp" style="color:#25D366;"></i>
+            <?= e($t['wa_note']) ?><br>
+            <span style="opacity:.8;"><?= e($t['pricing_note']) ?></span>
         </p>
     </div>
 </section>
@@ -483,29 +782,29 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 <!-- TRUST / SECURITY -->
 <section class="trust-section">
     <div class="trust-inner">
-        <div class="section-label"><i class="fas fa-shield-halved"></i> Security</div>
-        <div class="section-title">Your data is protected</div>
-        <div class="section-desc">Encryption, backups and data isolation — your business deserves solid infrastructure.</div>
+        <div class="section-label"><i class="fas fa-shield-halved"></i> <?= e($t['trust_label']) ?></div>
+        <div class="section-title"><?= e($t['trust_title']) ?></div>
+        <div class="section-desc"><?= e($t['trust_desc']) ?></div>
         <div class="trust-grid">
             <div class="trust-item">
                 <i class="fas fa-lock"></i>
-                <h4>HTTPS everywhere</h4>
-                <p>TLS 1.3 encrypted connections on every page and API call.</p>
+                <h4><?= e($t['trust1_t']) ?></h4>
+                <p><?= e($t['trust1_d']) ?></p>
             </div>
             <div class="trust-item">
                 <i class="fas fa-database"></i>
-                <h4>Dedicated database</h4>
-                <p>Every customer gets its own isolated database.</p>
+                <h4><?= e($t['trust2_t']) ?></h4>
+                <p><?= e($t['trust2_d']) ?></p>
             </div>
             <div class="trust-item">
                 <i class="fas fa-hard-drive"></i>
-                <h4>Daily backups</h4>
-                <p>Automatic daily backups of your data.</p>
+                <h4><?= e($t['trust3_t']) ?></h4>
+                <p><?= e($t['trust3_d']) ?></p>
             </div>
             <div class="trust-item">
                 <i class="fas fa-user-shield"></i>
-                <h4>Secure passwords</h4>
-                <p>Bcrypt hashing — no plain-text passwords ever.</p>
+                <h4><?= e($t['trust4_t']) ?></h4>
+                <p><?= e($t['trust4_d']) ?></p>
             </div>
         </div>
     </div>
@@ -514,33 +813,33 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 <!-- FAQ -->
 <section class="pad" id="faq" style="background:#fff;">
     <div class="container" style="text-align:center;">
-        <div class="section-label"><i class="fas fa-circle-question"></i> Questions</div>
-        <div class="section-title">Everything you want to know</div>
+        <div class="section-label"><i class="fas fa-circle-question"></i> <?= e($t['faq_label']) ?></div>
+        <div class="section-title"><?= e($t['faq_title']) ?></div>
 
-        <div class="faq-wrap" style="text-align:left;">
+        <div class="faq-wrap" style="text-align:<?= $isRtl ? 'right' : 'left' ?>;">
             <details class="faq-item">
-                <summary>How does the 7-day trial work?</summary>
-                <div class="faq-body">We record your card at signup but do not charge anything for 7 days. You can cancel at any time during the trial and no charge will be made. Your card is only billed on day 8 if you haven't cancelled.</div>
+                <summary><?= e($t['faq1_q']) ?></summary>
+                <div class="faq-body"><?= e($t['faq1_a']) ?></div>
             </details>
             <details class="faq-item">
-                <summary>What happens after the 7-day trial?</summary>
-                <div class="faq-body">If you haven't cancelled, your monthly subscription starts automatically and your card is charged. Otherwise, access is suspended, your data is kept and you can reactivate at any time.</div>
+                <summary><?= e($t['faq2_q']) ?></summary>
+                <div class="faq-body"><?= e($t['faq2_a']) ?></div>
             </details>
             <details class="faq-item">
-                <summary>Can I cancel at any time?</summary>
-                <div class="faq-body">Yes, no commitment. You can cancel in one click from your workspace (Settings &gt; Subscription). If you cancel during the trial, nothing is charged. Afterwards you keep access until the end of the period you already paid for.</div>
+                <summary><?= e($t['faq3_q']) ?></summary>
+                <div class="faq-body"><?= $t['faq3_a'] ?></div>
             </details>
             <details class="faq-item">
-                <summary>Is my data secure?</summary>
-                <div class="faq-body">Absolutely. HTTPS encryption, a dedicated isolated database per customer, automatic daily backups. Your data belongs to you and is exportable at any time.</div>
+                <summary><?= e($t['faq4_q']) ?></summary>
+                <div class="faq-body"><?= e($t['faq4_a']) ?></div>
             </details>
             <details class="faq-item">
-                <summary>Can I use GestionPro from a phone?</summary>
-                <div class="faq-body">Yes, the interface is fully responsive and works perfectly on phone, tablet and desktop.</div>
+                <summary><?= e($t['faq5_q']) ?></summary>
+                <div class="faq-body"><?= e($t['faq5_a']) ?></div>
             </details>
             <details class="faq-item">
-                <summary>Which languages are supported?</summary>
-                <div class="faq-body">English (default), French and Arabic — with native RTL support. You can switch languages in one click from your workspace.</div>
+                <summary><?= e($t['faq6_q']) ?></summary>
+                <div class="faq-body"><?= e($t['faq6_a']) ?></div>
             </details>
         </div>
     </div>
@@ -549,169 +848,36 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 <!-- CTA BANNER -->
 <section class="cta-banner">
     <div class="container">
-        <h2>Ready to simplify your business?</h2>
-        <p>Create your workspace in 30 seconds. 7 days free, cancel anytime.</p>
-        <button class="btn-cta btn-primary-cta" onclick="openRegister()"><i class="fas fa-rocket"></i> Create my workspace</button>
+        <h2><?= e($t['cta_h2']) ?></h2>
+        <p><?= e($t['cta_p']) ?></p>
+        <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-cta btn-primary-cta"><i class="fab fa-whatsapp"></i> <?= e($t['wa_contact']) ?></a>
     </div>
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
     <div class="footer-brand">GestionPro</div>
-    <p>&copy; <?= date('Y') ?> GestionPro — Business management software</p>
+    <p>&copy; <?= date('Y') ?> <?= e($t['footer_tagline']) ?></p>
     <div class="footer-links">
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#faq">FAQ</a>
-        <a href="<?= APP_BASE ?>/admin/login">Administration</a>
+        <a href="#features"><?= e($t['nav_features']) ?></a>
+        <a href="#pricing"><?= e($t['nav_pricing']) ?></a>
+        <a href="#faq"><?= e($t['nav_faq']) ?></a>
+        <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="<?= APP_BASE ?>/admin/login"><?= e($t['nav_admin_title']) ?></a>
     </div>
 </footer>
-
-<!-- REGISTER MODAL -->
-<div class="modal-overlay" id="registerModal">
-    <div class="modal">
-        <div id="registerForm">
-            <div class="modal-header">
-                <div>
-                    <div class="trial-modal-badge"><i class="fas fa-gift" style="font-size:11px;"></i> 7-day free trial</div>
-                    <h2>Create your workspace</h2>
-                    <p>Ready in 30 seconds, cancel anytime</p>
-                </div>
-                <button class="modal-close" onclick="closeRegister()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="register-error" id="regError"></div>
-
-                <div class="fg">
-                    <label>Business name *</label>
-                    <input type="text" id="regCompany" placeholder="e.g. Acme Shop" required>
-                </div>
-                <div class="fg">
-                    <label>Workspace address *</label>
-                    <div class="slug-preview">
-                        <span class="slug-prefix">gestionpro.it.com/</span>
-                        <input type="text" id="regSlug" placeholder="acme-shop" pattern="[a-z0-9_-]+" required>
-                    </div>
-                </div>
-                <div class="fg-row">
-                    <div class="fg">
-                        <label>Your name *</label>
-                        <input type="text" id="regName" placeholder="Jane Doe">
-                    </div>
-                    <div class="fg">
-                        <label>Phone</label>
-                        <input type="text" id="regPhone" placeholder="+1 555 123 4567">
-                    </div>
-                </div>
-                <div class="fg">
-                    <label>Email *</label>
-                    <input type="email" id="regEmail" placeholder="you@example.com">
-                </div>
-                <div class="fg">
-                    <label>Password *</label>
-                    <input type="password" id="regPassword" placeholder="At least 6 characters">
-                </div>
-                <input type="hidden" id="regPlan" value="starter">
-                <button class="btn-register" id="regSubmit" onclick="submitRegister()">
-                    <i class="fas fa-rocket"></i> Continue to secure checkout
-                </button>
-                <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--text-muted);">
-                    7 days free. Cancel before day 7 and you won't be charged.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
 window.addEventListener('scroll', () => {
     document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
 });
 
+// Smooth-scroll for same-page anchors only (skip external/WhatsApp links).
 document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
         const target = document.querySelector(a.getAttribute('href'));
         if (target) { e.preventDefault(); target.scrollIntoView({ behavior:'smooth', block:'start' }); }
     });
-});
-
-document.getElementById('regCompany').addEventListener('input', function() {
-    const slug = this.value.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .substring(0, 30);
-    document.getElementById('regSlug').value = slug;
-});
-
-function openRegister(plan) {
-    document.getElementById('regPlan').value = plan || 'starter';
-    document.getElementById('registerModal').classList.add('active');
-    document.getElementById('registerForm').style.display = '';
-    document.getElementById('regError').style.display = 'none';
-    setTimeout(() => document.getElementById('regCompany').focus(), 100);
-}
-
-function closeRegister() {
-    document.getElementById('registerModal').classList.remove('active');
-}
-
-document.getElementById('registerModal').addEventListener('click', function(e) {
-    if (e.target === this) closeRegister();
-});
-
-function submitRegister() {
-    const btn = document.getElementById('regSubmit');
-    const errEl = document.getElementById('regError');
-    errEl.style.display = 'none';
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating your workspace...';
-
-    const formData = new FormData();
-    formData.append('slug', document.getElementById('regSlug').value);
-    formData.append('company_name', document.getElementById('regCompany').value);
-    formData.append('owner_name', document.getElementById('regName').value);
-    formData.append('owner_email', document.getElementById('regEmail').value);
-    formData.append('owner_phone', document.getElementById('regPhone').value);
-    formData.append('password', document.getElementById('regPassword').value);
-    formData.append('plan', document.getElementById('regPlan').value);
-
-    fetch('<?= APP_BASE ?>/register', { method: 'POST', body: formData })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                if (data.mode === 'polar_checkout' && data.checkout_url) {
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to checkout...';
-                    window.location.href = data.checkout_url;
-                    return;
-                }
-                if (data.url) {
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opening your workspace...';
-                    window.location.href = data.url;
-                    return;
-                }
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-rocket"></i> Continue to secure checkout';
-                errEl.textContent = 'Workspace created but we could not continue automatically. Please sign in.';
-                errEl.style.display = 'block';
-            } else {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-rocket"></i> Continue to secure checkout';
-                errEl.textContent = data.error;
-                errEl.style.display = 'block';
-            }
-        })
-        .catch(e => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-rocket"></i> Continue to secure checkout';
-            errEl.textContent = 'Connection error. Please try again.';
-            errEl.style.display = 'block';
-        });
-}
-
-document.querySelectorAll('#registerModal input').forEach(input => {
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') submitRegister(); });
 });
 </script>
 
