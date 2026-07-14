@@ -26,7 +26,11 @@ defined('PO_PREFIX')          || define('PO_PREFIX', 'BC');
 
 // Supported languages
 defined('SUPPORTED_LANGS')    || define('SUPPORTED_LANGS', ['en', 'fr', 'ar']);
-defined('DEFAULT_LANG')       || define('DEFAULT_LANG', 'en');
+defined('DEFAULT_LANG')       || define('DEFAULT_LANG', 'ar');
+
+// WhatsApp ordering (Mauritania). International format, digits only, no '+'.
+// Used by the landing page "Order on WhatsApp" buttons.
+defined('WHATSAPP_ORDER')     || define('WHATSAPP_ORDER', '22232666333');
 
 // Multi-tenant mode
 defined('MULTI_TENANT')       || define('MULTI_TENANT', true);
