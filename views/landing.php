@@ -332,6 +332,8 @@ if (class_exists('Polar') && Polar::isConfigured()) {
             --text:#0F172A;--text-secondary:#475569;--text-muted:#94A3B8;
             --bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;--border-light:#F1F5F9;
             --success:#10B981;--danger:#EF4444;--warning:#F59E0B;
+            /* WhatsApp brand — every WhatsApp CTA uses it so the action reads instantly */
+            --wa:#25D366;--wa-dark:#1DBF5C;--wa-deep:#128C7E;--wa-glow:rgba(37,211,102,.35);
             --shadow-sm:0 1px 2px rgba(0,0,0,.04);
             --shadow-md:0 4px 12px rgba(0,0,0,.06);
             --shadow-lg:0 12px 40px rgba(0,0,0,.08);
@@ -352,8 +354,9 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         .nav-links{display:flex;align-items:center;gap:4px}
         .nav-links a{padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text-secondary);transition:all .2s}
         .nav-links a:hover{color:var(--text);background:var(--primary-50)}
-        .nav-links .btn-nav{background:var(--primary);color:#fff;font-weight:600;padding:9px 18px;border-radius:10px;display:inline-flex;align-items:center;gap:6px}
-        .nav-links .btn-nav:hover{background:var(--primary-dark);color:#fff}
+        .nav-links .btn-nav{background:var(--wa);color:#fff;font-weight:700;padding:9px 18px;border-radius:10px;display:inline-flex;align-items:center;gap:7px;box-shadow:0 3px 10px var(--wa-glow);transition:all .2s}
+        .nav-links .btn-nav:hover{background:var(--wa-dark);color:#fff;box-shadow:0 6px 16px rgba(37,211,102,.45)}
+        .nav-links .btn-nav i{font-size:16px}
 
         /* ===== HERO ===== */
         .hero{padding:130px 24px 80px;position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,var(--primary-50) 100%)}
@@ -366,8 +369,10 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         .hero-trust i{color:var(--success)}
         .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:52px}
         .btn-cta{display:inline-flex;align-items:center;gap:10px;padding:16px 30px;border-radius:14px;font-weight:700;font-size:15px;transition:all .25s;cursor:pointer;border:none;font-family:inherit}
-        .btn-primary-cta{background:var(--primary);color:#fff;box-shadow:0 8px 24px rgba(79,70,229,.35)}
-        .btn-primary-cta:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 14px 32px rgba(79,70,229,.4)}
+        /* Both hero and closing CTAs are WhatsApp actions — brand them as such. */
+        .btn-primary-cta{background:var(--wa);color:#fff;box-shadow:0 8px 24px var(--wa-glow)}
+        .btn-primary-cta:hover{background:var(--wa-dark);transform:translateY(-2px);box-shadow:0 14px 34px rgba(37,211,102,.45)}
+        .btn-cta i{font-size:19px}
         .btn-secondary-cta{background:var(--surface);color:var(--text);border:1.5px solid var(--border)}
         .btn-secondary-cta:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow-md)}
 
@@ -444,11 +449,14 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         .price-list{list-style:none;margin:24px 0}
         .price-list li{padding:8px 0;font-size:14px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:10px}
         .price-list li i{color:var(--success);font-size:13px;width:16px;margin-top:3px}
-        .btn-price{display:block;width:100%;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;font-family:inherit}
-        .btn-price.outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
-        .btn-price.outline:hover{border-color:var(--primary);color:var(--primary)}
-        .btn-price.filled{background:var(--primary);color:#fff}
-        .btn-price.filled:hover{background:var(--primary-dark)}
+        /* WhatsApp order buttons: inline-flex (was block, so the icon sat off-baseline). */
+        .btn-price{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border:none;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;font-family:inherit;line-height:1}
+        .btn-price i{font-size:17px}
+        .btn-price.outline{background:#fff;border:1.5px solid var(--wa);color:var(--wa-deep)}
+        .btn-price.outline:hover{background:var(--wa);border-color:var(--wa);color:#fff;transform:translateY(-1px);box-shadow:0 8px 20px var(--wa-glow)}
+        .btn-price.filled{background:var(--wa);color:#fff;box-shadow:0 4px 14px var(--wa-glow)}
+        .btn-price.filled:hover{background:var(--wa-dark);transform:translateY(-1px);box-shadow:0 10px 24px rgba(37,211,102,.45)}
+        .btn-price:active{transform:translateY(0)}
         .pricing-note{text-align:center;margin-top:28px;font-size:13px;color:var(--text-muted)}
 
         /* ===== TRUST / SECURITY ===== */
