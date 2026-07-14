@@ -81,6 +81,9 @@ class CaisseController extends Controller {
         $amountPaid = (float)$this->input('amount_paid', 0);
         $sessionId = $this->input('session_id');
         $isCredit = $this->input('is_credit') === '1';
+        // Offline POS: client-generated idempotency key + "sale already happened" flag.
+        $clientUid = trim((string)$this->input('client_uid', '')) ?: null;
+        $offline = $this->input('offline') === '1';
 
         if (empty($items)) {
             $this->json(['error' => 'Panier vide'], 400);
@@ -90,10 +93,26 @@ class CaisseController extends Controller {
             $this->json(['error' => 'Un client est requis pour une vente a credit'], 400);
         }
 
+        // Idempotency: if this sale was already synced, return the existing invoice
+        // instead of creating a duplicate (network retries, double flush, etc.).
+        if ($clientUid !== null) {
+            $existing = $this->db->prepare("SELECT number, total, amount_paid FROM invoices WHERE client_uid = ?");
+            $existing->execute([$clientUid]);
+            if ($row = $existing->fetch()) {
+                $this->json([
+                    'success' => true,
+                    'duplicate' => true,
+                    'invoice_number' => $row['number'],
+                    'total' => (float)$row['total'],
+                    'change' => max(0, $amountPaid - (float)$row['total']),
+                ]);
+            }
+        }
+
         $this->db->beginTransaction();
         try {
             $svc = new \App\Services\SellService($this->db);
-            $priced = $svc->priceAndLock($items);
+            $priced = $svc->priceAndLock($items, $offline);
             $subtotal     = $priced['subtotal'];
             $taxAmount    = $priced['tax'];
             $total        = $priced['total'];
@@ -106,17 +125,18 @@ class CaisseController extends Controller {
             $paid = $isCredit ? $amountPaid : $total;
 
             // Create invoice
-            $stmt = $this->db->prepare("INSERT INTO invoices (id, number, type, status, customer_id, user_id, issue_date, due_date, subtotal, tax_amount, total, amount_paid) VALUES (?,?,?,?,?,?,CURDATE(),?,?,?,?,?)");
+            $stmt = $this->db->prepare("INSERT INTO invoices (id, number, type, status, customer_id, user_id, issue_date, due_date, subtotal, tax_amount, total, amount_paid, client_uid) VALUES (?,?,?,?,?,?,CURDATE(),?,?,?,?,?,?)");
             $dueDate = $isCredit ? date('Y-m-d', strtotime('+30 days')) : date('Y-m-d');
-            $stmt->execute([$invoiceId, $invoiceNumber, 'invoice', $status, $customerId, $_SESSION['user_id'], $dueDate, $subtotal, $taxAmount, $total, $paid]);
+            $stmt->execute([$invoiceId, $invoiceNumber, 'invoice', $status, $customerId, $_SESSION['user_id'], $dueDate, $subtotal, $taxAmount, $total, $paid, $clientUid]);
 
             // Create invoice items & update stock
             foreach ($invoiceItems as $item) {
                 $this->db->prepare("INSERT INTO invoice_items (id, invoice_id, product_id, description, quantity, unit_price, tax_rate, line_total) VALUES (?,?,?,?,?,?,?,?)")
                     ->execute([$this->generateUUID(), $invoiceId, $item['product_id'], $item['description'], $item['quantity'], $item['unit_price'], $item['tax_rate'], $item['line_total']]);
 
-                // Atomic stock decrement with guard (defense in depth vs the FOR UPDATE above)
-                $svc->decrementStock($item['product_id'], (int)$item['quantity']);
+                // Atomic stock decrement with guard (defense in depth vs the FOR UPDATE above).
+                // Offline sales force the decrement (stock may go negative — reconciled later).
+                $svc->decrementStock($item['product_id'], (int)$item['quantity'], $offline);
 
                 // Stock movement
                 $this->db->prepare("INSERT INTO stock_movements (id, product_id, type, reason, quantity, unit_cost, reference_type, reference_id, user_id) VALUES (?,?,'out','sale',?,?,'invoice',?,?)")

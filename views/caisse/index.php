@@ -55,6 +55,7 @@
     <div class="pos-cart">
         <div class="pos-cart-header">
             <i class="fas fa-shopping-cart" style="margin-right: 8px;"></i><?= __('pos.cart') ?>
+            <span id="pendingSync" class="pos-pending hidden" title="<?= __('pos.pending') ?>"><i class="fas fa-cloud-arrow-up"></i> <span id="pendingCount">0</span></span>
             <span id="cartCount" style="margin-left: auto; background: var(--primary); color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px;">0</span>
         </div>
 
@@ -168,12 +169,16 @@ let cart = [];
 let selectedCustomer = null;
 const sessionId = '<?= $session['id'] ?>';
 const csrfToken = '<?= csrf_token() ?>';
+const SELL_URL = '<?= url('/caisse/sell') ?>';
 const POS_LANG = {
     cartEmpty: '<?= __('pos.cart_empty') ?>',
     clearConfirm: '<?= __('pos.clear_confirm') ?>',
     noClient: '<?= __('pos.no_client') ?>',
     sale: '<?= __('invoices.invoice') ?>',
-    change: '<?= __('pos.change') ?>'
+    change: '<?= __('pos.change') ?>',
+    offlineSaved: '<?= __('pos.offline_saved') ?>',
+    synced: '<?= __('pos.synced') ?>',
+    syncFailed: '<?= __('pos.sync_failed') ?>'
 };
 
 // Product click
@@ -384,41 +389,170 @@ document.getElementById('payAmount').addEventListener('input', function() {
     document.getElementById('changeDisplay').style.display = change > 0 ? '' : 'none';
 });
 
-function completeSale() {
-    const items = cart.map(i => ({ id: i.id, qty: i.qty }));
+// ============================================================
+// Offline-capable checkout
+//   - Every sale carries a client_uid (idempotency key).
+//   - Online: POST directly. Network failure falls back to the queue.
+//   - Offline: store in IndexedDB, decrement local stock, notify.
+//   - Reconnect / interval: flush the queue to the server.
+// ============================================================
+
+const ODB_NAME = 'gp-pos', ODB_STORE = 'pending-sales';
+function odbOpen() {
+    return new Promise((resolve, reject) => {
+        const rq = indexedDB.open(ODB_NAME, 1);
+        rq.onupgradeneeded = () => rq.result.createObjectStore(ODB_STORE, { keyPath: 'client_uid' });
+        rq.onsuccess = () => resolve(rq.result);
+        rq.onerror = () => reject(rq.error);
+    });
+}
+function odbTx(mode, fn) {
+    return odbOpen().then(db => new Promise((res, rej) => {
+        const tx = db.transaction(ODB_STORE, mode);
+        const store = tx.objectStore(ODB_STORE);
+        const out = fn(store);
+        tx.oncomplete = () => res(out && out.result !== undefined ? out.result : out);
+        tx.onerror = () => rej(tx.error);
+    }));
+}
+const odbAdd = (sale) => odbTx('readwrite', s => s.put(sale));
+const odbDel = (uid) => odbTx('readwrite', s => s.delete(uid));
+const odbAll = () => odbTx('readonly', s => s.getAll());
+
+function newUid() {
+    return (crypto.randomUUID) ? crypto.randomUUID()
+        : (Date.now() + '-' + Math.random().toString(16).slice(2));
+}
+
+function buildSale() {
     let total = 0;
     cart.forEach(item => { total += item.price * item.qty * (1 + item.tax / 100); });
-
-    const formData = new FormData();
-    formData.append('csrf_token', csrfToken);
-    formData.append('items', JSON.stringify(items));
-    formData.append('customer_id', selectedCustomer || '');
-    formData.append('payment_method', document.getElementById('payMethod').value);
-    formData.append('amount_paid', document.getElementById('payAmount').value);
-    formData.append('session_id', sessionId);
-    formData.append('is_credit', document.getElementById('creditSale').checked ? '1' : '0');
-
-    fetch('<?= url('/caisse/sell') ?>', { method: 'POST', body: formData })
-        .then(r => r.json())
-        .then(data => {
-            if (data.error) { alert(data.error); return; }
-            closeModal('payModal');
-            cart = [];
-            selectedCustomer = null;
-            document.getElementById('clientSearch').value = '';
-            document.getElementById('clientResult').innerHTML = '';
-            renderCart();
-
-            // Success notification
-            const toast = document.createElement('div');
-            toast.className = 'toast toast-success';
-            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${POS_LANG.sale} ${data.invoice_number} - Total: ${formatMoney(data.total)}${data.change > 0 ? ' | ' + POS_LANG.change + ': '+formatMoney(data.change) : ''}`;
-            const container = document.querySelector('.toast-container') || (() => { const c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); return c; })();
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 5000);
-        })
-        .catch(e => alert('Erreur: ' + e.message));
+    return {
+        client_uid: newUid(),
+        items: cart.map(i => ({ id: i.id, qty: i.qty })),
+        total: total,
+        customer_id: selectedCustomer || '',
+        payment_method: document.getElementById('payMethod').value,
+        amount_paid: document.getElementById('payAmount').value,
+        is_credit: document.getElementById('creditSale').checked ? '1' : '0',
+        created_at: new Date().toISOString()
+    };
 }
+
+function saleFormData(sale, offline) {
+    const fd = new FormData();
+    fd.append('csrf_token', csrfToken);
+    fd.append('items', JSON.stringify(sale.items));
+    fd.append('customer_id', sale.customer_id || '');
+    fd.append('payment_method', sale.payment_method);
+    fd.append('amount_paid', sale.amount_paid);
+    fd.append('session_id', sessionId);
+    fd.append('is_credit', sale.is_credit);
+    fd.append('client_uid', sale.client_uid);
+    if (offline) fd.append('offline', '1');
+    return fd;
+}
+
+function posToast(html, type) {
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + (type || 'success');
+    toast.innerHTML = html;
+    const container = document.querySelector('.toast-container')
+        || (() => { const c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); return c; })();
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+// Reduce the on-hand stock shown on the grid so the cashier can't oversell offline.
+function decrementLocalStock(sale) {
+    sale.items.forEach(it => {
+        document.querySelectorAll('.pos-product-card[data-id="' + it.id + '"]').forEach(card => {
+            const left = Math.max(0, (parseInt(card.dataset.stock) || 0) - it.qty);
+            card.dataset.stock = left;
+            const s = card.querySelector('.stock');
+            if (s) s.textContent = s.textContent.replace(/[0-9]+$/, left);
+        });
+    });
+}
+
+function resetAfterSale() {
+    closeModal('payModal');
+    cart = [];
+    selectedCustomer = null;
+    document.getElementById('clientSearch').value = '';
+    document.getElementById('clientResult').innerHTML = '';
+    document.getElementById('creditSale').checked = false;
+    renderCart();
+}
+
+async function updatePendingBadge() {
+    let n = 0;
+    try { n = (await odbAll()).length; } catch (e) {}
+    const badge = document.getElementById('pendingSync');
+    document.getElementById('pendingCount').textContent = n;
+    badge.classList.toggle('hidden', n === 0);
+}
+
+async function completeSale() {
+    if (cart.length === 0) return;
+    const sale = buildSale();
+
+    if (navigator.onLine) {
+        try {
+            const r = await fetch(SELL_URL, { method: 'POST', body: saleFormData(sale, false) });
+            const data = await r.json();
+            if (data.error) { alert(data.error); return; }
+            resetAfterSale();
+            posToast(`<i class="fas fa-check-circle"></i> ${POS_LANG.sale} ${data.invoice_number} - Total: ${formatMoney(data.total)}${data.change > 0 ? ' | ' + POS_LANG.change + ': ' + formatMoney(data.change) : ''}`, 'success');
+            return;
+        } catch (e) {
+            // Network dropped mid-request → fall through to the offline queue.
+        }
+    }
+
+    // Offline (or the request failed): persist locally and sync later.
+    try {
+        await odbAdd(sale);
+        decrementLocalStock(sale);
+        resetAfterSale();
+        updatePendingBadge();
+        const change = Math.max(0, parseFloat(sale.amount_paid || 0) - sale.total);
+        posToast(`<i class="fas fa-cloud-arrow-up"></i> ${POS_LANG.offlineSaved} - ${formatMoney(sale.total)}${change > 0 ? ' | ' + POS_LANG.change + ': ' + formatMoney(change) : ''}`, 'warning');
+    } catch (e) {
+        alert('Erreur: ' + e.message);
+    }
+}
+
+let flushing = false;
+async function flushQueue() {
+    if (flushing || !navigator.onLine) return;
+    flushing = true;
+    let synced = 0, failed = 0;
+    try {
+        const pending = await odbAll();
+        for (const sale of pending) {
+            let data;
+            try {
+                const r = await fetch(SELL_URL, { method: 'POST', body: saleFormData(sale, true) });
+                if (r.status === 401 || r.status === 403) break;   // need to re-login; retry later
+                if (!r.ok) { continue; }                            // server/transient error; keep
+                data = await r.json();
+            } catch (e) { break; }                                  // network dropped again; stop
+            if (data && data.success) { await odbDel(sale.client_uid); synced++; }
+            else if (data && data.error) { await odbDel(sale.client_uid); failed++; } // definitive business error
+        }
+    } finally {
+        flushing = false;
+        updatePendingBadge();
+        if (synced > 0) posToast(`<i class="fas fa-cloud-arrow-up"></i> ${synced} ${POS_LANG.synced}`, 'success');
+        if (failed > 0) posToast(`<i class="fas fa-triangle-exclamation"></i> ${failed} × ${POS_LANG.syncFailed}`, 'danger');
+    }
+}
+
+window.addEventListener('online', flushQueue);
+updatePendingBadge();
+flushQueue();
+setInterval(flushQueue, 30000);
 
 function formatMoney(amount) {
     const symbol = (typeof APP_CURRENCY_SYMBOL !== 'undefined') ? APP_CURRENCY_SYMBOL : '$';

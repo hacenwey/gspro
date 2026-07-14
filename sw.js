@@ -1,10 +1,11 @@
-// GestionPro — minimal service worker.
+// GestionPro — service worker (PWA + offline shell).
 // Strategy:
-//  - Network-first for navigation (HTML), fallback to cache, then offline page.
-//  - Cache-first for static assets (CSS/JS/fonts).
-//  - Never cache API or POST requests.
+//  - Precache the offline fallback page on install.
+//  - Navigation (HTML): network-first, fall back to the cached page, then offline.html.
+//  - Same-origin static assets + cross-origin fonts/CDN: cache-first.
+//  - Never touch non-GET requests or API/sell endpoints (POS sync must reach the network).
 
-const VERSION = 'gp-v1-2026-04-18';
+const VERSION = 'gp-v2-2026-07-14';
 const STATIC_CACHE = 'gp-static-' + VERSION;
 const PAGE_CACHE   = 'gp-pages-'  + VERSION;
 
@@ -12,10 +13,19 @@ const STATIC_ASSETS = [
     '/offline.html',
 ];
 
+// Cross-origin hosts whose CSS/fonts we want available offline (icons, webfonts).
+const CDN_HOSTS = [
+    'fonts.googleapis.com',
+    'fonts.gstatic.com',
+    'cdnjs.cloudflare.com',
+];
+
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(STATIC_CACHE).then(c => c.addAll(STATIC_ASSETS))
-              .then(() => self.skipWaiting())
+        caches.open(STATIC_CACHE)
+            // allSettled so one failed asset never blocks the whole install.
+            .then(c => Promise.allSettled(STATIC_ASSETS.map(a => c.add(a))))
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -27,16 +37,41 @@ self.addEventListener('activate', (event) => {
     );
 });
 
+async function cacheFirst(req, cacheName) {
+    const cached = await caches.match(req);
+    if (cached) return cached;
+    try {
+        const fresh = await fetch(req);
+        if (fresh && (fresh.ok || fresh.type === 'opaque')) {
+            const cache = await caches.open(cacheName);
+            cache.put(req, fresh.clone());
+        }
+        return fresh;
+    } catch (_) {
+        return cached || new Response('', { status: 504 });
+    }
+}
+
 self.addEventListener('fetch', (event) => {
     const req = event.request;
     if (req.method !== 'GET') return;
 
     const url = new URL(req.url);
 
-    // Never cache API or POST-like endpoints
-    if (url.pathname.includes('/api/') || url.pathname.includes('/caisse/sell')) return;
+    // Never cache API or sale endpoints — they must hit the network (or fail loudly).
+    if (url.pathname.includes('/api/') || url.pathname.includes('/caisse/sell') || url.pathname.includes('/caisse/search')) {
+        return;
+    }
 
-    // Navigation: network-first with offline fallback
+    // Cross-origin fonts / icon CDNs: cache-first.
+    if (CDN_HOSTS.includes(url.hostname)) {
+        event.respondWith(cacheFirst(req, STATIC_CACHE));
+        return;
+    }
+
+    if (url.origin !== self.location.origin) return;
+
+    // Navigation (HTML): network-first with offline fallback.
     if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
         event.respondWith((async () => {
             try {
@@ -52,21 +87,8 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Static assets: cache-first
-    if (/\.(css|js|woff2?|ttf|otf|png|jpg|jpeg|svg|ico)$/i.test(url.pathname)) {
-        event.respondWith((async () => {
-            const cached = await caches.match(req);
-            if (cached) return cached;
-            try {
-                const fresh = await fetch(req);
-                if (fresh.ok) {
-                    const cache = await caches.open(STATIC_CACHE);
-                    cache.put(req, fresh.clone());
-                }
-                return fresh;
-            } catch (_) {
-                return cached || new Response('', { status: 504 });
-            }
-        })());
+    // Same-origin static assets: cache-first.
+    if (/\.(css|js|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp)$/i.test(url.pathname)) {
+        event.respondWith(cacheFirst(req, STATIC_CACHE));
     }
 });

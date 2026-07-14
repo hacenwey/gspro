@@ -13,11 +13,20 @@
     <?php endif; ?>
     <link rel="manifest" href="<?= APP_BASE ?>/manifest.json">
     <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="GestionPro">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='34' fill='%234F46E5'/><text x='90' y='118' text-anchor='middle' font-family='Arial' font-size='78' font-weight='800' fill='white'>GP</text></svg>">
     <?php if (isset($extraCss)): ?>
     <style><?= $extraCss ?></style>
     <?php endif; ?>
 </head>
 <body>
+<!-- Offline connectivity banner (toggled by app.js on online/offline events) -->
+<div id="offlineBanner" class="offline-banner hidden">
+    <i class="fas fa-wifi"></i> <?= __('app.offline') ?>
+</div>
 <div class="app-layout">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
@@ -185,6 +194,7 @@
     const APP_CURRENCY_SYMBOL = '<?= addslashes(CURRENCY_SYMBOL) ?>';
     const APP_LANG = '<?= Lang::locale() ?>';
     const APP_RTL = <?= Lang::isRtl() ? 'true' : 'false' ?>;
+    const APP_INSTALL_TXT = '<?= addslashes(__('app.install')) ?>';
 </script>
 <script src="<?= asset('js/app.js') ?>"></script>
 <?php if (isset($extraJs)): ?>

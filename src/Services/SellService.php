@@ -29,7 +29,7 @@ final class SellService
      *   lines: array<int, array{product_id:string, description:string, quantity:int, unit_price:float, tax_rate:float, line_total:float}>
      * }
      */
-    public function priceAndLock(array $items): array
+    public function priceAndLock(array $items, bool $allowNegativeStock = false): array
     {
         if (empty($items)) {
             throw new RuntimeException('Panier vide');
@@ -76,7 +76,9 @@ final class SellService
             if (!$product) {
                 throw new RuntimeException("Produit introuvable ou desactive.");
             }
-            if ((int)$product['current_stock'] < $requested[$pid]) {
+            // Offline sales already left the shelf: record them even if the
+            // server view of stock is behind (it may go negative, reconciled later).
+            if (!$allowNegativeStock && (int)$product['current_stock'] < $requested[$pid]) {
                 throw new RuntimeException("Stock insuffisant pour: " . $product['name']);
             }
 
@@ -110,8 +112,14 @@ final class SellService
      * Decrement stock with an atomic guard. Throws if a concurrent sale
      * slipped between the FOR UPDATE and this call.
      */
-    public function decrementStock(string $productId, int $qty): void
+    public function decrementStock(string $productId, int $qty, bool $allowNegative = false): void
     {
+        if ($allowNegative) {
+            // Synced offline sale: force the decrement (stock may go negative).
+            $this->db->prepare("UPDATE products SET current_stock = current_stock - ? WHERE id = ?")
+                ->execute([$qty, $productId]);
+            return;
+        }
         $stmt = $this->db->prepare("
             UPDATE products SET current_stock = current_stock - ?
             WHERE id = ? AND current_stock >= ?

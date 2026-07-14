@@ -11,6 +11,45 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// ---- Connectivity banner ----
+function updateOnlineStatus() {
+    const banner = document.getElementById('offlineBanner');
+    if (!banner) return;
+    banner.classList.toggle('hidden', navigator.onLine);
+    document.body.classList.toggle('is-offline', !navigator.onLine);
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+document.addEventListener('DOMContentLoaded', updateOnlineStatus);
+
+// ---- PWA install prompt ----
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    let btn = document.getElementById('pwaInstallBtn');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'pwaInstallBtn';
+        btn.className = 'pwa-install-btn';
+        btn.innerHTML = '<i class="fas fa-download"></i> ' + (window.APP_INSTALL_TXT || 'Install');
+        btn.addEventListener('click', async () => {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+            btn.remove();
+        });
+        document.body.appendChild(btn);
+    }
+    btn.style.display = '';
+});
+window.addEventListener('appinstalled', () => {
+    const btn = document.getElementById('pwaInstallBtn');
+    if (btn) btn.remove();
+    deferredInstallPrompt = null;
+});
+
 // Theme Toggle with icon swap
 function toggleTheme() {
     const html = document.documentElement;

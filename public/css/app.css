@@ -1373,3 +1373,54 @@ textarea.form-control {
     .kpi-card { opacity: 1; transform: none; }
     .table tbody tr:hover { background: transparent; }
 }
+
+/* ===================== PWA / Offline ===================== */
+.offline-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 2000;
+    background: var(--warning);
+    color: #1F2937;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+body.is-offline .app-layout { padding-top: 38px; }
+
+.pos-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 10px;
+    background: var(--warning);
+    color: #1F2937;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    animation: gp-pulse 1.6s ease-in-out infinite;
+}
+@keyframes gp-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+.pwa-install-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1500;
+    background: var(--primary);
+    color: #fff;
+    border: 0;
+    border-radius: 24px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(79,70,229,0.4);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.pwa-install-btn:hover { background: var(--primary-dark, #4338CA); }
+[dir="rtl"] .pwa-install-btn { right: auto; left: 20px; }
