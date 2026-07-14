@@ -1424,3 +1424,36 @@ body.is-offline .app-layout { padding-top: 38px; }
 }
 .pwa-install-btn:hover { background: var(--primary-dark, #4338CA); }
 [dir="rtl"] .pwa-install-btn { right: auto; left: 20px; }
+
+/* ===================== POS receipt (thermal print) ===================== */
+#posReceipt { display: none; }
+.rcpt-head { text-align: center; margin-bottom: 6px; }
+.rcpt-shop { font-size: 15px; font-weight: 800; }
+.rcpt-head div, .rcpt-meta div { font-size: 11px; }
+.rcpt-meta { border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 4px 0; margin: 4px 0; }
+.rcpt-items { width: 100%; border-collapse: collapse; margin: 4px 0; }
+.rcpt-items td { font-size: 11px; padding: 1px 0; vertical-align: top; }
+.rcpt-items td.c { text-align: center; width: 30px; }
+.rcpt-items td.r { text-align: right; white-space: nowrap; }
+.rcpt-tot { border-top: 1px dashed #000; padding-top: 4px; }
+.rcpt-tot div { display: flex; justify-content: space-between; font-size: 12px; }
+.rcpt-tot div.g { font-weight: 800; font-size: 14px; margin: 2px 0; }
+.rcpt-foot { text-align: center; margin-top: 8px; font-size: 11px; }
+
+@media print {
+    body > *:not(#posReceipt) { display: none !important; }
+    #posReceipt {
+        display: block !important;
+        width: 80mm;
+        padding: 4mm 3mm;
+        margin: 0;
+        color: #000;
+        background: #fff;
+        font-family: 'Courier New', Courier, monospace;
+        line-height: 1.35;
+    }
+    @page { size: 80mm auto; margin: 0; }
+}
+
+/* Camera scanner video */
+#scanVideo { object-fit: cover; }

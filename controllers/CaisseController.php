@@ -24,6 +24,12 @@ class CaisseController extends Controller {
         ")->fetchAll();
         $totalProducts = (int)$this->db->query("SELECT COUNT(*) FROM products WHERE is_active = 1 AND current_stock > 0")->fetchColumn();
 
+        // Company info for the printed receipt header.
+        $settings = [];
+        foreach ($this->db->query("SELECT setting_key, setting_value FROM settings")->fetchAll() as $s) {
+            $settings[$s['setting_key']] = $s['setting_value'];
+        }
+
         $this->render('caisse/index', [
             'pageTitle' => 'Caisse (POS)',
             'session' => $session,
@@ -31,6 +37,12 @@ class CaisseController extends Controller {
             'products' => $products,
             'totalProducts' => $totalProducts,
             'productsShown' => count($products),
+            'shop' => [
+                'name'    => $settings['company_name'] ?? 'GestionPro',
+                'address' => $settings['company_address'] ?? '',
+                'phone'   => $settings['company_phone'] ?? '',
+                'tax_id'  => $settings['company_tax_id'] ?? '',
+            ],
         ]);
     }
 

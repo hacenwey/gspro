@@ -23,6 +23,7 @@
                 <span class="search-icon"><i class="fas fa-search"></i></span>
                 <input type="text" id="posSearch" class="form-control" placeholder="<?= __('pos.search') ?>" autofocus>
             </div>
+            <button type="button" class="btn btn-secondary" id="scanCamBtn" onclick="openScanner()" title="<?= __('pos.scan_camera') ?>"><i class="fas fa-camera"></i></button>
         </div>
         <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
             <button class="btn btn-sm btn-primary cat-filter active" data-cat="all"><?= __('pos.all') ?></button>
@@ -87,10 +88,32 @@
 </div>
 
 <!-- Close Session Button -->
-<div style="margin-top: 16px; text-align: right;">
-    <button class="btn btn-sm btn-secondary" onclick="openModal('closeModal')"><i class="fas fa-door-closed"></i> <?= __('pos.close_session') ?></button>
-    <a href="<?= url('/caisse/history') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-history"></i> <?= __('pos.history') ?></a>
+<div style="margin-top: 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+    <div style="display:flex; align-items:center; gap:14px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-secondary);">
+            <input type="checkbox" id="autoPrint"> <i class="fas fa-print"></i> <?= __('pos.autoprint') ?>
+        </label>
+        <button class="btn btn-sm btn-secondary" id="reprintBtn" onclick="reprintLast()" disabled><i class="fas fa-receipt"></i> <?= __('pos.reprint') ?></button>
+    </div>
+    <div>
+        <button class="btn btn-sm btn-secondary" onclick="openModal('closeModal')"><i class="fas fa-door-closed"></i> <?= __('pos.close_session') ?></button>
+        <a href="<?= url('/caisse/history') ?>" class="btn btn-sm btn-secondary"><i class="fas fa-history"></i> <?= __('pos.history') ?></a>
+    </div>
 </div>
+
+<!-- Camera barcode scanner overlay -->
+<div class="modal-overlay" id="scanModal">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal-header"><h3><i class="fas fa-barcode"></i> <?= __('pos.scan_camera') ?></h3><button class="modal-close" onclick="closeScanner()">&times;</button></div>
+        <div class="modal-body" style="text-align:center;">
+            <video id="scanVideo" playsinline style="width:100%;border-radius:var(--radius);background:#000;max-height:320px;"></video>
+            <div id="scanStatus" style="font-size:13px;color:var(--text-secondary);margin-top:8px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Printable receipt (hidden on screen, shown only when printing) -->
+<div id="posReceipt" aria-hidden="true"></div>
 
 <!-- Payment Modal -->
 <div class="modal-overlay" id="payModal">
@@ -170,6 +193,13 @@ let selectedCustomer = null;
 const sessionId = '<?= $session['id'] ?>';
 const csrfToken = '<?= csrf_token() ?>';
 const SELL_URL = '<?= url('/caisse/sell') ?>';
+const POS_SHOP = {
+    name: <?= json_encode($shop['name'] ?? 'GestionPro') ?>,
+    address: <?= json_encode($shop['address'] ?? '') ?>,
+    phone: <?= json_encode($shop['phone'] ?? '') ?>,
+    taxId: <?= json_encode($shop['tax_id'] ?? '') ?>,
+    cashier: <?= json_encode($_SESSION['user_full_name'] ?? ($_SESSION['user_name'] ?? '')) ?>
+};
 const POS_LANG = {
     cartEmpty: '<?= __('pos.cart_empty') ?>',
     clearConfirm: '<?= __('pos.clear_confirm') ?>',
@@ -178,7 +208,14 @@ const POS_LANG = {
     change: '<?= __('pos.change') ?>',
     offlineSaved: '<?= __('pos.offline_saved') ?>',
     synced: '<?= __('pos.synced') ?>',
-    syncFailed: '<?= __('pos.sync_failed') ?>'
+    syncFailed: '<?= __('pos.sync_failed') ?>',
+    notFound: '<?= __('pos.not_found') ?>',
+    thanks: '<?= __('pos.receipt_thanks') ?>',
+    receipt: '<?= __('pos.receipt') ?>',
+    total: '<?= __('invoices.total_ttc') ?>',
+    subtotal: '<?= __('invoices.subtotal') ?>',
+    tax: '<?= __('invoices.tax') ?>',
+    paid: '<?= __('pos.amount_received') ?>'
 };
 
 // Product click
@@ -261,10 +298,10 @@ document.getElementById('posSearch').addEventListener('input', function() {
     const raw = this.value;
     const q = raw.toLowerCase();
 
-    // Auto-add if exact barcode match
+    // Auto-add if exact barcode match (scanners that don't send an Enter suffix)
     if (raw.length >= 8) {
         const barcodeMatch = document.querySelector(`.pos-product-card[data-barcode="${raw}"]`);
-        if (barcodeMatch) { barcodeMatch.click(); this.value = ''; filterClientSide(''); posGridEmpty.classList.add('hidden'); return; }
+        if (barcodeMatch) { scanBarcode(raw); this.value = ''; filterClientSide(''); posGridEmpty.classList.add('hidden'); return; }
     }
 
     const visible = filterClientSide(q);
@@ -435,7 +472,9 @@ function buildSale() {
         payment_method: document.getElementById('payMethod').value,
         amount_paid: document.getElementById('payAmount').value,
         is_credit: document.getElementById('creditSale').checked ? '1' : '0',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        // Snapshot for the printed receipt (also lets us reprint queued offline sales).
+        _lines: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price, tax: i.tax }))
     };
 }
 
@@ -502,6 +541,7 @@ async function completeSale() {
             const r = await fetch(SELL_URL, { method: 'POST', body: saleFormData(sale, false) });
             const data = await r.json();
             if (data.error) { alert(data.error); return; }
+            handleReceipt(sale, data.invoice_number, false);
             resetAfterSale();
             posToast(`<i class="fas fa-check-circle"></i> ${POS_LANG.sale} ${data.invoice_number} - Total: ${formatMoney(data.total)}${data.change > 0 ? ' | ' + POS_LANG.change + ': ' + formatMoney(data.change) : ''}`, 'success');
             return;
@@ -514,6 +554,7 @@ async function completeSale() {
     try {
         await odbAdd(sale);
         decrementLocalStock(sale);
+        handleReceipt(sale, null, true);
         resetAfterSale();
         updatePendingBadge();
         const change = Math.max(0, parseFloat(sale.amount_paid || 0) - sale.total);
@@ -553,6 +594,172 @@ window.addEventListener('online', flushQueue);
 updatePendingBadge();
 flushQueue();
 setInterval(flushQueue, 30000);
+
+// ============================================================
+// Receipt printing (58/80mm thermal via the browser print dialog)
+// ============================================================
+let lastReceiptSale = null;
+
+function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function buildReceiptHTML(sale, invoiceNumber) {
+    let sub = 0, tax = 0;
+    (sale._lines || []).forEach(l => { const ls = l.price * l.qty; sub += ls; tax += ls * (l.tax / 100); });
+    const total = sale.total;
+    const paid = parseFloat(sale.amount_paid || 0);
+    const change = Math.max(0, paid - total);
+    const dt = new Date(sale.created_at || Date.now());
+    const p = n => String(n).padStart(2, '0');
+    const dstr = `${p(dt.getDate())}/${p(dt.getMonth() + 1)}/${dt.getFullYear()} ${p(dt.getHours())}:${p(dt.getMinutes())}`;
+    let rows = '';
+    (sale._lines || []).forEach(l => {
+        rows += `<tr><td>${escapeHtml(l.name)}</td><td class="c">${l.qty}</td><td class="r">${formatMoney(l.price * l.qty)}</td></tr>`;
+    });
+    return `
+    <div class="rcpt-head">
+        <div class="rcpt-shop">${escapeHtml(POS_SHOP.name)}</div>
+        ${POS_SHOP.address ? `<div>${escapeHtml(POS_SHOP.address)}</div>` : ''}
+        ${POS_SHOP.phone ? `<div>Tel: ${escapeHtml(POS_SHOP.phone)}</div>` : ''}
+        ${POS_SHOP.taxId ? `<div>NIF: ${escapeHtml(POS_SHOP.taxId)}</div>` : ''}
+    </div>
+    <div class="rcpt-meta">
+        <div>${POS_LANG.receipt}: ${invoiceNumber ? escapeHtml(invoiceNumber) : '(offline)'}</div>
+        <div>${dstr}</div>
+        ${POS_SHOP.cashier ? `<div>${escapeHtml(POS_SHOP.cashier)}</div>` : ''}
+    </div>
+    <table class="rcpt-items"><tbody>${rows}</tbody></table>
+    <div class="rcpt-tot">
+        <div><span>${POS_LANG.subtotal}</span><span>${formatMoney(sub)}</span></div>
+        <div><span>${POS_LANG.tax}</span><span>${formatMoney(tax)}</span></div>
+        <div class="g"><span>${POS_LANG.total}</span><span>${formatMoney(total)}</span></div>
+        <div><span>${POS_LANG.paid}</span><span>${formatMoney(paid)}</span></div>
+        ${change > 0 ? `<div><span>${POS_LANG.change}</span><span>${formatMoney(change)}</span></div>` : ''}
+    </div>
+    <div class="rcpt-foot">${escapeHtml(POS_LANG.thanks)}</div>`;
+}
+
+function printReceipt(sale, invoiceNumber) {
+    const el = document.getElementById('posReceipt');
+    el.innerHTML = buildReceiptHTML(sale, invoiceNumber);
+    // Move to a direct child of <body> so the print stylesheet can isolate it cleanly.
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+    window.print();
+}
+
+function handleReceipt(sale, invoiceNumber, offline) {
+    lastReceiptSale = { sale: sale, invoiceNumber: invoiceNumber };
+    const btn = document.getElementById('reprintBtn');
+    if (btn) btn.disabled = false;
+    if (document.getElementById('autoPrint').checked) printReceipt(sale, invoiceNumber);
+}
+
+function reprintLast() {
+    if (lastReceiptSale) printReceipt(lastReceiptSale.sale, lastReceiptSale.invoiceNumber);
+}
+
+(function () {
+    const cb = document.getElementById('autoPrint');
+    cb.checked = localStorage.getItem('pos_autoprint') === '1';
+    cb.addEventListener('change', () => localStorage.setItem('pos_autoprint', cb.checked ? '1' : '0'));
+})();
+
+// ============================================================
+// Barcode scanner — hardware wedge (keyboard) + camera (BarcodeDetector)
+// ============================================================
+let lastScan = { code: '', t: 0 };
+function scanBarcode(code) {
+    code = (code || '').trim();
+    if (!code) return;
+    const now = Date.now();
+    if (code === lastScan.code && now - lastScan.t < 500) return; // dedup double fire
+    lastScan = { code: code, t: now };
+
+    const sel = '.pos-product-card[data-barcode="' + ((window.CSS && CSS.escape) ? CSS.escape(code) : code) + '"]';
+    const card = document.querySelector(sel);
+    if (card) { addToCart(card); beep(true); return; }
+    if (navigator.onLine) {
+        remoteSearch(code).then(() => {
+            const c = document.querySelector(sel);
+            if (c) { addToCart(c); beep(true); }
+            else { beep(false); posToast('<i class="fas fa-barcode"></i> ' + POS_LANG.notFound + ' (' + escapeHtml(code) + ')', 'danger'); }
+        });
+    } else {
+        beep(false);
+        posToast('<i class="fas fa-barcode"></i> ' + POS_LANG.notFound + ' (' + escapeHtml(code) + ')', 'danger');
+    }
+}
+
+let audioCtx = null;
+function beep(ok) {
+    try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.frequency.value = ok ? 880 : 200;
+        o.connect(g); g.connect(audioCtx.destination);
+        g.gain.setValueAtTime(0.07, audioCtx.currentTime);
+        o.start(); o.stop(audioCtx.currentTime + (ok ? 0.08 : 0.2));
+    } catch (e) {}
+}
+
+// Hardware wedge: fast keystroke bursts ending with Enter.
+let wedgeBuf = '', wedgeLast = 0;
+document.addEventListener('keydown', function (e) {
+    const scanOpen = document.getElementById('scanModal');
+    if (scanOpen && scanOpen.classList.contains('active')) return;
+    const now = Date.now();
+    if (e.key === 'Enter') {
+        if (wedgeBuf.length >= 3 && (now - wedgeLast) < 60) {
+            e.preventDefault();
+            const code = wedgeBuf; wedgeBuf = '';
+            const active = document.activeElement;
+            if (active && active.id === 'posSearch') active.value = '';
+            scanBarcode(code);
+        } else { wedgeBuf = ''; }
+        return;
+    }
+    if (now - wedgeLast > 60) wedgeBuf = '';   // human-speed gap → reset
+    if (e.key.length === 1) wedgeBuf += e.key;
+    wedgeLast = now;
+});
+
+// Camera scanner (Chrome / Android). Degrades gracefully when unsupported.
+let scanStream = null, scanRaf = null, scanDetector = null;
+async function openScanner() {
+    if (!('BarcodeDetector' in window) || !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+        posToast('<i class="fas fa-camera"></i> ' + POS_LANG.notFound, 'danger');
+        return;
+    }
+    openModal('scanModal');
+    const status = document.getElementById('scanStatus');
+    status.textContent = '…';
+    try {
+        scanDetector = scanDetector || new BarcodeDetector();
+        scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const video = document.getElementById('scanVideo');
+        video.srcObject = scanStream;
+        await video.play();
+        status.textContent = '';
+        const tick = async () => {
+            if (!scanStream) return;
+            try {
+                const codes = await scanDetector.detect(video);
+                if (codes && codes.length) { scanBarcode(codes[0].rawValue); closeScanner(); return; }
+            } catch (e) {}
+            scanRaf = requestAnimationFrame(tick);
+        };
+        scanRaf = requestAnimationFrame(tick);
+    } catch (e) {
+        status.textContent = e.message || 'camera error';
+    }
+}
+function closeScanner() {
+    closeModal('scanModal');
+    if (scanRaf) cancelAnimationFrame(scanRaf);
+    scanRaf = null;
+    if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+}
 
 function formatMoney(amount) {
     const symbol = (typeof APP_CURRENCY_SYMBOL !== 'undefined') ? APP_CURRENCY_SYMBOL : '$';
