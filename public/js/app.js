@@ -177,11 +177,29 @@ function confirmDelete(form, message) {
     return false;
 }
 
-// Format number as currency
+// Format number as currency.
+//
+// Mirrors PHP formatMoney() in core/helpers.php — number_format($v, 2, ',', ' ')
+// followed by the currency CODE — so server-rendered amounts (product grid,
+// tables) and client-computed ones (cart, receipt) always read identically.
+// Intl is deliberately not used: its separators follow the UI language, which
+// made the cart show "1,234.56" in Arabic while PHP printed "1 234,56".
 function formatMoney(amount) {
-    const symbol = (typeof APP_CURRENCY_SYMBOL !== 'undefined') ? APP_CURRENCY_SYMBOL : '$';
-    const locale = (typeof APP_LANG !== 'undefined') ? APP_LANG : 'en';
-    return symbol + new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+    const n = Number(amount);
+    const fixed = (isFinite(n) ? n : 0).toFixed(2);
+    const neg = fixed.startsWith('-');
+    const parts = (neg ? fixed.slice(1) : fixed).split('.');
+    const grouped = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const code = (typeof APP_CURRENCY !== 'undefined') ? APP_CURRENCY : '';
+    return (neg ? '-' : '') + grouped + ',' + parts[1] + (code ? ' ' + code : '');
+}
+
+// Compact currency for chart axes: grouped integer + code, no decimals.
+function formatMoneyShort(amount) {
+    const n = Math.round(Number(amount) || 0);
+    const grouped = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const code = (typeof APP_CURRENCY !== 'undefined') ? APP_CURRENCY : '';
+    return (n < 0 ? '-' : '') + grouped + (code ? ' ' + code : '');
 }
 
 // Ripple effect on buttons

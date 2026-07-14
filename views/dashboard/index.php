@@ -235,7 +235,7 @@ function loadChart(period) {
                             beginAtZero: true,
                             grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
                             ticks: {
-                                callback: v => APP_CURRENCY_SYMBOL + v.toLocaleString(APP_LANG),
+                                callback: v => formatMoneyShort(v),
                                 font: { size: 11 }
                             }
                         },

@@ -276,7 +276,7 @@ function appendRemoteProduct(p) {
     card.dataset.ref = p.reference || '';
     card.dataset.barcode = p.barcode || '';
     card.dataset.remote = '1';
-    card.innerHTML = `<div class="name">${p.name}</div><div class="price">${p.selling_price}</div><div class="stock"><?= __('pos.stock_label') ?>: ${p.current_stock}</div>`;
+    card.innerHTML = `<div class="name">${p.name}</div><div class="price">${formatMoney(p.selling_price)}</div><div class="stock"><?= __('pos.stock_label') ?>: ${p.current_stock}</div>`;
     card.addEventListener('click', () => addToCart(card));
     posGrid.appendChild(card);
 }
@@ -761,10 +761,5 @@ function closeScanner() {
     if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
 }
 
-function formatMoney(amount) {
-    const symbol = (typeof APP_CURRENCY_SYMBOL !== 'undefined') ? APP_CURRENCY_SYMBOL : '$';
-    const locale = (typeof APP_LANG !== 'undefined') ? APP_LANG : 'en';
-    return symbol + new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
-}
 </script>
 <?php endif; ?>

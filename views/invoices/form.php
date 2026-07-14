@@ -158,11 +158,9 @@ function calcTotals() {
     document.getElementById('itemsJson').value = JSON.stringify(items);
 }
 
-function formatM(v) {
-    const symbol = (typeof APP_CURRENCY_SYMBOL !== 'undefined') ? APP_CURRENCY_SYMBOL : '$';
-    const locale = (typeof APP_LANG !== 'undefined') ? APP_LANG : 'en';
-    return symbol + new Intl.NumberFormat(locale, {minimumFractionDigits:2}).format(v);
-}
+// Delegates to the canonical formatMoney() in public/js/app.js so invoice totals
+// match the server-rendered amounts.
+function formatM(v) { return formatMoney(v); }
 
 addLine();
 </script>
