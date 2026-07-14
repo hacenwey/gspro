@@ -2,7 +2,7 @@
 class InvoiceController extends Controller {
 
     public function index(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $type = $this->input('type', '');
         $status = $this->input('status', '');
         $search = $this->input('search', '');
@@ -25,7 +25,7 @@ class InvoiceController extends Controller {
     }
 
     public function create(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $customers = $this->db->query("SELECT id, first_name, last_name FROM customers ORDER BY last_name")->fetchAll();
         $products = $this->db->query("SELECT id, name, reference, selling_price, tax_rate, current_stock FROM products WHERE is_active = 1 ORDER BY name")->fetchAll();
         $customerId = $this->input('customer_id', '');
@@ -34,7 +34,7 @@ class InvoiceController extends Controller {
     }
 
     public function store(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/invoices'); }
 
         $type = $this->input('type', 'invoice');
@@ -72,7 +72,7 @@ class InvoiceController extends Controller {
     }
 
     public function view(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $stmt = $this->db->prepare("SELECT i.*, c.first_name, c.last_name, c.phone, c.email, c.address, c.tax_id as client_tax_id, u.full_name as user_name FROM invoices i LEFT JOIN customers c ON i.customer_id = c.id LEFT JOIN users u ON i.user_id = u.id WHERE i.id = ?");
         $stmt->execute([$id]);
         $invoice = $stmt->fetch();
@@ -93,7 +93,7 @@ class InvoiceController extends Controller {
     }
 
     public function convertToInvoice(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/invoices'); }
 
         $quote = $this->db->prepare("SELECT * FROM invoices WHERE id = ? AND type = 'quote'");
@@ -129,7 +129,7 @@ class InvoiceController extends Controller {
     }
 
     public function delete(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $this->db->prepare("DELETE FROM invoice_items WHERE invoice_id = ?")->execute([$id]);
         $this->db->prepare("DELETE FROM invoices WHERE id = ?")->execute([$id]);
         $this->flash('success', 'Document supprime.');
@@ -137,7 +137,7 @@ class InvoiceController extends Controller {
     }
 
     public function email(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/invoices/view/' . $id); }
 
         $stmt = $this->db->prepare("SELECT i.*, c.first_name, c.last_name, c.email FROM invoices i LEFT JOIN customers c ON i.customer_id = c.id WHERE i.id = ?");
@@ -192,7 +192,7 @@ class InvoiceController extends Controller {
     }
 
     public function pdf(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $stmt = $this->db->prepare("SELECT i.*, c.first_name, c.last_name, c.phone, c.email, c.address, c.tax_id as client_tax_id FROM invoices i LEFT JOIN customers c ON i.customer_id = c.id WHERE i.id = ?");
         $stmt->execute([$id]); $invoice = $stmt->fetch();
         if (!$invoice) { $this->redirect('/invoices'); }

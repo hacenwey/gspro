@@ -2,7 +2,7 @@
 class CategoryController extends Controller {
 
     public function index(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $categories = $this->db->query("
             SELECT c.*, pc.name as parent_name,
             (SELECT COUNT(*) FROM products WHERE category_id = c.id AND is_active = 1) as product_count
@@ -18,7 +18,7 @@ class CategoryController extends Controller {
     }
 
     public function store(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/categories'); }
 
         $stmt = $this->db->prepare("INSERT INTO categories (id, name, parent_id, description) VALUES (?,?,?,?)");
@@ -34,7 +34,7 @@ class CategoryController extends Controller {
     }
 
     public function update(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/categories'); }
 
         $stmt = $this->db->prepare("UPDATE categories SET name=?, parent_id=?, description=? WHERE id=?");
@@ -50,7 +50,7 @@ class CategoryController extends Controller {
     }
 
     public function delete(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $this->db->prepare("UPDATE products SET category_id = NULL WHERE category_id = ?")->execute([$id]);
         $this->db->prepare("UPDATE categories SET parent_id = NULL WHERE parent_id = ?")->execute([$id]);
         $this->db->prepare("DELETE FROM categories WHERE id = ?")->execute([$id]);
@@ -62,7 +62,7 @@ class CategoryController extends Controller {
      * Download an .xlsx template showing the expected columns for category import.
      */
     public function importTemplate(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         (new \App\Services\XlsxWriter())->download('modele-categories.xlsx', [
             ['name', 'parent', 'description'],
             ['Boissons', '', 'Catégorie parente'],
@@ -79,7 +79,7 @@ class CategoryController extends Controller {
      * resolved after all rows are read so order in the file does not matter.
      */
     public function import(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/categories'); }
 
         $rows = $this->readUploadedSheet('/categories');

@@ -358,6 +358,7 @@ return [
     'common.yes' => 'نعم',
     'common.no' => 'لا',
     'common.confirm_delete' => 'هل أنت متأكد من الحذف؟',
+    'common.forbidden' => 'دورك لا يسمح بالوصول إلى هذه الصفحة.',
     'common.no_results' => 'لا توجد نتائج',
     'common.stock' => 'المخزون',
     'common.price' => 'السعر',

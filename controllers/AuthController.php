@@ -4,7 +4,7 @@ class AuthController extends Controller {
     public function loginForm(): void {
         // Check if user is already logged in for THIS tenant
         if (isset($_SESSION['user_id']) && $this->isSameTenant()) {
-            $this->redirect('/dashboard');
+            $this->redirect(roleHome()); // cashiers have no dashboard access
         }
         require APP_ROOT . '/views/auth/login.php';
     }
@@ -50,7 +50,7 @@ class AuthController extends Controller {
 
             LoginLog::record($logBase + ['user_id' => $user['id'], 'success' => true]);
 
-            $this->redirect('/dashboard');
+            $this->redirect(roleHome()); // cashiers have no dashboard access
         } else {
             LoginLog::record($logBase + ['user_id' => $user['id'] ?? null, 'success' => false]);
 

@@ -18,6 +18,10 @@ defined('ROLE_MANAGER')       || define('ROLE_MANAGER', 'manager');
 defined('ROLE_CASHIER')       || define('ROLE_CASHIER', 'cashier');
 defined('ROLE_ACCOUNTANT')    || define('ROLE_ACCOUNTANT', 'accountant');
 
+// Back-office roles = everyone except the cashier, who is restricted to the POS.
+// Guard non-POS controllers with this group.
+defined('ROLES_STAFF')        || define('ROLES_STAFF', [ROLE_ADMIN, ROLE_MANAGER, ROLE_ACCOUNTANT]);
+
 // Invoice prefixes
 defined('INVOICE_PREFIX')     || define('INVOICE_PREFIX', 'FAC');
 defined('QUOTE_PREFIX')       || define('QUOTE_PREFIX', 'DEV');

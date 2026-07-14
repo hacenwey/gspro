@@ -46,10 +46,19 @@ class Controller {
 
     protected function requireRole(array $roles): void {
         $this->requireAuth();
-        if (!in_array($_SESSION['user_role'], $roles)) {
-            http_response_code(403);
+        if (in_array($_SESSION['user_role'], $roles, true)) {
+            return;
+        }
+        // Access is denied either way; bounce to the role's own home rather than
+        // leaving a dead-end page (a cashier opening a bookmarked /dashboard).
+        $home = roleHome();
+        $current = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+        if ($current === url($home)) {
+            http_response_code(403); // would redirect to itself — deny outright
             die('Accès non autorisé');
         }
+        $this->flash('error', __('common.forbidden', 'Acces non autorise.'));
+        $this->redirect($home);
     }
 
     protected function input(string $key, $default = null) {

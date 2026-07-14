@@ -2,7 +2,7 @@
 class ProductController extends Controller {
 
     public function index(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $search = $this->input('search', '');
         $category = $this->input('category', '');
         $stockFilter = $this->input('stock', '');
@@ -40,7 +40,7 @@ class ProductController extends Controller {
     }
 
     public function create(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $categories = $this->db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         $this->render('products/form', [
             'pageTitle' => 'Nouveau produit',
@@ -50,7 +50,7 @@ class ProductController extends Controller {
     }
 
     public function store(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/products'); }
 
         $id = $this->generateUUID();
@@ -75,7 +75,7 @@ class ProductController extends Controller {
     }
 
     public function edit(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $product = $this->db->prepare("SELECT * FROM products WHERE id = ?");
         $product->execute([$id]);
         $product = $product->fetch();
@@ -90,7 +90,7 @@ class ProductController extends Controller {
     }
 
     public function update(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/products'); }
 
         $stmt = $this->db->prepare("UPDATE products SET reference=?, barcode=?, name=?, description=?, category_id=?, unit=?, purchase_price=?, selling_price=?, tax_rate=?, min_stock=? WHERE id=?");
@@ -113,7 +113,7 @@ class ProductController extends Controller {
     }
 
     public function delete(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $stmt = $this->db->prepare("UPDATE products SET is_active = 0 WHERE id = ?");
         $stmt->execute([$id]);
         $this->flash('success', 'Produit supprime.');
@@ -121,7 +121,7 @@ class ProductController extends Controller {
     }
 
     public function view(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $stmt = $this->db->prepare("SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?");
         $stmt->execute([$id]);
         $product = $stmt->fetch();
@@ -138,7 +138,7 @@ class ProductController extends Controller {
     }
 
     public function adjustStock(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/products/view/' . $id); }
 
         $type = $this->input('type');
@@ -175,7 +175,7 @@ class ProductController extends Controller {
      * Download an .xlsx template showing the expected columns for product import.
      */
     public function importTemplate(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         (new \App\Services\XlsxWriter())->download('modele-produits.xlsx', [
             ['reference', 'name', 'category', 'unit', 'purchase_price', 'selling_price', 'tax_rate', 'min_stock', 'current_stock', 'barcode', 'description'],
             ['P001', 'Exemple produit', 'Boissons', 'piece', '100', '150', '0', '5', '20', '6001234567890', 'Description optionnelle'],
@@ -192,7 +192,7 @@ class ProductController extends Controller {
      * created on the fly when missing.
      */
     public function import(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/products'); }
 
         $rows = $this->readUploadedSheet('/products');
@@ -286,7 +286,7 @@ class ProductController extends Controller {
     }
 
     public function apiList(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $search = $this->input('q', '');
         $stmt = $this->db->prepare("SELECT id, name, reference, barcode, selling_price, tax_rate, current_stock, unit FROM products WHERE is_active = 1 AND (name LIKE ? OR reference LIKE ? OR barcode LIKE ?) ORDER BY name LIMIT 50");
         $stmt->execute(["%$search%", "%$search%", "%$search%"]);

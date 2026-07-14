@@ -360,6 +360,7 @@ return [
     'common.yes' => 'Yes',
     'common.no' => 'No',
     'common.confirm_delete' => 'Are you sure you want to delete this item?',
+    'common.forbidden' => 'Your role does not allow access to that page.',
     'common.no_results' => 'No results found.',
     'common.stock' => 'Stock',
     'common.price' => 'Price',

@@ -360,6 +360,7 @@ return [
     'common.yes' => 'Oui',
     'common.no' => 'Non',
     'common.confirm_delete' => 'Etes-vous sur de vouloir supprimer cet element ?',
+    'common.forbidden' => 'Acces non autorise pour votre role.',
     'common.no_results' => 'Aucun resultat trouve.',
     'common.stock' => 'Stock',
     'common.price' => 'Prix',

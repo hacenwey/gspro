@@ -13,7 +13,7 @@ class TicketController extends Controller {
     }
 
     public function index(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
 
         $tenantId = Tenant::current()['id'];
         $status = $_GET['status'] ?? '';
@@ -45,13 +45,13 @@ class TicketController extends Controller {
     }
 
     public function create(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $pageTitle = __('tickets.create') ?: 'Nouveau ticket';
         $this->render('tickets/create', compact('pageTitle'));
     }
 
     public function store(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
 
         $subject = trim($_POST['subject'] ?? '');
         $message = trim($_POST['message'] ?? '');
@@ -84,7 +84,7 @@ class TicketController extends Controller {
     }
 
     public function view(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
 
         $tenantId = Tenant::current()['id'];
         $stmt = $this->masterDb->prepare("SELECT * FROM tickets WHERE id = ? AND tenant_id = ?");
@@ -106,7 +106,7 @@ class TicketController extends Controller {
     }
 
     public function reply(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
 
         $tenantId = Tenant::current()['id'];
         $stmt = $this->masterDb->prepare("SELECT * FROM tickets WHERE id = ? AND tenant_id = ?");

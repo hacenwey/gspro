@@ -2,7 +2,7 @@
 class ClientController extends Controller {
 
     public function index(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $search = $this->input('search', '');
         $category = $this->input('category', '');
         $page = max(1, (int)$this->input('page', 1));
@@ -26,12 +26,12 @@ class ClientController extends Controller {
     }
 
     public function create(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $this->render('clients/form', ['pageTitle' => 'Nouveau client', 'client' => null]);
     }
 
     public function store(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/clients'); }
 
         $stmt = $this->db->prepare("INSERT INTO customers (id, type, first_name, last_name, phone, email, address, tax_id, category, credit_limit, notes) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
@@ -54,7 +54,7 @@ class ClientController extends Controller {
     }
 
     public function edit(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $stmt = $this->db->prepare("SELECT * FROM customers WHERE id = ?");
         $stmt->execute([$id]);
         $client = $stmt->fetch();
@@ -63,7 +63,7 @@ class ClientController extends Controller {
     }
 
     public function update(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/clients'); }
 
         $stmt = $this->db->prepare("UPDATE customers SET type=?, first_name=?, last_name=?, phone=?, email=?, address=?, tax_id=?, category=?, credit_limit=?, notes=? WHERE id=?");
@@ -86,14 +86,14 @@ class ClientController extends Controller {
     }
 
     public function delete(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $this->db->prepare("DELETE FROM customers WHERE id = ?")->execute([$id]);
         $this->flash('success', 'Client supprime.');
         $this->redirect('/clients');
     }
 
     public function view(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $stmt = $this->db->prepare("SELECT * FROM customers WHERE id = ?");
         $stmt->execute([$id]);
         $client = $stmt->fetch();
@@ -123,6 +123,10 @@ class ClientController extends Controller {
         ]);
     }
 
+    /**
+     * Client lookup for the POS — the one client endpoint a cashier may call.
+     * Read-only and returns no back-office data beyond what the till needs.
+     */
     public function search(): void {
         $this->requireAuth();
         $q = $this->input('q', '');

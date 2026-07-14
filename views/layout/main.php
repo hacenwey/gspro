@@ -40,17 +40,25 @@
             </div>
         </div>
         <nav class="sidebar-nav">
+            <?php
+            // Cashiers are restricted to the POS (see ROLES_STAFF): hide what they
+            // cannot open, so the menu matches what the server actually allows.
+            $__staff = hasRole(ROLE_ADMIN, ROLE_MANAGER, ROLE_ACCOUNTANT);
+            ?>
             <div class="nav-section">
                 <div class="nav-section-title"><?= __('nav.main') ?></div>
+                <?php if ($__staff): ?>
                 <a href="<?= url('/dashboard') ?>" class="nav-item <?= isActive('/dashboard') ?>">
                     <span class="icon"><i class="fas fa-chart-line"></i></span>
                     <?= __('nav.dashboard') ?>
                 </a>
+                <?php endif; ?>
                 <a href="<?= url('/caisse') ?>" class="nav-item <?= isActive('/caisse') ?>">
                     <span class="icon"><i class="fas fa-cash-register"></i></span>
                     <?= __('nav.pos') ?>
                 </a>
             </div>
+            <?php if ($__staff): ?>
             <div class="nav-section">
                 <div class="nav-section-title"><?= __('nav.management') ?></div>
                 <a href="<?= url('/products') ?>" class="nav-item <?= isActive('/products') ?>">
@@ -105,7 +113,8 @@
                     ?>
                 </a>
             </div>
-            <?php if (hasRole('admin', 'manager')): ?>
+            <?php endif; /* $__staff */ ?>
+            <?php if (hasRole(ROLE_ADMIN, ROLE_MANAGER)): ?>
             <div class="nav-section">
                 <div class="nav-section-title"><?= __('nav.admin') ?></div>
                 <a href="<?= url('/settings') ?>" class="nav-item <?= isActive('/settings') ?>">

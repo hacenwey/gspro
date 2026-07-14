@@ -68,6 +68,14 @@ function hasRole(string ...$roles): bool {
     return isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], $roles);
 }
 
+/**
+ * Landing route for the current role. Cashiers are POS-only, so sending them to
+ * the dashboard would bounce them straight into an access denial after login.
+ */
+function roleHome(): string {
+    return hasRole(ROLE_CASHIER) ? '/caisse' : '/dashboard';
+}
+
 function csrf_token(): string {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

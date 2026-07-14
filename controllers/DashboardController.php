@@ -2,7 +2,7 @@
 class DashboardController extends Controller {
 
     public function index(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
 
         // Check onboarding
         $onboardingDone = $this->db->query("SELECT setting_value FROM settings WHERE setting_key = 'onboarding_done'")->fetchColumn();
@@ -71,7 +71,7 @@ class DashboardController extends Controller {
     }
 
     public function chartData(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $period = $_GET['period'] ?? '7d';
 
         if ($period === '7d' || $period === '30d') {

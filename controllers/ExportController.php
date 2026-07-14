@@ -7,7 +7,7 @@
 class ExportController extends Controller {
 
     public function products(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $rows = $this->db->query("
             SELECT p.reference, p.barcode, p.name, c.name AS category, p.unit,
                    p.purchase_price, p.selling_price, p.tax_rate,
@@ -23,7 +23,7 @@ class ExportController extends Controller {
     }
 
     public function clients(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $rows = $this->db->query("
             SELECT type, last_name, first_name, phone, email, address, tax_id,
                    category, loyalty_points, credit_limit, balance, created_at
@@ -37,7 +37,7 @@ class ExportController extends Controller {
     }
 
     public function sales(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $from = $this->input('from', date('Y-m-01'));
         $to   = $this->input('to',   date('Y-m-d'));
         $stmt = $this->db->prepare("

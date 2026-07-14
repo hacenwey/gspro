@@ -2,7 +2,7 @@
 class DebtController extends Controller {
 
     public function index(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $type = $this->input('type', 'receivable');
         $status = $this->input('status', '');
         $page = max(1, (int)$this->input('page', 1));
@@ -41,7 +41,7 @@ class DebtController extends Controller {
     }
 
     public function recordPayment(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/debts'); }
 
         $debt = $this->db->prepare("SELECT * FROM debts WHERE id = ?");
@@ -73,7 +73,7 @@ class DebtController extends Controller {
     }
 
     public function view(string $id): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $debt = $this->db->prepare("SELECT d.*, c.first_name, c.last_name, s.company_name FROM debts d LEFT JOIN customers c ON d.customer_id = c.id LEFT JOIN suppliers s ON d.supplier_id = s.id WHERE d.id = ?");
         $debt->execute([$id]);
         $debt = $debt->fetch();

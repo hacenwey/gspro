@@ -2,7 +2,7 @@
 class PaymentController extends Controller {
 
     public function index(): void {
-        $this->requireAuth();
+        $this->requireRole(ROLES_STAFF);
         $type = $this->input('type', '');
         $method = $this->input('method', '');
         $page = max(1, (int)$this->input('page', 1));
