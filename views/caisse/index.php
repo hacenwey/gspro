@@ -190,9 +190,9 @@
 <script>
 let cart = [];
 let selectedCustomer = null;
-const sessionId = '<?= $session['id'] ?>';
-const csrfToken = '<?= csrf_token() ?>';
-const SELL_URL = '<?= url('/caisse/sell') ?>';
+const sessionId = <?= json_encode($session['id']) ?>;
+const csrfToken = <?= json_encode(csrf_token()) ?>;
+const SELL_URL = <?= json_encode(url('/caisse/sell')) ?>;
 const POS_SHOP = {
     name: <?= json_encode($shop['name'] ?? 'GestionPro') ?>,
     address: <?= json_encode($shop['address'] ?? '') ?>,
@@ -200,31 +200,52 @@ const POS_SHOP = {
     taxId: <?= json_encode($shop['tax_id'] ?? '') ?>,
     cashier: <?= json_encode($_SESSION['user_full_name'] ?? ($_SESSION['user_name'] ?? '')) ?>
 };
+// json_encode() (not bare quotes) — it emits a properly escaped JS literal, so a
+// translation containing an apostrophe (fr: "d'une vente") can't break the script.
 const POS_LANG = {
-    cartEmpty: '<?= __('pos.cart_empty') ?>',
-    clearConfirm: '<?= __('pos.clear_confirm') ?>',
-    noClient: '<?= __('pos.no_client') ?>',
-    sale: '<?= __('invoices.invoice') ?>',
-    change: '<?= __('pos.change') ?>',
-    offlineSaved: '<?= __('pos.offline_saved') ?>',
-    synced: '<?= __('pos.synced') ?>',
-    syncFailed: '<?= __('pos.sync_failed') ?>',
-    notFound: '<?= __('pos.not_found') ?>',
-    thanks: '<?= __('pos.receipt_thanks') ?>',
-    receipt: '<?= __('pos.receipt') ?>',
-    total: '<?= __('invoices.total_ttc') ?>',
-    subtotal: '<?= __('invoices.subtotal') ?>',
-    tax: '<?= __('invoices.tax') ?>',
-    paid: '<?= __('pos.amount_received') ?>'
+    cartEmpty: <?= json_encode(__('pos.cart_empty')) ?>,
+    clearConfirm: <?= json_encode(__('pos.clear_confirm')) ?>,
+    noClient: <?= json_encode(__('pos.no_client')) ?>,
+    sale: <?= json_encode(__('invoices.invoice')) ?>,
+    change: <?= json_encode(__('pos.change')) ?>,
+    offlineSaved: <?= json_encode(__('pos.offline_saved')) ?>,
+    synced: <?= json_encode(__('pos.synced')) ?>,
+    syncFailed: <?= json_encode(__('pos.sync_failed')) ?>,
+    notFound: <?= json_encode(__('pos.not_found')) ?>,
+    stockLimit: <?= json_encode(__('pos.stock_limit')) ?>,
+    thanks: <?= json_encode(__('pos.receipt_thanks')) ?>,
+    receipt: <?= json_encode(__('pos.receipt')) ?>,
+    total: <?= json_encode(__('invoices.total_ttc')) ?>,
+    subtotal: <?= json_encode(__('invoices.subtotal')) ?>,
+    tax: <?= json_encode(__('invoices.tax')) ?>,
+    paid: <?= json_encode(__('pos.amount_received')) ?>
 };
+
+// Visual feedback on the tapped product card (green pulse / red shake).
+function flashCard(card, ok) {
+    const cls = ok ? 'is-added' : 'is-denied';
+    card.classList.remove('is-added', 'is-denied');
+    void card.offsetWidth; // restart the animation
+    card.classList.add(cls);
+    setTimeout(() => card.classList.remove(cls), 450);
+}
 
 // Product click
 function addToCart(card) {
     const id = card.dataset.id;
     const existing = cart.find(i => i.id === id);
-    const stock = parseInt(card.dataset.stock);
+    const stock = parseInt(card.dataset.stock) || 0;
+
+    // Refusing silently used to look like "the click does nothing" — always say why.
+    if (stock <= 0 || (existing && existing.qty >= stock)) {
+        flashCard(card, false);
+        beep(false);
+        posToast(`<i class="fas fa-triangle-exclamation"></i> ${POS_LANG.stockLimit} — ${escapeHtml(card.dataset.name)} (${stock})`, 'warning');
+        return;
+    }
+
     if (existing) {
-        if (existing.qty < stock) existing.qty++;
+        existing.qty++;
     } else {
         cart.push({
             id: id,
@@ -235,6 +256,7 @@ function addToCart(card) {
             stock: stock
         });
     }
+    flashCard(card, true);
     renderCart();
 }
 
@@ -396,6 +418,14 @@ function renderCart() {
     document.getElementById('taxTotal').textContent = formatMoney(tax);
     document.getElementById('grandTotal').textContent = formatMoney(subtotal + tax);
     document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
+
+    // Pay/clear only make sense with a non-empty cart — reflect that instead of
+    // letting the buttons look active but do nothing.
+    const empty = cart.length === 0;
+    document.querySelectorAll('.pos-actions .btn-pay, .pos-actions .btn-danger').forEach(b => {
+        b.disabled = empty;
+        b.classList.toggle('is-disabled', empty);
+    });
 }
 
 function changeQty(index, delta) {
@@ -594,6 +624,10 @@ window.addEventListener('online', flushQueue);
 updatePendingBadge();
 flushQueue();
 setInterval(flushQueue, 30000);
+
+// Initial cart paint — deferred because formatMoney() lives in app.js, which the
+// layout loads *after* this inline script.
+document.addEventListener('DOMContentLoaded', renderCart);
 
 // ============================================================
 // Receipt printing (58/80mm thermal via the browser print dialog)

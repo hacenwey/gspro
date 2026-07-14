@@ -291,6 +291,8 @@ return [
     'pos.reprint' => 'Reprint',
     'pos.autoprint' => 'Auto print',
     'pos.not_found' => 'Product not found',
+    'pos.stock_limit' => 'Maximum stock reached',
+    'pos.added' => 'added',
     'pos.receipt_thanks' => 'Thank you for your visit!',
     'pos.receipt' => 'Receipt',
     'pos.stock_label' => 'Stock',

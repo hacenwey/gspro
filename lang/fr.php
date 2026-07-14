@@ -291,6 +291,8 @@ return [
     'pos.reprint' => 'Reimprimer',
     'pos.autoprint' => 'Impression auto',
     'pos.not_found' => 'Produit introuvable',
+    'pos.stock_limit' => 'Stock maximum atteint',
+    'pos.added' => 'ajoute',
     'pos.receipt_thanks' => 'Merci de votre visite !',
     'pos.receipt' => 'Ticket',
     'pos.stock_label' => 'Stock',

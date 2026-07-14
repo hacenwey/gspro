@@ -291,6 +291,8 @@ return [
     'pos.reprint' => 'إعادة الطباعة',
     'pos.autoprint' => 'طباعة تلقائية',
     'pos.not_found' => 'المنتج غير موجود',
+    'pos.stock_limit' => 'تم بلوغ الحد الأقصى للمخزون',
+    'pos.added' => 'أضيف',
     'pos.receipt_thanks' => 'شكرا لزيارتكم!',
     'pos.receipt' => 'إيصال',
     'pos.stock_label' => 'المخزون',

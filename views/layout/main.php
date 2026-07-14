@@ -194,7 +194,7 @@
     const APP_CURRENCY_SYMBOL = '<?= addslashes(CURRENCY_SYMBOL) ?>';
     const APP_LANG = '<?= Lang::locale() ?>';
     const APP_RTL = <?= Lang::isRtl() ? 'true' : 'false' ?>;
-    const APP_INSTALL_TXT = '<?= addslashes(__('app.install')) ?>';
+    const APP_INSTALL_TXT = <?= json_encode(__('app.install')) ?>;
 </script>
 <script src="<?= asset('js/app.js') ?>"></script>
 <?php if (isset($extraJs)): ?>
