@@ -26,7 +26,7 @@ defined('PO_PREFIX')          || define('PO_PREFIX', 'BC');
 
 // Supported languages
 defined('SUPPORTED_LANGS')    || define('SUPPORTED_LANGS', ['en', 'fr', 'ar']);
-defined('DEFAULT_LANG')       || define('DEFAULT_LANG', 'ar');
+defined('DEFAULT_LANG')       || define('DEFAULT_LANG', 'fr');
 
 // WhatsApp ordering (Mauritania). International format, digits only, no '+'.
 // Used by the landing page "Order on WhatsApp" buttons.

@@ -13,14 +13,16 @@ try {
 
 // ===================== LANDING PAGE I18N =====================
 // The landing page is served before Lang::init() (see index.php), so it
-// handles locale selection on its own. Arabic is the default for the
-// Mauritanian market; French and English stay available via ?lang=.
+// handles locale selection on its own. It follows DEFAULT_LANG rather than
+// hardcoding a locale, so the app default stays defined in one place;
+// the other languages remain available via ?lang=.
 $landingLangs = ['ar', 'fr', 'en'];
+$landingDefault = in_array(DEFAULT_LANG, $landingLangs, true) ? DEFAULT_LANG : 'fr';
 if (isset($_GET['lang']) && in_array($_GET['lang'], $landingLangs, true)) {
     $_SESSION['lang'] = $_GET['lang'];
 }
-$lang = $_SESSION['lang'] ?? 'ar';
-if (!in_array($lang, $landingLangs, true)) { $lang = 'ar'; }
+$lang = $_SESSION['lang'] ?? $landingDefault;
+if (!in_array($lang, $landingLangs, true)) { $lang = $landingDefault; }
 $dir     = $lang === 'ar' ? 'rtl' : 'ltr';
 $isRtl   = $lang === 'ar';
 
