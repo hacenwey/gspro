@@ -37,10 +37,9 @@ $TR = [
     'ar' => [
         'cur' => 'أوقية',
         'page_title' => 'GestionPro — برنامج إدارة الأعمال المتكامل',
-        'page_desc' => 'أدِر المخزون والفواتير ونقاط البيع والعملاء. تجربة مجانية 7 أيام، ألغِ في أي وقت.',
+        'page_desc' => 'أدِر المخزون والفواتير ونقاط البيع والعملاء. أداة واحدة لتجارتك — اطلب عبر واتساب، دون التزام.',
         'nav_features' => 'المميزات', 'nav_pricing' => 'الأسعار', 'nav_faq' => 'الأسئلة الشائعة',
         'nav_admin_title' => 'الإدارة', 'nav_cta' => 'ابدأ الفترة المجانية',
-        'hero_badge' => 'تجربة 7 أيام — يمكنك الإلغاء في أي وقت',
         'hero_h1_1' => 'أدِر تجارتك.', 'hero_h1_2' => 'بسّط يومك.',
         'hero_sub' => 'المنصة المتكاملة للمتاجر والشركات الصغيرة والمتوسطة وأصحاب الخدمات. المخزون، نقاط البيع، الفواتير، العملاء والمالية — أداة واحدة، جاهزة في 30 ثانية.',
         'hero_trust1' => '7 أيام مجاناً', 'hero_trust2' => 'بدون بطاقة بنكية مطلوبة',
@@ -59,22 +58,24 @@ $TR = [
         'feat5_t' => 'لوحات معلومات وتقارير', 'feat5_d' => 'اتجاهات الإيرادات، أفضل المنتجات، وضع الخزينة — رؤى واضحة بنظرة واحدة.',
         'feat6_t' => '3 لغات', 'feat6_d' => 'واجهة كاملة بالعربية والفرنسية والإنجليزية مع دعم أصلي للكتابة من اليمين لليسار. بدّل بنقرة واحدة.',
         'how_label' => 'البدء', 'how_title' => 'جاهز في 30 ثانية',
-        'step1_t' => 'أنشئ مساحة عملك', 'step1_d' => 'اختر اسماً لتجارتك. أدخل بطاقتك لبدء تجربة الـ7 أيام.',
+        'step1_t' => 'أنشئ مساحة عملك', 'step1_d' => 'تواصل معنا عبر واتساب: يُنشئ فريقنا مساحة عملك ويرافقك. لا حاجة لبطاقة بنكية.',
         'step2_t' => 'أضف منتجاتك', 'step2_d' => 'استورد كتالوجك، حدّد الأسعار ومستويات المخزون الافتتاحية.',
         'step3_t' => 'ابدأ البيع', 'step3_d' => 'استخدم نقاط البيع، أصدر فواتير للعملاء، وتابع أموالك في الوقت الفعلي.',
         'price_label' => 'الأسعار', 'price_title' => 'خطة لكل نشاط تجاري',
-        'price_desc' => 'ابدأ بتجربة مجانية لمدة <strong>7 أيام</strong> على أي خطة. ألغِ قبل انتهاء التجربة ولن تُدفع أي رسوم.',
-        'trial_badge' => 'تجربة 7 أيام',
+        'price_desc' => 'اختر باقتك و<strong>اطلب عبر واتساب</strong>. فريقنا يرافقك، دون أي التزام.',
         'plan_starter' => 'المبتدئ', 'plan_starter_d' => 'للشركات الصغيرة والمتوسطة النامية',
         'plan_pro' => 'المحترف', 'plan_pro_d' => 'للفرق الأكبر',
         'per_month' => '/ شهر', 'billed_monthly' => 'فوترة شهرية', 'per_year' => '/ سنة', 'billed_yearly' => 'فوترة سنوية',
-        'plan_secure' => 'خطة آمنة عبر Polar',
+        'plan_secure' => 'اطلب عبر واتساب',
+        // Bullets shown on the live Polar plan cards when no custom list is set in /admin/polar.
+        'feat_b1' => 'نقاط بيع + فواتير غير محدودة', 'feat_b2' => 'منتجات، مخزون، عملاء، موردون',
+        'feat_b3' => 'فواتير PDF + تصدير CSV', 'feat_b4' => 'متعدد المستخدمين و3 لغات',
+        'feat_b5' => 'مرافقة عبر واتساب',
         'starter_b1' => '5 مستخدمين', 'starter_b2' => '500 منتج', 'starter_b3' => 'نقاط بيع + فواتير غير محدودة',
-        'starter_b4' => 'دعم ذو أولوية', 'starter_b5' => 'ألغِ في أي وقت خلال التجربة',
+        'starter_b4' => 'دعم ذو أولوية', 'starter_b5' => 'بدون التزام',
         'pro_b1' => '15 مستخدماً', 'pro_b2' => '5000 منتج', 'pro_b3' => 'كل ما في خطة المبتدئ',
         'pro_b4' => 'دعم على مدار الساعة', 'pro_b5' => 'تقارير متقدمة',
-        'start_trial_btn' => 'ابدأ تجربة الـ7 أيام',
-        'pricing_note' => 'جميع الأسعار بالأوقية (MRU). دفع آمن بالبطاقة — ألغِ في أي وقت.',
+        'pricing_note' => 'جميع الأسعار بالأوقية (MRU). دون التزام — لا حاجة لبطاقة بنكية.',
         'trust_label' => 'الأمان', 'trust_title' => 'بياناتك محميّة',
         'trust_desc' => 'تشفير ونسخ احتياطي وعزل للبيانات — نشاطك يستحق بنية تحتية متينة.',
         'trust1_t' => 'HTTPS في كل مكان', 'trust1_d' => 'اتصالات مشفّرة بـ TLS 1.3 على كل صفحة وكل طلب API.',
@@ -94,9 +95,8 @@ $TR = [
         'faq5_a' => 'نعم، الواجهة متجاوبة بالكامل وتعمل بشكل مثالي على الهاتف والجهاز اللوحي والحاسوب.',
         'faq6_q' => 'ما اللغات المدعومة؟',
         'faq6_a' => 'العربية (افتراضياً) والفرنسية والإنجليزية — مع دعم أصلي للكتابة من اليمين لليسار. يمكنك تبديل اللغة بنقرة واحدة من مساحة عملك.',
-        'cta_h2' => 'جاهز لتبسيط تجارتك؟', 'cta_p' => 'أنشئ مساحة عملك في 30 ثانية. 7 أيام مجاناً، ألغِ في أي وقت.',
+        'cta_h2' => 'جاهز لتبسيط تجارتك؟', 'cta_p' => 'راسلنا عبر واتساب: مساحة عملك جاهزة في نفس اليوم، دون أي التزام.',
         'footer_tagline' => 'GestionPro — برنامج إدارة الأعمال',
-        'modal_badge' => 'تجربة مجانية 7 أيام', 'modal_title' => 'أنشئ مساحة عملك', 'modal_sub' => 'جاهزة في 30 ثانية، ألغِ في أي وقت',
         'f_company' => 'اسم النشاط التجاري *', 'f_company_ph' => 'مثال: متجر النور',
         'f_slug' => 'عنوان مساحة العمل *', 'f_slug_ph' => 'acme-shop',
         'f_name' => 'اسمك *', 'f_name_ph' => 'محمد الأمين',
@@ -117,10 +117,9 @@ $TR = [
     'fr' => [
         'cur' => 'MRU',
         'page_title' => 'GestionPro — Logiciel de gestion d\'entreprise tout-en-un',
-        'page_desc' => 'Gérez stock, factures, caisse et clients. Essai gratuit 7 jours, annulez à tout moment.',
+        'page_desc' => 'Gérez stock, factures, caisse et clients. Un seul outil pour votre activité — commandez sur WhatsApp, sans engagement.',
         'nav_features' => 'Fonctionnalités', 'nav_pricing' => 'Tarifs', 'nav_faq' => 'FAQ',
         'nav_admin_title' => 'Administration', 'nav_cta' => 'Essai gratuit',
-        'hero_badge' => 'Essai 7 jours — annulez à tout moment',
         'hero_h1_1' => 'Gérez votre activité.', 'hero_h1_2' => 'Simplifiez votre journée.',
         'hero_sub' => 'La plateforme tout-en-un pour boutiques, PME et prestataires de services. Stock, caisse, factures, clients et finances — un seul outil, prêt en 30 secondes.',
         'hero_trust1' => '7 jours gratuits', 'hero_trust2' => 'Aucune carte bancaire requise',
@@ -139,22 +138,24 @@ $TR = [
         'feat5_t' => 'Tableaux de bord & rapports', 'feat5_d' => 'Tendances du chiffre d\'affaires, meilleurs produits, situation de trésorerie — des analyses claires en un coup d\'œil.',
         'feat6_t' => '3 langues', 'feat6_d' => 'Interface complète en arabe, français et anglais avec support RTL natif. Changez en un clic.',
         'how_label' => 'Prise en main', 'how_title' => 'Prêt en 30 secondes',
-        'step1_t' => 'Créez votre espace', 'step1_d' => 'Choisissez un nom pour votre activité. Entrez votre carte pour démarrer l\'essai de 7 jours.',
+        'step1_t' => 'Créez votre espace', 'step1_d' => 'Contactez-nous sur WhatsApp : notre équipe crée votre espace et vous accompagne. Aucune carte bancaire requise.',
         'step2_t' => 'Ajoutez vos produits', 'step2_d' => 'Importez votre catalogue, définissez les prix et les stocks de départ.',
         'step3_t' => 'Commencez à vendre', 'step3_d' => 'Utilisez la caisse, facturez vos clients, suivez vos finances en temps réel.',
         'price_label' => 'Tarifs', 'price_title' => 'Une offre pour chaque activité',
-        'price_desc' => 'Commencez avec un <strong>essai gratuit de 7 jours</strong> sur toute offre. Annulez avant la fin de l\'essai et rien ne vous sera facturé.',
-        'trial_badge' => 'Essai 7 jours',
+        'price_desc' => 'Choisissez votre offre et <strong>commandez sur WhatsApp</strong>. Notre équipe vous accompagne, sans engagement.',
         'plan_starter' => 'Starter', 'plan_starter_d' => 'Pour PME en croissance',
         'plan_pro' => 'Pro', 'plan_pro_d' => 'Pour les grandes équipes',
         'per_month' => '/ mois', 'billed_monthly' => 'Facturé mensuellement', 'per_year' => '/ an', 'billed_yearly' => 'Facturé annuellement',
-        'plan_secure' => 'Offre sécurisée sur Polar',
+        'plan_secure' => 'Commandez sur WhatsApp',
+        // Bullets shown on the live Polar plan cards when no custom list is set in /admin/polar.
+        'feat_b1' => 'Caisse + factures illimitées', 'feat_b2' => 'Produits, stock, clients, fournisseurs',
+        'feat_b3' => 'Factures PDF + exports CSV', 'feat_b4' => 'Multi-utilisateurs et 3 langues',
+        'feat_b5' => 'Accompagnement sur WhatsApp',
         'starter_b1' => '5 utilisateurs', 'starter_b2' => '500 produits', 'starter_b3' => 'Caisse + factures illimitées',
-        'starter_b4' => 'Support prioritaire', 'starter_b5' => 'Annulez à tout moment pendant l\'essai',
+        'starter_b4' => 'Support prioritaire', 'starter_b5' => 'Sans engagement',
         'pro_b1' => '15 utilisateurs', 'pro_b2' => '5 000 produits', 'pro_b3' => 'Tout de Starter',
         'pro_b4' => 'Support 24/7', 'pro_b5' => 'Rapports avancés',
-        'start_trial_btn' => 'Démarrer l\'essai 7 jours',
-        'pricing_note' => 'Tous les prix en MRU. Paiement sécurisé par carte — annulez à tout moment.',
+        'pricing_note' => 'Tous les prix en MRU. Sans engagement — aucune carte bancaire requise.',
         'trust_label' => 'Sécurité', 'trust_title' => 'Vos données sont protégées',
         'trust_desc' => 'Chiffrement, sauvegardes et isolation des données — votre activité mérite une infrastructure solide.',
         'trust1_t' => 'HTTPS partout', 'trust1_d' => 'Connexions chiffrées TLS 1.3 sur chaque page et appel API.',
@@ -174,9 +175,8 @@ $TR = [
         'faq5_a' => 'Oui, l\'interface est entièrement responsive et fonctionne parfaitement sur téléphone, tablette et ordinateur.',
         'faq6_q' => 'Quelles langues sont prises en charge ?',
         'faq6_a' => 'L\'arabe (par défaut), le français et l\'anglais — avec support RTL natif. Vous pouvez changer de langue en un clic depuis votre espace.',
-        'cta_h2' => 'Prêt à simplifier votre activité ?', 'cta_p' => 'Créez votre espace en 30 secondes. 7 jours gratuits, annulez à tout moment.',
+        'cta_h2' => 'Prêt à simplifier votre activité ?', 'cta_p' => 'Écrivez-nous sur WhatsApp : votre espace est prêt le jour même, sans engagement.',
         'footer_tagline' => 'GestionPro — Logiciel de gestion d\'entreprise',
-        'modal_badge' => 'Essai gratuit 7 jours', 'modal_title' => 'Créez votre espace', 'modal_sub' => 'Prêt en 30 secondes, annulez à tout moment',
         'f_company' => 'Nom de l\'entreprise *', 'f_company_ph' => 'ex. Boutique Acme',
         'f_slug' => 'Adresse de l\'espace *', 'f_slug_ph' => 'acme-shop',
         'f_name' => 'Votre nom *', 'f_name_ph' => 'Jean Dupont',
@@ -197,10 +197,9 @@ $TR = [
     'en' => [
         'cur' => 'MRU',
         'page_title' => 'GestionPro — All-in-one business management software',
-        'page_desc' => 'Manage stock, invoices, POS and clients. 7-day free trial, cancel anytime.',
+        'page_desc' => 'Manage stock, invoices, POS and clients. One tool for your business — order on WhatsApp, no commitment.',
         'nav_features' => 'Features', 'nav_pricing' => 'Pricing', 'nav_faq' => 'FAQ',
         'nav_admin_title' => 'Administration', 'nav_cta' => 'Start free trial',
-        'hero_badge' => '7-day trial — cancel anytime',
         'hero_h1_1' => 'Run your business.', 'hero_h1_2' => 'Simplify your day.',
         'hero_sub' => 'The all-in-one platform for shops, SMBs and service businesses. Stock, POS, invoices, clients and finance — one tool, ready in 30 seconds.',
         'hero_trust1' => '7 days free', 'hero_trust2' => 'No bank card required',
@@ -219,22 +218,24 @@ $TR = [
         'feat5_t' => 'Dashboards & reports', 'feat5_d' => 'Revenue trends, top products, cash positions — clear insights at a glance.',
         'feat6_t' => '3 languages', 'feat6_d' => 'Full interface in Arabic, French and English with native RTL support. Switch in one click.',
         'how_label' => 'Getting started', 'how_title' => 'Ready in 30 seconds',
-        'step1_t' => 'Create your workspace', 'step1_d' => 'Pick a name for your business. Enter your card to start the 7-day trial.',
+        'step1_t' => 'Create your workspace', 'step1_d' => 'Message us on WhatsApp: our team sets up your workspace and guides you. No bank card required.',
         'step2_t' => 'Add your products', 'step2_d' => 'Import your catalogue, set prices and opening stock levels.',
         'step3_t' => 'Start selling', 'step3_d' => 'Use the POS, invoice clients, track your finances in real time.',
         'price_label' => 'Pricing', 'price_title' => 'A plan for every business',
-        'price_desc' => 'Start with a <strong>7-day free trial</strong> on any plan. Cancel before the trial ends and you won\'t be charged.',
-        'trial_badge' => '7-day trial',
+        'price_desc' => 'Pick your plan and <strong>order on WhatsApp</strong>. Our team guides you, with no commitment.',
         'plan_starter' => 'Starter', 'plan_starter_d' => 'For growing SMBs',
         'plan_pro' => 'Pro', 'plan_pro_d' => 'For larger teams',
         'per_month' => '/ month', 'billed_monthly' => 'Billed monthly', 'per_year' => '/ year', 'billed_yearly' => 'Billed yearly',
-        'plan_secure' => 'Secure plan on Polar',
+        'plan_secure' => 'Order on WhatsApp',
+        // Bullets shown on the live Polar plan cards when no custom list is set in /admin/polar.
+        'feat_b1' => 'POS + unlimited invoices', 'feat_b2' => 'Products, stock, customers, suppliers',
+        'feat_b3' => 'PDF invoices + CSV exports', 'feat_b4' => 'Multi-user and 3 languages',
+        'feat_b5' => 'WhatsApp onboarding support',
         'starter_b1' => '5 users', 'starter_b2' => '500 products', 'starter_b3' => 'POS + unlimited invoices',
-        'starter_b4' => 'Priority support', 'starter_b5' => 'Cancel anytime during the trial',
+        'starter_b4' => 'Priority support', 'starter_b5' => 'No commitment',
         'pro_b1' => '15 users', 'pro_b2' => '5,000 products', 'pro_b3' => 'Everything in Starter',
         'pro_b4' => '24/7 support', 'pro_b5' => 'Advanced reports',
-        'start_trial_btn' => 'Start 7-day trial',
-        'pricing_note' => 'All prices in MRU. Secure card checkout — cancel anytime.',
+        'pricing_note' => 'All prices in MRU. No commitment — no bank card required.',
         'trust_label' => 'Security', 'trust_title' => 'Your data is protected',
         'trust_desc' => 'Encryption, backups and data isolation — your business deserves solid infrastructure.',
         'trust1_t' => 'HTTPS everywhere', 'trust1_d' => 'TLS 1.3 encrypted connections on every page and API call.',
@@ -254,9 +255,8 @@ $TR = [
         'faq5_a' => 'Yes, the interface is fully responsive and works perfectly on phone, tablet and desktop.',
         'faq6_q' => 'Which languages are supported?',
         'faq6_a' => 'Arabic (default), French and English — with native RTL support. You can switch languages in one click from your workspace.',
-        'cta_h2' => 'Ready to simplify your business?', 'cta_p' => 'Create your workspace in 30 seconds. 7 days free, cancel anytime.',
+        'cta_h2' => 'Ready to simplify your business?', 'cta_p' => 'Message us on WhatsApp: your workspace is ready the same day, with no commitment.',
         'footer_tagline' => 'GestionPro — Business management software',
-        'modal_badge' => '7-day free trial', 'modal_title' => 'Create your workspace', 'modal_sub' => 'Ready in 30 seconds, cancel anytime',
         'f_company' => 'Business name *', 'f_company_ph' => 'e.g. Acme Shop',
         'f_slug' => 'Workspace address *', 'f_slug_ph' => 'acme-shop',
         'f_name' => 'Your name *', 'f_name_ph' => 'Jane Doe',
@@ -293,8 +293,12 @@ $pricePro     = $fmtMru(GeoCurrency::PLANS['pro']['USD'] ?? 0) . ' ' . $cur;
 // response the view falls back to the hardcoded Starter + Pro cards below.
 $polarProducts = [];
 if (class_exists('Polar') && Polar::isConfigured()) {
-    $featuresMap     = class_exists('ProductFeatures') ? ProductFeatures::all() : [];
-    $defaultFeatures = class_exists('ProductFeatures') ? ProductFeatures::defaults() : [];
+    $featuresMap = class_exists('ProductFeatures') ? ProductFeatures::all() : [];
+    // Fall back to the *translated* bullets, not ProductFeatures::defaults() —
+    // those are hardcoded English and were showing up verbatim on the FR/AR pages.
+    $defaultFeatures = [
+        $t['feat_b1'], $t['feat_b2'], $t['feat_b3'], $t['feat_b4'], $t['feat_b5'],
+    ];
     foreach (Polar::listProductsCached() as $p) {
         if (($p['is_archived'] ?? false) === true) continue;
         $price = ($p['prices'][0] ?? null);
@@ -358,8 +362,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         .hero{padding:130px 24px 80px;position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,var(--primary-50) 100%)}
         .hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,.08) 0%,transparent 70%);pointer-events:none}
         .hero-inner{max-width:1100px;margin:0 auto;text-align:center;position:relative}
-        .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px 6px 8px;background:#fff;border:1px solid var(--primary-100);border-radius:100px;font-size:13px;font-weight:600;color:var(--primary);margin-bottom:28px;box-shadow:var(--shadow-sm)}
-        .hero-badge i{width:20px;height:20px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px}
         .hero h1{font-size:clamp(36px,5.5vw,68px);font-weight:900;line-height:1.05;letter-spacing:-2px;max-width:860px;margin:0 auto 20px;background:linear-gradient(135deg,var(--text) 0%,var(--primary-dark) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .hero-sub{font-size:clamp(16px,2vw,19px);color:var(--text-secondary);max-width:620px;margin:0 auto 36px;line-height:1.65}
         .hero-trust{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:28px;font-size:13px;color:var(--text-secondary)}
@@ -437,7 +439,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         .price-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
         .price-card.popular{border-color:var(--primary);box-shadow:0 8px 32px rgba(79,70,229,.15);border-width:1.5px}
         .price-card.popular::before{content:'\2B50 Most popular';position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:5px 14px;background:var(--primary);color:#fff;border-radius:100px;font-size:11px;font-weight:700;white-space:nowrap}
-        .trial-badge{display:inline-block;padding:3px 10px;background:rgba(16,185,129,.1);color:var(--success);font-size:11px;font-weight:700;border-radius:100px;margin-bottom:10px;letter-spacing:.3px}
         .price-name{font-size:19px;font-weight:700;margin-bottom:4px}
         .price-desc{font-size:13px;color:var(--text-muted);margin-bottom:20px}
         .price-amount{font-size:42px;font-weight:900;letter-spacing:-1.5px;line-height:1}
@@ -540,7 +541,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         body{font-family:'Cairo','Inter',sans-serif}
         .hero h1{letter-spacing:0}
         .section-title,.hero-sub{letter-spacing:0}
-        .hero-badge{padding:6px 8px 6px 16px}
         .price-amount span{margin-left:0;margin-right:4px}
         .slug-prefix{border-radius:0 10px 10px 0;border-right:1.5px solid var(--border);border-left:0}
         .slug-preview input{border-radius:10px 0 0 10px}
@@ -581,9 +581,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 <!-- HERO -->
 <section class="hero">
     <div class="hero-inner">
-        <div class="hero-badge">
-            <i class="fas fa-gift"></i> <?= e($t['hero_badge']) ?>
-        </div>
         <h1><?= e($t['hero_h1_1']) ?><br><?= e($t['hero_h1_2']) ?></h1>
         <p class="hero-sub"><?= e($t['hero_sub']) ?></p>
 
@@ -727,7 +724,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
                 $waPlan    = $waLink(sprintf($t['wa_msg_plan'], $prod['name'] !== '' ? $prod['name'] : 'GestionPro'));
         ?>
             <div class="price-card<?= $isPopular ? ' popular' : '' ?>">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> <?= e($t['trial_badge']) ?></div>
                 <div class="price-name"><?= htmlspecialchars($prod['name'], ENT_QUOTES) ?></div>
                 <div class="price-desc"><?= htmlspecialchars($prod['desc'] !== '' ? $prod['desc'] : $t['plan_secure']) ?></div>
                 <div class="price-amount"><?= e($priceStr) ?><span><?= e($intervalL) ?></span></div>
@@ -741,7 +737,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
             </div>
         <?php endforeach; else: ?>
             <div class="price-card popular">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> <?= e($t['trial_badge']) ?></div>
                 <div class="price-name"><?= e($t['plan_starter']) ?></div>
                 <div class="price-desc"><?= e($t['plan_starter_d']) ?></div>
                 <div class="price-amount"><?= e($priceStarter) ?><span><?= e($t['per_month']) ?></span></div>
@@ -756,7 +751,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
                 <a href="<?= e($waLink(sprintf($t['wa_msg_plan'], $t['plan_starter']))) ?>" target="_blank" rel="noopener" class="btn-price filled"><i class="fab fa-whatsapp"></i> <?= e($t['wa_order']) ?></a>
             </div>
             <div class="price-card">
-                <div class="trial-badge"><i class="fas fa-gift" style="font-size:10px;"></i> <?= e($t['trial_badge']) ?></div>
                 <div class="price-name"><?= e($t['plan_pro']) ?></div>
                 <div class="price-desc"><?= e($t['plan_pro_d']) ?></div>
                 <div class="price-amount"><?= e($pricePro) ?><span><?= e($t['per_month']) ?></span></div>
