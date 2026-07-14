@@ -86,6 +86,16 @@ class SettingsController extends Controller {
             $this->db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?")->execute([$key, $value, $value]);
         }
 
+        // Language is whitelisted separately: an unknown code would leave the app
+        // with no translations. Also applied to the current session so the change
+        // is visible right away rather than only after the next login.
+        $lang = $this->input('language', '');
+        if (in_array($lang, SUPPORTED_LANGS, true)) {
+            $this->db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('language', ?) ON DUPLICATE KEY UPDATE setting_value = ?")
+                ->execute([$lang, $lang]);
+            $_SESSION['lang'] = $lang;
+        }
+
         $this->flash('success', 'Parametres mis a jour.');
         $this->redirect('/settings');
     }

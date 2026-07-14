@@ -103,6 +103,21 @@ $statusLabel = match($subStatus) {
                         <input type="number" name="default_quote_validity" class="form-control" value="<?= $settings['default_quote_validity'] ?? '30' ?>">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="form-label"><?= __('settings.language') ?></label>
+                    <?php
+                    $__langNames = ['fr' => 'Français', 'ar' => 'العربية', 'en' => 'English'];
+                    $__curLang = $settings['language'] ?? Lang::locale();
+                    ?>
+                    <select name="language" class="form-control">
+                        <?php foreach (SUPPORTED_LANGS as $__code): ?>
+                        <option value="<?= e($__code) ?>" <?= $__curLang === $__code ? 'selected' : '' ?>>
+                            <?= e($__langNames[$__code] ?? $__code) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small style="color: var(--text-muted); font-size: 12px;"><?= __('settings.language_hint') ?></small>
+                </div>
                 <button type="submit" class="btn btn-primary mt-2"><i class="fas fa-save"></i> <?= __('common.save') ?></button>
             </form>
         </div>

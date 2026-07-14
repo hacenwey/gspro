@@ -319,6 +319,8 @@ return [
     'settings.tax_id' => 'السجل التجاري',
     'settings.default_tax' => 'الضريبة الافتراضية (%)',
     'settings.currency' => 'العملة',
+    'settings.language' => 'اللغة',
+    'settings.language_hint' => 'اللغة الافتراضية للتطبيق. تبقى محفوظة بعد تسجيل الخروج.',
     'settings.payment_terms' => 'مهلة الدفع (أيام)',
     'settings.quote_validity' => 'صلاحية العرض (أيام)',
     'settings.users' => 'المستخدمون',

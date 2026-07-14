@@ -227,6 +227,7 @@ class Tenant {
             ['default_tax_rate', '0'],
             ['currency', 'MRU'],
             ['currency_symbol', 'UM'],
+            ['language', DEFAULT_LANG],
             ['default_payment_terms', '30'],
             ['default_quote_validity', '30'],
             ['low_stock_alert', '1'],

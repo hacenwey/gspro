@@ -321,6 +321,8 @@ return [
     'settings.tax_id' => 'NIF / Registre de commerce',
     'settings.default_tax' => 'TVA par defaut (%)',
     'settings.currency' => 'Devise',
+    'settings.language' => 'Langue',
+    'settings.language_hint' => 'Langue par defaut de l\'application. Conservee apres deconnexion.',
     'settings.payment_terms' => 'Delai paiement (jours)',
     'settings.quote_validity' => 'Validite devis (jours)',
     'settings.users' => 'Utilisateurs',

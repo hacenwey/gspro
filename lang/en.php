@@ -321,6 +321,8 @@ return [
     'settings.tax_id' => 'Tax ID / Registration',
     'settings.default_tax' => 'Default VAT (%)',
     'settings.currency' => 'Currency',
+    'settings.language' => 'Language',
+    'settings.language_hint' => 'Default application language. Kept after logout.',
     'settings.payment_terms' => 'Payment terms (days)',
     'settings.quote_validity' => 'Quote validity (days)',
     'settings.users' => 'Users',
