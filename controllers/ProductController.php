@@ -171,6 +171,120 @@ class ProductController extends Controller {
         $this->redirect('/products/view/' . $id);
     }
 
+    /**
+     * Download an .xlsx template showing the expected columns for product import.
+     */
+    public function importTemplate(): void {
+        $this->requireAuth();
+        (new \App\Services\XlsxWriter())->download('modele-produits.xlsx', [
+            ['reference', 'name', 'category', 'unit', 'purchase_price', 'selling_price', 'tax_rate', 'min_stock', 'current_stock', 'barcode', 'description'],
+            ['P001', 'Exemple produit', 'Boissons', 'piece', '100', '150', '0', '5', '20', '6001234567890', 'Description optionnelle'],
+        ]);
+        exit;
+    }
+
+    /**
+     * Bulk import products from an uploaded .xlsx file.
+     *
+     * Columns are matched by header name (first row), so column order is free.
+     * Rows are upserted by `reference`: an existing reference is updated,
+     * otherwise a new product is created. Categories are matched by name and
+     * created on the fly when missing.
+     */
+    public function import(): void {
+        $this->requireAuth();
+        if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/products'); }
+
+        $rows = $this->readUploadedSheet('/products');
+        if ($rows === null) { return; }
+
+        $col = $this->headerMap($rows[0]);
+        if (!isset($col['reference']) && !isset($col['ref'])) {
+            $this->flash('error', 'Colonne "reference" introuvable dans le fichier.');
+            $this->redirect('/products');
+        }
+
+        $categoryCache = $this->loadCategoryCache();
+        $inserted = 0; $updated = 0; $skipped = 0;
+
+        $this->db->beginTransaction();
+        try {
+            for ($i = 1, $n = count($rows); $i < $n; $i++) {
+                $row = $rows[$i];
+                $reference = trim($this->cell($row, $col, ['reference', 'ref']));
+                $name      = trim($this->cell($row, $col, ['name', 'nom', 'designation', 'désignation']));
+                if ($reference === '' || $name === '') { $skipped++; continue; }
+
+                $categoryId = $this->resolveCategory(
+                    trim($this->cell($row, $col, ['category', 'categorie', 'catégorie'])),
+                    $categoryCache
+                );
+
+                $barcode      = trim($this->cell($row, $col, ['barcode', 'code_barre', 'code-barres'])) ?: null;
+                $description  = $this->cell($row, $col, ['description']);
+                $unit         = trim($this->cell($row, $col, ['unit', 'unite', 'unité'])) ?: 'piece';
+                $purchase     = $this->num($this->cell($row, $col, ['purchase_price', 'prix_achat', 'prix achat']));
+                $selling      = $this->num($this->cell($row, $col, ['selling_price', 'prix_vente', 'prix vente']));
+                $taxRate      = $this->num($this->cell($row, $col, ['tax_rate', 'tva', 'taxe']), TAX_RATE_DEFAULT);
+                $minStock     = (int)$this->num($this->cell($row, $col, ['min_stock', 'stock_min', 'stock min']));
+                $stockRaw     = $this->cell($row, $col, ['current_stock', 'stock', 'quantite', 'quantité']);
+
+                $existing = $this->db->prepare("SELECT id FROM products WHERE reference = ?");
+                $existing->execute([$reference]);
+                $existingId = $existing->fetchColumn();
+
+                if ($existingId) {
+                    // Update descriptive fields; overwrite stock only when the column is filled.
+                    $sql = "UPDATE products SET barcode=?, name=?, description=?, category_id=?, unit=?, purchase_price=?, selling_price=?, tax_rate=?, min_stock=?, is_active=1";
+                    $params = [$barcode, $name, $description, $categoryId, $unit, $purchase, $selling, $taxRate, $minStock];
+                    if (trim($stockRaw) !== '') {
+                        $sql .= ", current_stock=?";
+                        $params[] = (int)$this->num($stockRaw);
+                    }
+                    $sql .= " WHERE id=?";
+                    $params[] = $existingId;
+                    $this->db->prepare($sql)->execute($params);
+                    $updated++;
+                } else {
+                    $this->db->prepare("INSERT INTO products (id, reference, barcode, name, description, category_id, unit, purchase_price, selling_price, tax_rate, min_stock, current_stock) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+                        ->execute([
+                            $this->generateUUID(), $reference, $barcode, $name, $description, $categoryId,
+                            $unit, $purchase, $selling, $taxRate, $minStock, (int)$this->num($stockRaw),
+                        ]);
+                    $inserted++;
+                }
+            }
+            $this->db->commit();
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            $this->flash('error', 'Import échoué: ' . $e->getMessage());
+            $this->redirect('/products');
+        }
+
+        $this->flash('success', "Import terminé : $inserted ajouté(s), $updated mis à jour, $skipped ignoré(s).");
+        $this->redirect('/products');
+    }
+
+    /** @return array<string, string> lowercase name => category id */
+    private function loadCategoryCache(): array {
+        $cache = [];
+        foreach ($this->db->query("SELECT id, name FROM categories")->fetchAll() as $c) {
+            $cache[mb_strtolower(trim($c['name']))] = $c['id'];
+        }
+        return $cache;
+    }
+
+    /** Resolve a category by name, creating it when absent. Returns null for blank names. */
+    private function resolveCategory(string $name, array &$cache): ?string {
+        if ($name === '') { return null; }
+        $key = mb_strtolower($name);
+        if (isset($cache[$key])) { return $cache[$key]; }
+        $id = $this->generateUUID();
+        $this->db->prepare("INSERT INTO categories (id, name) VALUES (?, ?)")->execute([$id, $name]);
+        $cache[$key] = $id;
+        return $id;
+    }
+
     public function apiList(): void {
         $this->requireAuth();
         $search = $this->input('q', '');

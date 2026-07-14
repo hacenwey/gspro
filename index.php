@@ -127,6 +127,8 @@ Router::get('/api/dashboard/chart', 'DashboardController', 'chartData');
 
 // Products
 Router::get('/products', 'ProductController', 'index');
+Router::get('/products/import/template', 'ProductController', 'importTemplate');
+Router::post('/products/import', 'ProductController', 'import');
 Router::get('/products/create', 'ProductController', 'create');
 Router::post('/products/store', 'ProductController', 'store');
 Router::get('/products/edit/{id}', 'ProductController', 'edit');
@@ -137,6 +139,8 @@ Router::post('/products/adjust-stock/{id}', 'ProductController', 'adjustStock');
 
 // Categories
 Router::get('/categories', 'CategoryController', 'index');
+Router::get('/categories/import/template', 'CategoryController', 'importTemplate');
+Router::post('/categories/import', 'CategoryController', 'import');
 Router::post('/categories/store', 'CategoryController', 'store');
 Router::post('/categories/update/{id}', 'CategoryController', 'update');
 Router::post('/categories/delete/{id}', 'CategoryController', 'delete');

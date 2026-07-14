@@ -1,6 +1,9 @@
 <div class="toolbar">
     <div></div>
-    <button class="btn btn-primary" onclick="openModal('catModal')"><i class="fas fa-plus"></i> <?= __('categories.new') ?></button>
+    <div class="toolbar-filters">
+        <button class="btn btn-secondary" onclick="openModal('catImportModal')" title="Importer depuis Excel"><i class="fas fa-file-excel"></i> Importer</button>
+        <button class="btn btn-primary" onclick="openModal('catModal')"><i class="fas fa-plus"></i> <?= __('categories.new') ?></button>
+    </div>
 </div>
 
 <div class="card">
@@ -70,6 +73,39 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('catModal')"><?= __('common.cancel') ?></button>
                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <?= __('common.save') ?></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Import Excel Modal -->
+<div class="modal-overlay" id="catImportModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-file-excel"></i> Importer des catégories (Excel)</h3>
+            <button class="modal-close" onclick="closeModal('catImportModal')">&times;</button>
+        </div>
+        <form method="POST" action="<?= url('/categories/import') ?>" enctype="multipart/form-data">
+            <?= csrf_field() ?>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+                    Fichier <strong>.xlsx</strong> avec une ligne d'en-tête. Les catégories sont ajoutées ou mises à jour
+                    selon leur <strong>nom</strong>. La colonne <strong>parent</strong> (facultative) référence une autre catégorie par son nom.
+                </p>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                    Colonnes : <code>name, parent, description</code>
+                </p>
+                <a href="<?= url('/categories/import/template') ?>" class="btn btn-secondary btn-sm" style="margin-bottom: 14px;">
+                    <i class="fas fa-download"></i> Télécharger le modèle
+                </a>
+                <div class="form-group">
+                    <label class="form-label">Fichier Excel (.xlsx) *</label>
+                    <input type="file" name="file" accept=".xlsx" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('catImportModal')"><?= __('common.cancel') ?></button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Importer</button>
             </div>
         </form>
     </div>

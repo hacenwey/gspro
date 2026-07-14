@@ -108,4 +108,71 @@ class Controller {
     protected function flash(string $type, string $message): void {
         $_SESSION['flash'] = ['type' => $type, 'message' => $message];
     }
+
+    // ===================== XLSX IMPORT HELPERS =====================
+
+    /**
+     * Parse the uploaded `file` field as an .xlsx sheet.
+     *
+     * On any problem it sets a flash message, redirects to $redirectPath and
+     * (because redirect() exits) never returns.
+     *
+     * @return array<int, array<int, string>>|null Rows, or null after redirecting.
+     */
+    protected function readUploadedSheet(string $redirectPath): ?array {
+        $file = $_FILES['file'] ?? null;
+        if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            $this->flash('error', 'Aucun fichier valide reçu.');
+            $this->redirect($redirectPath);
+        }
+        if (!preg_match('/\.xlsx$/i', (string)$file['name'])) {
+            $this->flash('error', 'Format non supporté. Utilisez un fichier .xlsx.');
+            $this->redirect($redirectPath);
+        }
+        try {
+            $rows = (new \App\Services\XlsxReader())->read($file['tmp_name']);
+        } catch (\Throwable $e) {
+            $this->flash('error', 'Lecture du fichier échouée: ' . $e->getMessage());
+            $this->redirect($redirectPath);
+            return null;
+        }
+        if (count($rows) < 2) {
+            $this->flash('error', 'Le fichier ne contient aucune ligne de données.');
+            $this->redirect($redirectPath);
+            return null;
+        }
+        return $rows;
+    }
+
+    /**
+     * Build a lowercased header-name => column-index map from the header row.
+     * @return array<string, int>
+     */
+    protected function headerMap(array $headerRow): array {
+        $map = [];
+        foreach ($headerRow as $i => $label) {
+            $key = strtolower(trim((string)$label));
+            if ($key !== '' && !isset($map[$key])) { $map[$key] = $i; }
+        }
+        return $map;
+    }
+
+    /** Read a cell from $row by trying each candidate header name against the map. */
+    protected function cell(array $row, array $col, array $names): string {
+        foreach ($names as $name) {
+            if (isset($col[$name]) && isset($row[$col[$name]])) {
+                return (string)$row[$col[$name]];
+            }
+        }
+        return '';
+    }
+
+    /** Parse a possibly locale-formatted number (comma decimals, thin/regular spaces). */
+    protected function num(string $value, float $default = 0): float {
+        $value = trim($value);
+        if ($value === '') { return (float)$default; }
+        $value = str_replace([' ', "\xC2\xA0"], '', $value);
+        $value = str_replace(',', '.', $value);
+        return is_numeric($value) ? (float)$value : (float)$default;
+    }
 }
