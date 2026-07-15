@@ -36,5 +36,10 @@ defined('DEFAULT_LANG')       || define('DEFAULT_LANG', 'fr');
 // Used by the landing page "Order on WhatsApp" buttons.
 defined('WHATSAPP_ORDER')     || define('WHATSAPP_ORDER', '22232666333');
 
+// Google Search Console ownership token, rendered as a meta tag on the landing.
+// Must stay in place: Google re-checks periodically and drops the property if it
+// disappears. Set to '' to remove the tag.
+defined('GOOGLE_SITE_VERIFICATION') || define('GOOGLE_SITE_VERIFICATION', 'YXDYAYN8Xb7mfIf3rUf713srmXPV_6vjNcCLyrB7rKI');
+
 // Multi-tenant mode
 defined('MULTI_TENANT')       || define('MULTI_TENANT', true);

@@ -322,6 +322,9 @@ if (class_exists('Polar') && Polar::isConfigured()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($t['page_title']) ?></title>
     <meta name="description" content="<?= e($t['page_desc']) ?>">
+    <?php if (defined('GOOGLE_SITE_VERIFICATION') && GOOGLE_SITE_VERIFICATION !== ''): ?>
+    <meta name="google-site-verification" content="<?= e(GOOGLE_SITE_VERIFICATION) ?>">
+    <?php endif; ?>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
