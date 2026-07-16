@@ -50,19 +50,29 @@ $itemClass = ['pending' => 'secondary', 'sent' => 'info', 'preparing' => 'warnin
                 <p><?= __('pos.cart_empty') ?></p>
             </div>
             <?php else: foreach ($items as $it): ?>
-            <div class="pos-cart-item">
+            <?php $isPaid = !empty($it['invoice_id']); ?>
+            <div class="pos-cart-item <?= $isPaid ? 'is-settled' : '' ?>">
+                <?php if (!$locked && !$isPaid): ?>
+                <input type="checkbox" class="split-pick" value="<?= e($it['id']) ?>"
+                       data-total="<?= (float)$it['line_total'] ?>" onchange="refreshSplit()"
+                       title="<?= __('orders.split') ?>" style="width:18px;height:18px;flex-shrink:0;cursor:pointer;">
+                <?php endif; ?>
                 <div class="item-info">
                     <div class="item-name"><?= e($it['description']) ?></div>
                     <div class="item-price">
                         <?= formatMoney($it['unit_price']) ?> × <?= (int)$it['quantity'] ?>
+                        <?php if ($isPaid): ?>
+                        <span class="badge badge-success" style="font-size:9px;margin-left:4px;"><i class="fas fa-check"></i> <?= __('orders.paid_lines') ?></span>
+                        <?php else: ?>
                         <span class="badge badge-<?= $itemClass[$it['status']] ?? 'secondary' ?>" style="font-size:9px;margin-left:4px;"><?= __('orders.status.' . ($it['status'] === 'pending' ? 'open' : $it['status'])) ?></span>
+                        <?php endif; ?>
                     </div>
                     <?php if ($it['notes']): ?>
                     <div style="font-size:11px;color:var(--warning);"><i class="fas fa-comment"></i> <?= e($it['notes']) ?></div>
                     <?php endif; ?>
                 </div>
                 <div class="item-total"><?= formatMoney($it['line_total']) ?></div>
-                <?php if (!$locked && $it['status'] === 'pending'): ?>
+                <?php if (!$locked && !$isPaid && $it['status'] === 'pending'): ?>
                 <form method="POST" action="<?= url('/orders/item/remove/' . $it['id']) ?>" style="display:inline;">
                     <?= csrf_field() ?>
                     <button class="remove-btn" type="submit"><i class="fas fa-times"></i></button>
@@ -76,6 +86,14 @@ $itemClass = ['pending' => 'secondary', 'sent' => 'info', 'preparing' => 'warnin
             <div class="pos-total-row"><span><?= __('invoices.subtotal') ?></span><span class="amount"><?= formatMoney($totals['subtotal']) ?></span></div>
             <div class="pos-total-row"><span><?= __('invoices.tax') ?></span><span class="amount"><?= formatMoney($totals['tax']) ?></span></div>
             <div class="pos-total-row grand-total"><span><?= __('invoices.total_ttc') ?></span><span class="amount"><?= formatMoney($totals['total']) ?></span></div>
+            <?php if (!$locked && $due['total'] < $totals['total'] - 0.001): ?>
+            <div class="pos-total-row" style="color:var(--danger);font-weight:700;">
+                <span><?= __('orders.remaining') ?></span><span class="amount"><?= formatMoney($due['total']) ?></span>
+            </div>
+            <?php endif; ?>
+            <div class="pos-total-row hidden" id="splitRow" style="color:var(--success);font-weight:700;">
+                <span><?= __('orders.selection') ?></span><span class="amount" id="splitTotal">—</span>
+            </div>
         </div>
 
         <?php if (!$locked): ?>
@@ -83,11 +101,16 @@ $itemClass = ['pending' => 'secondary', 'sent' => 'info', 'preparing' => 'warnin
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text-secondary);">
                 <input type="checkbox" id="autoKitchen"> <i class="fas fa-print"></i> <?= __('kticket.autoprint') ?>
             </label>
-            <button class="btn btn-sm btn-secondary" id="reprintKBtn" onclick="reprintKitchen()" disabled><i class="fas fa-receipt"></i> <?= __('kticket.reprint') ?></button>
+            <div style="display:flex;gap:6px;">
+                <button class="btn btn-sm btn-secondary" onclick="selectAllSplit()"><i class="fas fa-check-double"></i> <?= __('orders.select_all') ?></button>
+                <button class="btn btn-sm btn-secondary" onclick="openModal('mergeModal')" <?= empty($mergeable) ? 'disabled' : '' ?>><i class="fas fa-code-merge"></i> <?= __('orders.merge') ?></button>
+                <button class="btn btn-sm btn-secondary" id="reprintKBtn" onclick="reprintKitchen()" disabled><i class="fas fa-receipt"></i> <?= __('kticket.reprint') ?></button>
+            </div>
         </div>
+        <div style="padding:0 16px 8px;font-size:11px;color:var(--text-muted);"><i class="fas fa-circle-info"></i> <?= __('orders.split_hint') ?></div>
         <div class="pos-actions" style="grid-template-columns:1fr 1fr;">
             <button class="btn btn-warning w-100" id="sendBtn" onclick="sendToKitchen()"><i class="fas fa-fire-burner"></i> <?= __('orders.send_kitchen') ?></button>
-            <button class="btn btn-success btn-pay" onclick="openModal('payOrderModal')" <?= empty($items) ? 'disabled' : '' ?>><i class="fas fa-money-bill-wave"></i> <?= __('orders.pay') ?></button>
+            <button class="btn btn-success btn-pay" id="payBtn" onclick="openModal('payOrderModal')" <?= $due['total'] <= 0 ? 'disabled' : '' ?>><i class="fas fa-money-bill-wave"></i> <?= __('orders.pay') ?></button>
         </div>
         <?php endif; ?>
     </div>
@@ -97,12 +120,14 @@ $itemClass = ['pending' => 'secondary', 'sent' => 'info', 'preparing' => 'warnin
 <div class="modal-overlay" id="payOrderModal">
     <div class="modal">
         <div class="modal-header"><h3><?= __('pos.payment') ?></h3><button class="modal-close" onclick="closeModal('payOrderModal')">&times;</button></div>
-        <form method="POST" action="<?= url('/orders/pay/' . $order['id']) ?>">
+        <form method="POST" action="<?= url('/orders/pay/' . $order['id']) ?>" id="payForm">
             <?= csrf_field() ?>
+            <!-- Filled from the ticked lines; empty = settle everything still owed. -->
+            <div id="payItemIds"></div>
             <div class="modal-body">
                 <div style="text-align:center;margin-bottom:20px;">
-                    <div style="font-size:14px;color:var(--text-secondary);"><?= __('pos.total_to_pay') ?></div>
-                    <div style="font-size:36px;font-weight:800;font-family:var(--font-mono);color:var(--primary);"><?= formatMoney($totals['total']) ?></div>
+                    <div style="font-size:14px;color:var(--text-secondary);" id="payLabel"><?= __('pos.total_to_pay') ?></div>
+                    <div style="font-size:36px;font-weight:800;font-family:var(--font-mono);color:var(--primary);" id="payTotalTxt"><?= formatMoney($due['total']) ?></div>
                 </div>
                 <div class="form-group">
                     <label class="form-label"><?= __('pos.payment_method') ?></label>
@@ -117,12 +142,37 @@ $itemClass = ['pending' => 'secondary', 'sent' => 'info', 'preparing' => 'warnin
                 </div>
                 <div class="form-group">
                     <label class="form-label"><?= __('pos.amount_received') ?></label>
-                    <input type="number" name="amount_paid" class="form-control" step="0.01" min="0" value="<?= number_format($totals['total'], 2, '.', '') ?>" style="font-size:22px;font-weight:700;text-align:center;font-family:var(--font-mono);">
+                    <input type="number" name="amount_paid" id="payAmountInput" class="form-control" step="0.01" min="0" value="<?= number_format($due['total'], 2, '.', '') ?>" style="font-size:22px;font-weight:700;text-align:center;font-family:var(--font-mono);">
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('payOrderModal')"><?= __('common.cancel') ?></button>
                 <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> <?= __('pos.validate') ?></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Merge into another open ticket -->
+<div class="modal-overlay" id="mergeModal">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal-header"><h3><i class="fas fa-code-merge"></i> <?= __('orders.merge') ?></h3><button class="modal-close" onclick="closeModal('mergeModal')">&times;</button></div>
+        <form method="POST" action="<?= url('/orders/merge/' . $order['id']) ?>">
+            <?= csrf_field() ?>
+            <div class="modal-body">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;"><?= __('orders.merge_hint') ?></p>
+                <div class="form-group">
+                    <label class="form-label"><?= __('orders.merge_into') ?></label>
+                    <select name="target_id" class="form-control" required>
+                        <?php foreach ($mergeable as $m): ?>
+                        <option value="<?= e($m['id']) ?>"><?= e($m['number']) ?><?= $m['table_name'] ? ' — ' . e($m['table_name']) : '' ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('mergeModal')"><?= __('common.cancel') ?></button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-code-merge"></i> <?= __('orders.merge') ?></button>
             </div>
         </form>
     </div>
@@ -201,6 +251,43 @@ document.getElementById('dishSearch').addEventListener('input', function () {
         c.style.display = (q === '' || c.dataset.name.toLowerCase().includes(q)) ? '' : 'none';
     });
 });
+
+// ============================================================
+// Split bill: tick the dishes this bill covers. No selection means
+// "settle everything still owed", so the common case stays one click.
+// ============================================================
+const DUE_TOTAL = <?= json_encode(round((float)$due['total'], 2)) ?>;
+const L_PAY_ALL = <?= json_encode(__('pos.total_to_pay')) ?>;
+const L_SELECTION = <?= json_encode(__('orders.selection')) ?>;
+
+function pickedItems() {
+    return [...document.querySelectorAll('.split-pick:checked')];
+}
+
+function refreshSplit() {
+    const picked = pickedItems();
+    const sum = picked.reduce((s, c) => s + parseFloat(c.dataset.total || 0), 0);
+    const row = document.getElementById('splitRow');
+    row.classList.toggle('hidden', picked.length === 0);
+    document.getElementById('splitTotal').textContent = formatMoney(sum);
+
+    // The pay dialog follows the selection: partial when some are ticked,
+    // whole remaining balance when none are.
+    const partial = picked.length > 0;
+    document.getElementById('payLabel').textContent = partial ? L_SELECTION : L_PAY_ALL;
+    document.getElementById('payTotalTxt').textContent = formatMoney(partial ? sum : DUE_TOTAL);
+    document.getElementById('payAmountInput').value = (partial ? sum : DUE_TOTAL).toFixed(2);
+
+    const box = document.getElementById('payItemIds');
+    box.innerHTML = picked.map(c => `<input type="hidden" name="item_ids[]" value="${esc(c.value)}">`).join('');
+}
+
+function selectAllSplit() {
+    const boxes = [...document.querySelectorAll('.split-pick')];
+    const allOn = boxes.every(b => b.checked);
+    boxes.forEach(b => { b.checked = !allOn; });
+    refreshSplit();
+}
 
 // ============================================================
 // Kitchen ticket — deliberately price-free: the kitchen needs

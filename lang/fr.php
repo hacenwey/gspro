@@ -514,4 +514,21 @@ return [
     'kticket.reprint' => 'Reimprimer le bon',
     'kticket.waiter' => 'Serveur',
     'kticket.new_items' => 'Nouveaux plats',
+
+    // Split / merge bills
+    'orders.remaining' => 'Reste',
+    'orders.paid_lines' => 'Deja paye',
+    'orders.split' => 'Separer l\'addition',
+    'orders.split_hint' => 'Cochez les plats de cette addition. Les autres restent a payer.',
+    'orders.split_pay' => 'Encaisser la selection',
+    'orders.split_none' => 'Aucun plat selectionne',
+    'orders.select_all' => 'Tout cocher',
+    'orders.pay_all' => 'Tout encaisser',
+    'orders.merge' => 'Fusionner',
+    'orders.merge_into' => 'Fusionner dans',
+    'orders.merge_hint' => 'Les plats non payes seront deplaces vers la commande choisie.',
+    'orders.merged_ok' => 'Commandes fusionnees.',
+    'orders.merged_from' => 'Fusionnee dans',
+    'orders.no_mergeable' => 'Aucune autre commande ouverte',
+    'orders.selection' => 'Selection',
 ];

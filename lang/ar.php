@@ -512,4 +512,21 @@ return [
     'kticket.reprint' => 'إعادة طباعة القسيمة',
     'kticket.waiter' => 'النادل',
     'kticket.new_items' => 'أصناف جديدة',
+
+    // Split / merge bills
+    'orders.remaining' => 'المتبقي',
+    'orders.paid_lines' => 'مدفوع',
+    'orders.split' => 'تقسيم الفاتورة',
+    'orders.split_hint' => 'حدد الأصناف في هذه الفاتورة. الباقي يبقى للدفع.',
+    'orders.split_pay' => 'تحصيل المحدد',
+    'orders.split_none' => 'لم يتم تحديد أي صنف',
+    'orders.select_all' => 'تحديد الكل',
+    'orders.pay_all' => 'تحصيل الكل',
+    'orders.merge' => 'دمج',
+    'orders.merge_into' => 'دمج في',
+    'orders.merge_hint' => 'ستُنقل الأصناف غير المدفوعة إلى الطلب المختار.',
+    'orders.merged_ok' => 'تم دمج الطلبات.',
+    'orders.merged_from' => 'مدموج في',
+    'orders.no_mergeable' => 'لا يوجد طلب مفتوح آخر',
+    'orders.selection' => 'المحدد',
 ];

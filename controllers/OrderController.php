@@ -94,6 +94,14 @@ class OrderController extends Controller {
         ")->fetchAll();
         $categories = $this->db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
 
+        // Other open tickets, so this one can be merged into a table that joined up.
+        $mergeable = $this->db->prepare("
+            SELECT o.id, o.number, t.name AS table_name
+            FROM orders o LEFT JOIN service_tables t ON o.table_id = t.id
+            WHERE o.status NOT IN ('paid','cancelled') AND o.id <> ?
+            ORDER BY o.created_at");
+        $mergeable->execute([$id]);
+
         $this->render('orders/view', [
             'pageTitle'  => $order['number'],
             'order'      => $order,
@@ -101,6 +109,8 @@ class OrderController extends Controller {
             'products'   => $products,
             'categories' => $categories,
             'totals'     => $this->svc()->totals($id),
+            'due'        => $this->svc()->totalsFor($id),   // what is still owed
+            'mergeable'  => $mergeable->fetchAll(),
         ]);
     }
 
@@ -195,8 +205,13 @@ class OrderController extends Controller {
             $this->redirect('/orders/view/' . $id);
         }
 
-        $svc   = $this->svc();
-        $items = $svc->itemsForSale($id);
+        $svc = $this->svc();
+
+        // A split bill posts the lines it covers; no selection means "all that's left".
+        $itemIds = $_POST['item_ids'] ?? null;
+        $itemIds = is_array($itemIds) && $itemIds ? array_map('strval', $itemIds) : null;
+
+        $items = $svc->itemsForSale($id, $itemIds);
         if (!$items) {
             $this->flash('error', __('orders.empty', 'Commande vide.'));
             $this->redirect('/orders/view/' . $id);
@@ -231,17 +246,37 @@ class OrderController extends Controller {
                 $priced['total'], $method, $_SESSION['user_id']
             );
 
-            $svc->markPaid($id, $invoiceId);
+            $svc->settle($id, $itemIds, $invoiceId);
             $this->db->commit();
 
-            $change = max(0, $amountPaid - $priced['total']);
-            $this->flash('success', sprintf('%s %s — %s%s',
+            $change    = max(0, $amountPaid - $priced['total']);
+            $remaining = $svc->totalsFor($id)['total'];
+            $this->flash('success', sprintf('%s %s — %s%s%s',
                 __('orders.paid_ok', 'Encaissee.'), $number, formatMoney($priced['total']),
-                $change > 0 ? ' | ' . __('pos.change') . ': ' . formatMoney($change) : ''));
-            $this->redirect('/orders');
+                $change > 0 ? ' | ' . __('pos.change') . ': ' . formatMoney($change) : '',
+                $remaining > 0 ? ' | ' . __('orders.remaining', 'Reste') . ': ' . formatMoney($remaining) : ''));
+
+            // A partly-settled table stays open on its own ticket.
+            $this->redirect($remaining > 0 ? '/orders/view/' . $id : '/orders');
         } catch (\Throwable $e) {
             $this->db->rollBack();
             $this->flash('error', 'Erreur: ' . $e->getMessage());
+            $this->redirect('/orders/view/' . $id);
+        }
+    }
+
+    /** Merge this ticket into another open one (two tables joining up). */
+    public function merge(string $id): void {
+        $this->guard();
+        if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/orders/view/' . $id); }
+
+        $target = (string)$this->input('target_id', '');
+        try {
+            $this->svc()->merge($id, $target);
+            $this->flash('success', __('orders.merged_ok', 'Commandes fusionnees.'));
+            $this->redirect('/orders/view/' . $target);
+        } catch (\Throwable $e) {
+            $this->flash('error', $e->getMessage());
             $this->redirect('/orders/view/' . $id);
         }
     }

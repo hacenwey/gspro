@@ -514,4 +514,21 @@ return [
     'kticket.reprint' => 'Reprint ticket',
     'kticket.waiter' => 'Waiter',
     'kticket.new_items' => 'New dishes',
+
+    // Split / merge bills
+    'orders.remaining' => 'Remaining',
+    'orders.paid_lines' => 'Already paid',
+    'orders.split' => 'Split the bill',
+    'orders.split_hint' => 'Tick the dishes on this bill. The rest stays to be paid.',
+    'orders.split_pay' => 'Charge selection',
+    'orders.split_none' => 'No dish selected',
+    'orders.select_all' => 'Select all',
+    'orders.pay_all' => 'Charge everything',
+    'orders.merge' => 'Merge',
+    'orders.merge_into' => 'Merge into',
+    'orders.merge_hint' => 'Unpaid dishes will move to the chosen order.',
+    'orders.merged_ok' => 'Orders merged.',
+    'orders.merged_from' => 'Merged into',
+    'orders.no_mergeable' => 'No other open order',
+    'orders.selection' => 'Selection',
 ];

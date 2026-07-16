@@ -181,6 +181,7 @@ Router::post('/orders/item/remove/{id}', 'OrderController', 'removeItem');
 Router::post('/orders/send/{id}', 'OrderController', 'send');
 Router::post('/orders/pay/{id}', 'OrderController', 'pay');
 Router::post('/orders/cancel/{id}', 'OrderController', 'cancel');
+Router::post('/orders/merge/{id}', 'OrderController', 'merge');
 
 Router::get('/kitchen', 'KitchenController', 'index');
 Router::get('/kitchen/feed', 'KitchenController', 'feed');

@@ -191,7 +191,34 @@ final class OrderService
         $this->db->prepare($sql)->execute([$new, $orderId]);
     }
 
-    /** @return array{subtotal:float,tax:float,total:float} */
+    /**
+     * What is still owed, optionally for one bill's selection only.
+     * @param string[]|null $itemIds null = every unpaid line
+     * @return array{subtotal:float,tax:float,total:float}
+     */
+    public function totalsFor(string $orderId, ?array $itemIds = null): array
+    {
+        $sql = "SELECT COALESCE(SUM(unit_price * quantity), 0) AS sub,
+                       COALESCE(SUM(unit_price * quantity * tax_rate / 100), 0) AS tax
+                FROM order_items
+                WHERE order_id = ? AND status <> 'cancelled' AND invoice_id IS NULL";
+        $params = [$orderId];
+        if ($itemIds !== null) {
+            if (!$itemIds) {
+                return ['subtotal' => 0.0, 'tax' => 0.0, 'total' => 0.0];
+            }
+            $sql .= " AND id IN (" . implode(',', array_fill(0, count($itemIds), '?')) . ")";
+            $params = array_merge($params, array_values($itemIds));
+        }
+        $q = $this->db->prepare($sql);
+        $q->execute($params);
+        $r = $q->fetch(PDO::FETCH_ASSOC) ?: ['sub' => 0, 'tax' => 0];
+        $sub = (float)$r['sub'];
+        $tax = (float)$r['tax'];
+        return ['subtotal' => $sub, 'tax' => $tax, 'total' => $sub + $tax];
+    }
+
+    /** Whole-order totals, paid lines included. @return array{subtotal:float,tax:float,total:float} */
     public function totals(string $orderId): array
     {
         $q = $this->db->prepare(
@@ -206,15 +233,45 @@ final class OrderService
         return ['subtotal' => $sub, 'tax' => $tax, 'total' => $sub + $tax];
     }
 
-    /** @return array<int, array{id:string, qty:int}> shape SellService expects */
-    public function itemsForSale(string $orderId): array
+    /**
+     * Lines still to be settled: live, and not yet on an invoice.
+     * @return array<int, array<string, mixed>>
+     */
+    public function unpaidItems(string $orderId): array
     {
         $q = $this->db->prepare(
-            "SELECT product_id, SUM(quantity) AS qty FROM order_items
-             WHERE order_id = ? AND status <> 'cancelled' AND product_id IS NOT NULL
-             GROUP BY product_id"
+            "SELECT * FROM order_items
+             WHERE order_id = ? AND status <> 'cancelled' AND invoice_id IS NULL
+             ORDER BY created_at"
         );
         $q->execute([$orderId]);
+        return $q->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Quantities to move as stock, grouped per product — the shape SellService
+     * expects. Restricted to $itemIds when a bill only covers part of the table.
+     *
+     * @param string[]|null $itemIds null = every unpaid line
+     * @return array<int, array{id:string, qty:int}>
+     */
+    public function itemsForSale(string $orderId, ?array $itemIds = null): array
+    {
+        $sql = "SELECT product_id, SUM(quantity) AS qty FROM order_items
+                WHERE order_id = ? AND status <> 'cancelled' AND product_id IS NOT NULL
+                  AND invoice_id IS NULL";
+        $params = [$orderId];
+        if ($itemIds !== null) {
+            if (!$itemIds) {
+                return [];
+            }
+            $sql .= " AND id IN (" . implode(',', array_fill(0, count($itemIds), '?')) . ")";
+            $params = array_merge($params, array_values($itemIds));
+        }
+        $sql .= " GROUP BY product_id";
+
+        $q = $this->db->prepare($sql);
+        $q->execute($params);
         $out = [];
         foreach ($q->fetchAll(PDO::FETCH_ASSOC) as $r) {
             $out[] = ['id' => (string)$r['product_id'], 'qty' => (int)$r['qty']];
@@ -222,10 +279,68 @@ final class OrderService
         return $out;
     }
 
+    /**
+     * Bind the settled lines to their invoice, then close the order if nothing
+     * is left to pay. Splitting a bill means several invoices per order, so the
+     * line — not the order — is what carries the payment link.
+     *
+     * @param string[]|null $itemIds null = every unpaid line
+     */
+    public function settle(string $orderId, ?array $itemIds, string $invoiceId): void
+    {
+        $sql = "UPDATE order_items SET invoice_id = ?
+                WHERE order_id = ? AND status <> 'cancelled' AND invoice_id IS NULL";
+        $params = [$invoiceId, $orderId];
+        if ($itemIds !== null) {
+            if (!$itemIds) {
+                throw new RuntimeException('Aucune ligne selectionnee.');
+            }
+            $sql .= " AND id IN (" . implode(',', array_fill(0, count($itemIds), '?')) . ")";
+            $params = array_merge($params, array_values($itemIds));
+        }
+        $this->db->prepare($sql)->execute($params);
+
+        // orders.invoice_id keeps the *last* invoice, for a one-click link back;
+        // the full truth of who paid what lives on the lines.
+        if (!$this->unpaidItems($orderId)) {
+            $this->db->prepare("UPDATE orders SET status = 'paid', invoice_id = ?, closed_at = {$this->nowExpr()} WHERE id = ?")
+                ->execute([$invoiceId, $orderId]);
+        } else {
+            $this->db->prepare("UPDATE orders SET invoice_id = ? WHERE id = ?")->execute([$invoiceId, $orderId]);
+        }
+    }
+
+    /** Settle the whole order in one invoice. */
     public function markPaid(string $orderId, string $invoiceId): void
     {
-        $this->db->prepare("UPDATE orders SET status = 'paid', invoice_id = ?, closed_at = {$this->nowExpr()} WHERE id = ?")
-            ->execute([$invoiceId, $orderId]);
+        $this->settle($orderId, null, $invoiceId);
+    }
+
+    /**
+     * Move every line of $sourceId onto $targetId and close the source.
+     *
+     * Only unpaid lines move: a dish already invoiced belongs to the bill that
+     * paid it. The source keeps its number and points at its host, so the merge
+     * stays traceable instead of vanishing.
+     */
+    public function merge(string $sourceId, string $targetId): void
+    {
+        if ($sourceId === $targetId) {
+            throw new RuntimeException('Impossible de fusionner une commande avec elle-meme.');
+        }
+        $this->assertEditable($sourceId);
+        $this->assertEditable($targetId);
+
+        $moved = $this->db->prepare("UPDATE order_items SET order_id = ? WHERE order_id = ? AND invoice_id IS NULL AND status <> 'cancelled'");
+        $moved->execute([$targetId, $sourceId]);
+        if ($moved->rowCount() === 0) {
+            throw new RuntimeException('Aucune ligne a fusionner.');
+        }
+
+        $this->db->prepare("UPDATE orders SET status = 'cancelled', merged_into_id = ?, closed_at = {$this->nowExpr()} WHERE id = ?")
+            ->execute([$targetId, $sourceId]);
+
+        $this->refreshStatus($targetId);
     }
 
     public function cancel(string $orderId): void
@@ -235,7 +350,9 @@ final class OrderService
         if ($cur->fetchColumn() === 'paid') {
             throw new RuntimeException('Une commande encaissee ne peut pas etre annulee.');
         }
-        $this->db->prepare("UPDATE order_items SET status = 'cancelled' WHERE order_id = ?")->execute([$orderId]);
+        // Never touch an invoiced line: cancelling it would rewrite the history of
+        // a bill someone already paid. Only what is still owed gets cancelled.
+        $this->db->prepare("UPDATE order_items SET status = 'cancelled' WHERE order_id = ? AND invoice_id IS NULL")->execute([$orderId]);
         $this->db->prepare("UPDATE orders SET status = 'cancelled', closed_at = {$this->nowExpr()} WHERE id = ?")->execute([$orderId]);
     }
 

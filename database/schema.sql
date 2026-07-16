@@ -361,6 +361,7 @@ CREATE TABLE orders (
     user_id CHAR(36) NOT NULL,
     cash_session_id CHAR(36) NULL,
     invoice_id CHAR(36) NULL,
+    merged_into_id CHAR(36) NULL,
     notes TEXT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     sent_at DATETIME NULL,
@@ -372,7 +373,8 @@ CREATE TABLE orders (
     INDEX idx_orders_created (created_at),
     FOREIGN KEY (table_id) REFERENCES service_tables(id) ON DELETE SET NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
-    FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE SET NULL
+    FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE SET NULL,
+    FOREIGN KEY (merged_into_id) REFERENCES orders(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Per-line status so the kitchen can tick dish by dish, not just whole orders.
@@ -387,8 +389,11 @@ CREATE TABLE order_items (
     line_total DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     status ENUM('pending','preparing','ready','served','cancelled') NOT NULL DEFAULT 'pending',
     notes VARCHAR(255) NULL,
+    invoice_id CHAR(36) NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_order_items_order (order_id),
+    INDEX idx_order_items_invoice (invoice_id),
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

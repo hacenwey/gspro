@@ -38,13 +38,15 @@ final class OrderServiceTest extends TestCase
             CREATE TABLE orders (
                 id TEXT PRIMARY KEY, number TEXT, type TEXT, status TEXT DEFAULT 'open',
                 table_id TEXT, customer_id TEXT, user_id TEXT, cash_session_id TEXT,
-                invoice_id TEXT, notes TEXT, sent_at TEXT, ready_at TEXT, closed_at TEXT
+                invoice_id TEXT, merged_into_id TEXT, notes TEXT,
+                sent_at TEXT, ready_at TEXT, closed_at TEXT
             )");
         $this->pdo->exec("
             CREATE TABLE order_items (
                 id TEXT PRIMARY KEY, order_id TEXT NOT NULL, product_id TEXT,
                 description TEXT, quantity INTEGER, unit_price REAL, tax_rate REAL,
                 line_total REAL, status TEXT DEFAULT 'pending', notes TEXT,
+                invoice_id TEXT,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP
             )");
         $this->svc = new OrderService($this->pdo);
@@ -245,6 +247,127 @@ final class OrderServiceTest extends TestCase
         $this->assertSame('cancelled', $this->statusOf($id));
         $this->assertSame('cancelled', (string)$this->pdo->query("SELECT status FROM order_items")->fetchColumn());
         $this->assertSame([], $this->svc->itemsForSale($id)); // nothing to invoice
+    }
+
+    // ===================== Split & merge =====================
+
+    /** @return string[] ids of the order's lines, in creation order */
+    private function itemIds(string $orderId): array
+    {
+        $q = $this->pdo->prepare("SELECT id FROM order_items WHERE order_id = ? ORDER BY created_at, rowid");
+        $q->execute([$orderId]);
+        return $q->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    public function test_settling_part_of_a_table_leaves_the_rest_owed(): void
+    {
+        $id = $this->newOrder();
+        $this->svc->addItem($id, 'p1', 1);  // 100
+        $this->svc->addItem($id, 'p2', 1);  // 50 + 10% = 55
+        [$first] = $this->itemIds($id);
+
+        $this->svc->settle($id, [$first], 'inv-1');
+
+        // The order stays open — someone still owes for the juice.
+        $this->assertSame('open', $this->statusOf($id));
+        $this->assertEquals(55.0, $this->svc->totalsFor($id)['total']);
+        $this->assertCount(1, $this->svc->unpaidItems($id));
+
+        // ...and the settled dish is off the next bill, and off stock.
+        $this->assertSame([['id' => 'p2', 'qty' => 1]], $this->svc->itemsForSale($id));
+    }
+
+    public function test_order_closes_once_the_last_line_is_settled(): void
+    {
+        $id = $this->newOrder();
+        $this->svc->addItem($id, 'p1', 1);
+        $this->svc->addItem($id, 'p2', 1);
+        [$a, $b] = $this->itemIds($id);
+
+        $this->svc->settle($id, [$a], 'inv-1');
+        $this->assertSame('open', $this->statusOf($id));
+
+        $this->svc->settle($id, [$b], 'inv-2');
+        $this->assertSame('paid', $this->statusOf($id));
+        $this->assertEquals(0.0, $this->svc->totalsFor($id)['total']);
+        $this->assertSame('inv-2', $this->pdo->query("SELECT invoice_id FROM orders")->fetchColumn());
+    }
+
+    public function test_settling_without_a_selection_takes_everything_owed(): void
+    {
+        $id = $this->newOrder();
+        $this->svc->addItem($id, 'p1', 1);
+        $this->svc->addItem($id, 'p2', 2);
+
+        $this->svc->markPaid($id, 'inv-1'); // null selection = all
+        $this->assertSame('paid', $this->statusOf($id));
+        $this->assertSame([], $this->svc->unpaidItems($id));
+    }
+
+    public function test_a_settled_line_is_never_resold_or_cancelled(): void
+    {
+        $id = $this->newOrder();
+        $this->svc->addItem($id, 'p1', 1);
+        $this->svc->addItem($id, 'p2', 1);
+        [$paidLine] = $this->itemIds($id);
+        $this->svc->settle($id, [$paidLine], 'inv-1');
+
+        // Cancelling the table must not rewrite the bill someone already paid.
+        $this->svc->cancel($id);
+        $q = $this->pdo->prepare("SELECT status FROM order_items WHERE id = ?");
+        $q->execute([$paidLine]);
+        $this->assertSame('pending', $q->fetchColumn(), 'an invoiced line must keep its status');
+    }
+
+    public function test_merge_moves_unpaid_lines_and_leaves_a_trail(): void
+    {
+        $a = $this->newOrder();
+        $b = $this->newOrder();
+        $this->svc->addItem($a, 'p1', 1);
+        $this->svc->addItem($b, 'p2', 2);
+
+        $this->svc->merge($b, $a); // b joins a
+
+        $this->assertCount(2, $this->svc->unpaidItems($a));
+        $this->assertSame('cancelled', $this->statusOf($b));
+
+        $q = $this->pdo->prepare("SELECT merged_into_id FROM orders WHERE id = ?");
+        $q->execute([$b]);
+        $this->assertSame($a, $q->fetchColumn(), 'the merged ticket must point at its host');
+    }
+
+    public function test_merge_leaves_already_invoiced_lines_behind(): void
+    {
+        $a = $this->newOrder();
+        $b = $this->newOrder();
+        $this->svc->addItem($b, 'p1', 1);
+        $this->svc->addItem($b, 'p2', 1);
+        [$paid] = $this->itemIds($b);
+        $this->svc->settle($b, [$paid], 'inv-1'); // one dish already paid on b
+
+        $this->svc->merge($b, $a);
+
+        // Only the unpaid dish moves; the paid one stays with the bill that paid it.
+        $this->assertCount(1, $this->svc->unpaidItems($a));
+        $q = $this->pdo->prepare("SELECT order_id FROM order_items WHERE id = ?");
+        $q->execute([$paid]);
+        $this->assertSame($b, $q->fetchColumn());
+    }
+
+    public function test_merge_rejects_self_and_closed_orders(): void
+    {
+        $a = $this->newOrder();
+        $this->svc->addItem($a, 'p1', 1);
+
+        try { $this->svc->merge($a, $a); $this->fail('merged with itself'); }
+        catch (RuntimeException $e) { $this->assertStringContainsString('elle-meme', $e->getMessage()); }
+
+        $b = $this->newOrder();
+        $this->svc->addItem($b, 'p1', 1);
+        $this->svc->markPaid($b, 'inv-9');
+
+        $this->expectException(RuntimeException::class);
+        $this->svc->merge($a, $b); // target already closed
     }
 
     public function test_line_in_the_kitchen_cannot_be_removed(): void
