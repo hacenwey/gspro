@@ -42,7 +42,7 @@ $TR = [
         'nav_admin_title' => 'الإدارة', 'nav_cta' => 'تواصل معنا',
         'hero_h1_1' => 'أدِر تجارتك.', 'hero_h1_2' => 'بسّط يومك.',
         'hero_sub' => 'المنصة المتكاملة للمتاجر والشركات الصغيرة والمتوسطة وأصحاب الخدمات. المخزون، نقاط البيع، الفواتير، العملاء والمالية — أداة واحدة، جاهزة في 30 ثانية.',
-        'hero_trust1' => 'دون التزام', 'hero_trust2' => 'بدون بطاقة بنكية مطلوبة',
+        'hero_trust1' => 'يعمل حتى بدون إنترنت', 'hero_trust2' => 'بدون بطاقة بنكية مطلوبة',
         'hero_trust3' => 'متوفر بالعربية والفرنسية والإنجليزية',
         'hero_cta1' => 'أنشئ مساحة عملي', 'hero_cta2' => 'شاهد العرض',
         'stat_businesses' => 'شركات نشطة', 'stat_signup' => 'للتسجيل', 'stat_uptime' => 'التشغيل', 'stat_access' => 'الوصول',
@@ -56,7 +56,20 @@ $TR = [
         'feat3_t' => 'عروض الأسعار والفواتير', 'feat3_d' => 'أنشئ عروض أسعار، حوّلها إلى فواتير، وأصدر ملفات PDF احترافية في ثوانٍ.',
         'feat4_t' => 'متابعة الديون', 'feat4_d' => 'أدِر مستحقات العملاء والموردين. اعرف من يدين لك وبماذا في أي وقت.',
         'feat5_t' => 'لوحات معلومات وتقارير', 'feat5_d' => 'اتجاهات الإيرادات، أفضل المنتجات، وضع الخزينة — رؤى واضحة بنظرة واحدة.',
-        'feat6_t' => '3 لغات', 'feat6_d' => 'واجهة كاملة بالعربية والفرنسية والإنجليزية مع دعم أصلي للكتابة من اليمين لليسار. بدّل بنقرة واحدة.',
+        // Slot 6 sells offline rather than languages: it is the real differentiator,
+        // and the language mention already lives in the hero and the FAQ.
+        'feat6_t' => 'يعمل دون اتصال', 'feat6_d' => 'الصندوق يواصل البيع حتى بدون إنترنت. تتم مزامنة المبيعات تلقائياً بمجرد عودة الشبكة.',
+        // Problem-first section — each pain maps to a feature above it.
+        'prob_label' => 'هل يبدو مألوفاً؟', 'prob_title' => 'الصداع الذي يعرفه كل تاجر',
+        'prob_desc' => 'إذا وجدت نفسك في واحدة فقط من هذه النقاط، فإن GestionPro صُنع لك.',
+        'prob1_t' => 'البيع بالأجل دون رؤية واضحة',
+        'prob1_d' => 'دفتر وقصاصات، وفي آخر الشهر لم تعد تعرف من يدين لك وبكم — ولا منذ متى.',
+        'prob2_t' => 'نفاد المخزون يكتشفه الزبون',
+        'prob2_d' => 'تعرف أن صنفاً ما نفد عندما يطلبه الزبون. مخزونك في ذاكرتك، لا في جدول.',
+        'prob3_t' => 'أرقام غامضة عند الإغلاق',
+        'prob3_d' => 'كم بعت فعلاً اليوم؟ ما الذي ينجح؟ هل تربح؟ أنت تخمّن.',
+        'prob4_t' => 'الاتصال الذي ينقطع',
+        'prob4_d' => 'ينقطع الإنترنت فيتوقف الصندوق. زبائنك ينتظرون بينما تسجّل على ورقة.',
         'how_label' => 'البدء', 'how_title' => 'جاهز في 30 ثانية',
         'step1_t' => 'أنشئ مساحة عملك', 'step1_d' => 'تواصل معنا عبر واتساب: يُنشئ فريقنا مساحة عملك ويرافقك. لا حاجة لبطاقة بنكية.',
         'step2_t' => 'أضف منتجاتك', 'step2_d' => 'استورد كتالوجك، حدّد الأسعار ومستويات المخزون الافتتاحية.',
@@ -121,7 +134,7 @@ $TR = [
         'nav_admin_title' => 'Administration', 'nav_cta' => 'Nous contacter',
         'hero_h1_1' => 'Gérez votre activité.', 'hero_h1_2' => 'Simplifiez votre journée.',
         'hero_sub' => 'La plateforme tout-en-un pour boutiques, PME et prestataires de services. Stock, caisse, factures, clients et finances — un seul outil, prêt en 30 secondes.',
-        'hero_trust1' => 'Sans engagement', 'hero_trust2' => 'Aucune carte bancaire requise',
+        'hero_trust1' => 'Fonctionne même sans internet', 'hero_trust2' => 'Aucune carte bancaire requise',
         'hero_trust3' => 'Disponible en arabe, français et anglais',
         'hero_cta1' => 'Créer mon espace', 'hero_cta2' => 'Voir la démo',
         'stat_businesses' => 'Entreprises actives', 'stat_signup' => 'Inscription', 'stat_uptime' => 'Disponibilité', 'stat_access' => 'Accès',
@@ -135,7 +148,20 @@ $TR = [
         'feat3_t' => 'Devis & Factures', 'feat3_d' => 'Créez des devis, convertissez-les en factures, générez des PDF professionnels en quelques secondes.',
         'feat4_t' => 'Suivi des crédits', 'feat4_d' => 'Gérez les créances clients et les dettes fournisseurs. Sachez qui vous doit quoi, à tout moment.',
         'feat5_t' => 'Tableaux de bord & rapports', 'feat5_d' => 'Tendances du chiffre d\'affaires, meilleurs produits, situation de trésorerie — des analyses claires en un coup d\'œil.',
-        'feat6_t' => '3 langues', 'feat6_d' => 'Interface complète en arabe, français et anglais avec support RTL natif. Changez en un clic.',
+        // Slot 6 sells offline rather than languages: it is the real differentiator,
+        // and the language mention already lives in the hero and the FAQ.
+        'feat6_t' => 'Fonctionne hors ligne', 'feat6_d' => 'La caisse continue d\'encaisser même sans internet. Les ventes se synchronisent toutes seules dès que le réseau revient.',
+        // Problem-first section — each pain maps to a feature above it.
+        'prob_label' => 'Ça vous parle ?', 'prob_title' => 'Les casse-têtes que tout commerçant connaît',
+        'prob_desc' => 'Si vous vous reconnaissez dans un seul de ces points, GestionPro est fait pour vous.',
+        'prob1_t' => 'Vendre à crédit, à l\'aveugle',
+        'prob1_d' => 'Un carnet, des ardoises, et en fin de mois vous ne savez plus qui vous doit quoi — ni depuis quand.',
+        'prob2_t' => 'La rupture découverte par le client',
+        'prob2_d' => 'Vous apprenez qu\'un article manque quand on vous le demande. Votre stock est dans votre tête, pas dans un tableau.',
+        'prob3_t' => 'Des chiffres flous à la fermeture',
+        'prob3_d' => 'Combien avez-vous vraiment vendu aujourd\'hui ? Qu\'est-ce qui marche ? Gagnez-vous de l\'argent ? Vous devinez.',
+        'prob4_t' => 'La connexion qui lâche',
+        'prob4_d' => 'Internet saute et la caisse s\'arrête. Vos clients attendent pendant que vous notez sur un bout de papier.',
         'how_label' => 'Prise en main', 'how_title' => 'Prêt en 30 secondes',
         'step1_t' => 'Créez votre espace', 'step1_d' => 'Contactez-nous sur WhatsApp : notre équipe crée votre espace et vous accompagne. Aucune carte bancaire requise.',
         'step2_t' => 'Ajoutez vos produits', 'step2_d' => 'Importez votre catalogue, définissez les prix et les stocks de départ.',
@@ -200,7 +226,7 @@ $TR = [
         'nav_admin_title' => 'Administration', 'nav_cta' => 'Contact us',
         'hero_h1_1' => 'Run your business.', 'hero_h1_2' => 'Simplify your day.',
         'hero_sub' => 'The all-in-one platform for shops, SMBs and service businesses. Stock, POS, invoices, clients and finance — one tool, ready in 30 seconds.',
-        'hero_trust1' => 'No commitment', 'hero_trust2' => 'No bank card required',
+        'hero_trust1' => 'Works even without internet', 'hero_trust2' => 'No bank card required',
         'hero_trust3' => 'Available in Arabic, French and English',
         'hero_cta1' => 'Create my workspace', 'hero_cta2' => 'See the demo',
         'stat_businesses' => 'Active businesses', 'stat_signup' => 'Sign-up', 'stat_uptime' => 'Uptime', 'stat_access' => 'Access',
@@ -214,7 +240,20 @@ $TR = [
         'feat3_t' => 'Quotes & Invoices', 'feat3_d' => 'Create quotes, convert them to invoices, generate professional PDFs in seconds.',
         'feat4_t' => 'Credit tracking', 'feat4_d' => 'Manage customer receivables and supplier payables. Know who owes you what, anytime.',
         'feat5_t' => 'Dashboards & reports', 'feat5_d' => 'Revenue trends, top products, cash positions — clear insights at a glance.',
-        'feat6_t' => '3 languages', 'feat6_d' => 'Full interface in Arabic, French and English with native RTL support. Switch in one click.',
+        // Slot 6 sells offline rather than languages: it is the real differentiator,
+        // and the language mention already lives in the hero and the FAQ.
+        'feat6_t' => 'Works offline', 'feat6_d' => 'The till keeps selling with no internet. Sales sync on their own the moment the connection is back.',
+        // Problem-first section — each pain maps to a feature above it.
+        'prob_label' => 'Sound familiar?', 'prob_title' => 'The headaches every shop owner knows',
+        'prob_desc' => 'If even one of these rings true, GestionPro was built for you.',
+        'prob1_t' => 'Selling on credit, blind',
+        'prob1_d' => 'A notebook, scraps of paper — and by month end you no longer know who owes you what, or since when.',
+        'prob2_t' => 'Stock-outs your customer finds first',
+        'prob2_d' => 'You learn an item ran out when someone asks for it. Your stock lives in your head, not in a table.',
+        'prob3_t' => 'Fuzzy numbers at closing',
+        'prob3_d' => 'How much did you really sell today? What works? Are you making money? You guess.',
+        'prob4_t' => 'The connection that drops',
+        'prob4_d' => 'The internet cuts out and the till stops. Your customers wait while you scribble on paper.',
         'how_label' => 'Getting started', 'how_title' => 'Ready in 30 seconds',
         'step1_t' => 'Create your workspace', 'step1_d' => 'Message us on WhatsApp: our team sets up your workspace and guides you. No bank card required.',
         'step2_t' => 'Add your products', 'step2_d' => 'Import your catalogue, set prices and opening stock levels.',
@@ -424,6 +463,15 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         .feat-icon.i4{background:rgba(14,165,233,.1);color:#0EA5E9}
         .feat-icon.i5{background:rgba(239,68,68,.1);color:#EF4444}
         .feat-icon.i6{background:rgba(168,85,247,.1);color:#A855F7}
+
+        /* Problem-first section: name the pain before selling the cure. */
+        .prob-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+        .prob-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+        .prob-card{display:flex;gap:16px;align-items:flex-start;padding:24px;border-radius:16px;background:var(--bg);border:1px solid var(--border);transition:all .25s}
+        .prob-card:hover{border-color:var(--primary-200);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+        .prob-card .ic{flex:0 0 44px;height:44px;border-radius:12px;background:rgba(239,68,68,.09);color:var(--danger);display:flex;align-items:center;justify-content:center;font-size:17px}
+        .prob-card h3{font-size:16px;font-weight:700;margin-bottom:6px;letter-spacing:-.2px}
+        .prob-card p{font-size:14px;color:var(--text-secondary);line-height:1.65}
         .feat-card h3{font-size:17px;font-weight:700;margin-bottom:8px}
         .feat-card p{font-size:14px;color:var(--text-secondary);line-height:1.65}
 
@@ -527,7 +575,7 @@ if (class_exists('Polar') && Polar::isConfigured()) {
 
         /* ===== RESPONSIVE ===== */
         @media (max-width:900px){
-            .features-grid,.steps,.trust-grid{grid-template-columns:1fr}
+            .features-grid,.steps,.trust-grid,.prob-grid{grid-template-columns:1fr}
             .pricing-grid{grid-template-columns:1fr}
             .trust-grid{grid-template-columns:repeat(2,1fr)}
             .hero-stats{grid-template-columns:repeat(2,1fr);gap:14px}
@@ -644,6 +692,34 @@ if (class_exists('Polar') && Polar::isConfigured()) {
     </div>
 </section>
 
+<!-- PROBLEMS — name the pain first, then sell the cure -->
+<section class="pad prob-section">
+    <div class="container">
+        <div class="section-label"><i class="fas fa-circle-question"></i> <?= e($t['prob_label']) ?></div>
+        <div class="section-title"><?= e($t['prob_title']) ?></div>
+        <div class="section-desc"><?= e($t['prob_desc']) ?></div>
+
+        <div class="prob-grid">
+            <div class="prob-card">
+                <div class="ic"><i class="fas fa-hand-holding-dollar"></i></div>
+                <div><h3><?= e($t['prob1_t']) ?></h3><p><?= e($t['prob1_d']) ?></p></div>
+            </div>
+            <div class="prob-card">
+                <div class="ic"><i class="fas fa-boxes-stacked"></i></div>
+                <div><h3><?= e($t['prob2_t']) ?></h3><p><?= e($t['prob2_d']) ?></p></div>
+            </div>
+            <div class="prob-card">
+                <div class="ic"><i class="fas fa-chart-line"></i></div>
+                <div><h3><?= e($t['prob3_t']) ?></h3><p><?= e($t['prob3_d']) ?></p></div>
+            </div>
+            <div class="prob-card">
+                <div class="ic"><i class="fas fa-wifi"></i></div>
+                <div><h3><?= e($t['prob4_t']) ?></h3><p><?= e($t['prob4_d']) ?></p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- FEATURES -->
 <section class="pad" id="features">
     <div class="container">
@@ -656,6 +732,11 @@ if (class_exists('Polar') && Polar::isConfigured()) {
                 <div class="feat-icon i1"><i class="fas fa-cash-register"></i></div>
                 <h3><?= e($t['feat1_t']) ?></h3>
                 <p><?= e($t['feat1_d']) ?></p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon i6"><i class="fas fa-wifi"></i></div>
+                <h3><?= e($t['feat6_t']) ?></h3>
+                <p><?= e($t['feat6_d']) ?></p>
             </div>
             <div class="feat-card">
                 <div class="feat-icon i2"><i class="fas fa-boxes-stacked"></i></div>
@@ -676,11 +757,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
                 <div class="feat-icon i5"><i class="fas fa-chart-line"></i></div>
                 <h3><?= e($t['feat5_t']) ?></h3>
                 <p><?= e($t['feat5_d']) ?></p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon i6"><i class="fas fa-language"></i></div>
-                <h3><?= e($t['feat6_t']) ?></h3>
-                <p><?= e($t['feat6_d']) ?></p>
             </div>
         </div>
     </div>
