@@ -12,6 +12,7 @@ require_once __DIR__ . '/core/LoginLog.php';
 require_once __DIR__ . '/core/GeoCurrency.php';
 require_once __DIR__ . '/core/Polar.php';
 require_once __DIR__ . '/core/ProductFeatures.php';
+require_once __DIR__ . '/core/Settings.php';
 require_once __DIR__ . '/core/helpers.php';
 require_once __DIR__ . '/core/Lang.php';
 require_once __DIR__ . '/core/Controller.php';

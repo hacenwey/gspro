@@ -42,5 +42,13 @@ defined('WHATSAPP_ORDER')     || define('WHATSAPP_ORDER', '22232666333');
 // Whichever proof is used must stay in place: Google re-checks periodically.
 defined('GOOGLE_SITE_VERIFICATION') || define('GOOGLE_SITE_VERIFICATION', '');
 
+// Business vertical, per tenant (settings key 'business_type'). GestionPro is
+// horizontal: a clothing shop must not see tables and a kitchen screen, so the
+// restaurant module is gated on this. Retail stays the default.
+defined('BUSINESS_RETAIL')     || define('BUSINESS_RETAIL', 'retail');
+defined('BUSINESS_RESTAURANT') || define('BUSINESS_RESTAURANT', 'restaurant');
+defined('BUSINESS_TYPES')      || define('BUSINESS_TYPES', [BUSINESS_RETAIL, BUSINESS_RESTAURANT]);
+defined('BUSINESS_TYPE_DEFAULT') || define('BUSINESS_TYPE_DEFAULT', BUSINESS_RETAIL);
+
 // Multi-tenant mode
 defined('MULTI_TENANT')       || define('MULTI_TENANT', true);

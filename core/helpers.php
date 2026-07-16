@@ -76,6 +76,17 @@ function roleHome(): string {
     return hasRole(ROLE_CASHIER) ? '/caisse' : '/dashboard';
 }
 
+/** Tenant's business vertical. Unknown/empty values fall back to retail. */
+function businessType(): string {
+    $t = class_exists('Settings') ? Settings::get('business_type', BUSINESS_TYPE_DEFAULT) : BUSINESS_TYPE_DEFAULT;
+    return in_array($t, BUSINESS_TYPES, true) ? $t : BUSINESS_TYPE_DEFAULT;
+}
+
+/** Gate for the restaurant module (orders, tables, kitchen screen). */
+function isRestaurant(): bool {
+    return businessType() === BUSINESS_RESTAURANT;
+}
+
 function csrf_token(): string {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

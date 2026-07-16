@@ -96,6 +96,15 @@ class SettingsController extends Controller {
             $_SESSION['lang'] = $lang;
         }
 
+        // Business vertical: whitelisted like the language — an unknown value would
+        // silently disable the module it gates.
+        $biz = $this->input('business_type', '');
+        if (in_array($biz, BUSINESS_TYPES, true)) {
+            $this->db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('business_type', ?) ON DUPLICATE KEY UPDATE setting_value = ?")
+                ->execute([$biz, $biz]);
+        }
+
+        Settings::flush(); // cached for the request — drop it so the redirect reads fresh values
         $this->flash('success', 'Parametres mis a jour.');
         $this->redirect('/settings');
     }

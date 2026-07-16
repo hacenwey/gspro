@@ -118,6 +118,24 @@ $statusLabel = match($subStatus) {
                     </select>
                     <small style="color: var(--text-muted); font-size: 12px;"><?= __('settings.language_hint') ?></small>
                 </div>
+                <div class="form-group">
+                    <label class="form-label"><?= __('settings.business_type') ?></label>
+                    <?php
+                    $__bizNames = [
+                        BUSINESS_RETAIL     => __('settings.business.retail'),
+                        BUSINESS_RESTAURANT => __('settings.business.restaurant'),
+                    ];
+                    $__curBiz = $settings['business_type'] ?? BUSINESS_TYPE_DEFAULT;
+                    ?>
+                    <select name="business_type" class="form-control">
+                        <?php foreach (BUSINESS_TYPES as $__bt): ?>
+                        <option value="<?= e($__bt) ?>" <?= $__curBiz === $__bt ? 'selected' : '' ?>>
+                            <?= e($__bizNames[$__bt] ?? $__bt) ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small style="color: var(--text-muted); font-size: 12px;"><?= __('settings.business_type_hint') ?></small>
+                </div>
                 <button type="submit" class="btn btn-primary mt-2"><i class="fas fa-save"></i> <?= __('common.save') ?></button>
             </form>
         </div>
