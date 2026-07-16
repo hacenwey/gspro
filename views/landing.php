@@ -38,7 +38,7 @@ $TR = [
         'cur' => 'أوقية',
         'page_title' => 'GestionPro — برنامج إدارة الأعمال المتكامل',
         'page_desc' => 'أدِر المخزون والفواتير ونقاط البيع والعملاء. أداة واحدة لتجارتك — اطلب عبر واتساب، دون التزام.',
-        'nav_features' => 'المميزات', 'nav_pricing' => 'الأسعار', 'nav_faq' => 'الأسئلة الشائعة',
+        'nav_features' => 'المميزات', 'nav_faq' => 'الأسئلة الشائعة',
         'nav_admin_title' => 'الإدارة', 'nav_cta' => 'تواصل معنا',
         'hero_h1_1' => 'أدِر تجارتك.', 'hero_h1_2' => 'بسّط يومك.',
         'hero_sub' => 'المنصة المتكاملة للمتاجر والشركات الصغيرة والمتوسطة وأصحاب الخدمات. المخزون، نقاط البيع، الفواتير، العملاء والمالية — أداة واحدة، جاهزة في 30 ثانية.',
@@ -74,21 +74,7 @@ $TR = [
         'step1_t' => 'أنشئ مساحة عملك', 'step1_d' => 'تواصل معنا عبر واتساب: يُنشئ فريقنا مساحة عملك ويرافقك. لا حاجة لبطاقة بنكية.',
         'step2_t' => 'أضف منتجاتك', 'step2_d' => 'استورد كتالوجك، حدّد الأسعار ومستويات المخزون الافتتاحية.',
         'step3_t' => 'ابدأ البيع', 'step3_d' => 'استخدم نقاط البيع، أصدر فواتير للعملاء، وتابع أموالك في الوقت الفعلي.',
-        'price_label' => 'الأسعار', 'price_title' => 'خطة لكل نشاط تجاري',
-        'price_desc' => 'اختر باقتك و<strong>اطلب عبر واتساب</strong>. فريقنا يرافقك، دون أي التزام.',
-        'plan_starter' => 'المبتدئ', 'plan_starter_d' => 'للشركات الصغيرة والمتوسطة النامية',
-        'plan_pro' => 'المحترف', 'plan_pro_d' => 'للفرق الأكبر',
-        'per_month' => '/ شهر', 'billed_monthly' => 'فوترة شهرية', 'per_year' => '/ سنة', 'billed_yearly' => 'فوترة سنوية',
-        'plan_secure' => 'اطلب عبر واتساب',
         // Bullets shown on the live Polar plan cards when no custom list is set in /admin/polar.
-        'feat_b1' => 'نقاط بيع + فواتير غير محدودة', 'feat_b2' => 'منتجات، مخزون، عملاء، موردون',
-        'feat_b3' => 'فواتير PDF + تصدير CSV', 'feat_b4' => 'متعدد المستخدمين و3 لغات',
-        'feat_b5' => 'مرافقة عبر واتساب',
-        'starter_b1' => '5 مستخدمين', 'starter_b2' => '500 منتج', 'starter_b3' => 'نقاط بيع + فواتير غير محدودة',
-        'starter_b4' => 'دعم ذو أولوية', 'starter_b5' => 'بدون التزام',
-        'pro_b1' => '15 مستخدماً', 'pro_b2' => '5000 منتج', 'pro_b3' => 'كل ما في خطة المبتدئ',
-        'pro_b4' => 'دعم على مدار الساعة', 'pro_b5' => 'تقارير متقدمة',
-        'pricing_note' => 'جميع الأسعار بالأوقية (MRU). دون التزام — لا حاجة لبطاقة بنكية.',
         'trust_label' => 'الأمان', 'trust_title' => 'بياناتك محميّة',
         'trust_desc' => 'تشفير ونسخ احتياطي وعزل للبيانات — نشاطك يستحق بنية تحتية متينة.',
         'trust1_t' => 'HTTPS في كل مكان', 'trust1_d' => 'اتصالات مشفّرة بـ TLS 1.3 على كل صفحة وكل طلب API.',
@@ -121,16 +107,37 @@ $TR = [
         'js_created_err' => 'تم إنشاء مساحة العمل لكن تعذّر المتابعة تلقائياً. يرجى تسجيل الدخول.',
         'js_conn_err' => 'خطأ في الاتصال. يرجى المحاولة مرة أخرى.',
         'popular' => '\2B50 الأكثر شيوعاً',
-        'wa_order' => 'اطلب عبر واتساب', 'wa_start' => 'ابدأ عبر واتساب', 'wa_contact' => 'تواصل معنا عبر واتساب',
+        'wa_start' => 'ابدأ عبر واتساب', 'wa_contact' => 'تواصل معنا عبر واتساب',
         'wa_msg_general' => 'مرحباً، أرغب في معرفة المزيد عن GestionPro.',
-        'wa_msg_plan' => 'مرحباً، أرغب في طلب باقة « %s » من GestionPro.',
         'wa_note' => 'اطلب عبر واتساب وسيتواصل معك فريقنا لإتمام طلبك.',
+        // Use cases per business
+        'nav_usecases' => 'لمن؟',
+        'uc_label' => 'لمن؟', 'uc_title' => 'لكل مهنة قواعدها',
+        'uc_desc' => 'يتكيف GestionPro مع نشاطك: فعّل ما تحتاجه فقط.',
+        'uc1_t' => 'متجر وتجارة', 'uc1_sub' => 'مواد غذائية، أدوات، ملابس، تجميل...',
+        'uc1_b1' => 'صندوق سريع مع قارئ الباركود',
+        'uc1_b2' => 'مخزون لحظي وتنبيهات النفاد',
+        'uc1_b3' => 'ديون الزبائن: من يدين وبكم ومنذ متى',
+        'uc1_b4' => 'إيصالات مطبوعة وفواتير PDF',
+        'uc1_b5' => 'يواصل البيع حتى لو انقطع الإنترنت',
+        'uc2_t' => 'مطعم ومقهى وحلويات', 'uc2_sub' => 'قاعة، وجبات سريعة، عصائر، تموين...',
+        'uc2_b1' => 'طلبات حسب الطاولة أو سفري أو توصيل',
+        'uc2_b2' => 'شاشة مطبخ وبون يطبع عند الإرسال',
+        'uc2_b3' => 'ملاحظات لكل صنف: بدون بصل، ناضج جيدا...',
+        'uc2_b4' => 'تقسيم أو دمج الفواتير',
+        'uc2_b5' => 'حساب طاه محصور في شاشته',
+        'uc3_t' => 'خدمات وحرفيون', 'uc3_sub' => 'ورشات، مقدمو خدمات، مهن حرة...',
+        'uc3_b1' => 'عرض سعر يتحول إلى فاتورة بنقرة',
+        'uc3_b2' => 'فواتير PDF بترويسة مؤسستك',
+        'uc3_b3' => 'متابعة المدفوعات والمتأخرات',
+        'uc3_b4' => 'ملف الزبائن والسجل الكامل',
+        'uc3_b5' => 'تصدير CSV لمحاسبك',
     ],
     'fr' => [
         'cur' => 'MRU',
         'page_title' => 'GestionPro — Logiciel de gestion d\'entreprise tout-en-un',
         'page_desc' => 'Gérez stock, factures, caisse et clients. Un seul outil pour votre activité — commandez sur WhatsApp, sans engagement.',
-        'nav_features' => 'Fonctionnalités', 'nav_pricing' => 'Tarifs', 'nav_faq' => 'FAQ',
+        'nav_features' => 'Fonctionnalités', 'nav_faq' => 'FAQ',
         'nav_admin_title' => 'Administration', 'nav_cta' => 'Nous contacter',
         'hero_h1_1' => 'Gérez votre activité.', 'hero_h1_2' => 'Simplifiez votre journée.',
         'hero_sub' => 'La plateforme tout-en-un pour boutiques, PME et prestataires de services. Stock, caisse, factures, clients et finances — un seul outil, prêt en 30 secondes.',
@@ -166,21 +173,7 @@ $TR = [
         'step1_t' => 'Créez votre espace', 'step1_d' => 'Contactez-nous sur WhatsApp : notre équipe crée votre espace et vous accompagne. Aucune carte bancaire requise.',
         'step2_t' => 'Ajoutez vos produits', 'step2_d' => 'Importez votre catalogue, définissez les prix et les stocks de départ.',
         'step3_t' => 'Commencez à vendre', 'step3_d' => 'Utilisez la caisse, facturez vos clients, suivez vos finances en temps réel.',
-        'price_label' => 'Tarifs', 'price_title' => 'Une offre pour chaque activité',
-        'price_desc' => 'Choisissez votre offre et <strong>commandez sur WhatsApp</strong>. Notre équipe vous accompagne, sans engagement.',
-        'plan_starter' => 'Starter', 'plan_starter_d' => 'Pour PME en croissance',
-        'plan_pro' => 'Pro', 'plan_pro_d' => 'Pour les grandes équipes',
-        'per_month' => '/ mois', 'billed_monthly' => 'Facturé mensuellement', 'per_year' => '/ an', 'billed_yearly' => 'Facturé annuellement',
-        'plan_secure' => 'Commandez sur WhatsApp',
         // Bullets shown on the live Polar plan cards when no custom list is set in /admin/polar.
-        'feat_b1' => 'Caisse + factures illimitées', 'feat_b2' => 'Produits, stock, clients, fournisseurs',
-        'feat_b3' => 'Factures PDF + exports CSV', 'feat_b4' => 'Multi-utilisateurs et 3 langues',
-        'feat_b5' => 'Accompagnement sur WhatsApp',
-        'starter_b1' => '5 utilisateurs', 'starter_b2' => '500 produits', 'starter_b3' => 'Caisse + factures illimitées',
-        'starter_b4' => 'Support prioritaire', 'starter_b5' => 'Sans engagement',
-        'pro_b1' => '15 utilisateurs', 'pro_b2' => '5 000 produits', 'pro_b3' => 'Tout de Starter',
-        'pro_b4' => 'Support 24/7', 'pro_b5' => 'Rapports avancés',
-        'pricing_note' => 'Tous les prix en MRU. Sans engagement — aucune carte bancaire requise.',
         'trust_label' => 'Sécurité', 'trust_title' => 'Vos données sont protégées',
         'trust_desc' => 'Chiffrement, sauvegardes et isolation des données — votre activité mérite une infrastructure solide.',
         'trust1_t' => 'HTTPS partout', 'trust1_d' => 'Connexions chiffrées TLS 1.3 sur chaque page et appel API.',
@@ -213,16 +206,37 @@ $TR = [
         'js_created_err' => 'Espace créé mais impossible de continuer automatiquement. Veuillez vous connecter.',
         'js_conn_err' => 'Erreur de connexion. Veuillez réessayer.',
         'popular' => '\2B50 Le plus populaire',
-        'wa_order' => 'Commander sur WhatsApp', 'wa_start' => 'Démarrer sur WhatsApp', 'wa_contact' => 'Nous contacter sur WhatsApp',
+        'wa_start' => 'Démarrer sur WhatsApp', 'wa_contact' => 'Nous contacter sur WhatsApp',
         'wa_msg_general' => 'Bonjour, je souhaite en savoir plus sur GestionPro.',
-        'wa_msg_plan' => 'Bonjour, je souhaite commander le pack « %s » de GestionPro.',
         'wa_note' => 'Commandez sur WhatsApp et notre équipe vous recontacte pour finaliser votre commande.',
+        // Use cases per business
+        'nav_usecases' => 'Pour qui',
+        'uc_label' => 'Pour qui', 'uc_title' => 'Chaque metier a ses regles',
+        'uc_desc' => 'GestionPro s\'adapte a votre activite : vous n\'activez que ce dont vous avez besoin.',
+        'uc1_t' => 'Boutique & commerce', 'uc1_sub' => 'Alimentation, quincaillerie, vetements, cosmetiques...',
+        'uc1_b1' => 'Caisse rapide avec scan de code-barres',
+        'uc1_b2' => 'Stock en temps reel et alertes de rupture',
+        'uc1_b3' => 'Credits clients : qui doit quoi, depuis quand',
+        'uc1_b4' => 'Tickets imprimes et factures PDF',
+        'uc1_b5' => 'Encaisse meme quand internet tombe',
+        'uc2_t' => 'Restaurant, cafe & patisserie', 'uc2_sub' => 'Salle, snack, jus, traiteur...',
+        'uc2_b1' => 'Commandes par table, a emporter ou en livraison',
+        'uc2_b2' => 'Ecran cuisine + bon imprime a l\'envoi',
+        'uc2_b3' => 'Notes par plat : sans oignon, bien cuit...',
+        'uc2_b4' => 'Separer ou fusionner les additions',
+        'uc2_b5' => 'Compte cuisinier limite a son ecran',
+        'uc3_t' => 'Services & artisans', 'uc3_sub' => 'Ateliers, prestataires, professions liberales...',
+        'uc3_b1' => 'Devis converti en facture en un clic',
+        'uc3_b2' => 'Factures PDF a votre en-tete',
+        'uc3_b3' => 'Suivi des paiements et des impayes',
+        'uc3_b4' => 'Fichier clients et historique complet',
+        'uc3_b5' => 'Exports CSV pour votre comptable',
     ],
     'en' => [
         'cur' => 'MRU',
         'page_title' => 'GestionPro — All-in-one business management software',
         'page_desc' => 'Manage stock, invoices, POS and clients. One tool for your business — order on WhatsApp, no commitment.',
-        'nav_features' => 'Features', 'nav_pricing' => 'Pricing', 'nav_faq' => 'FAQ',
+        'nav_features' => 'Features', 'nav_faq' => 'FAQ',
         'nav_admin_title' => 'Administration', 'nav_cta' => 'Contact us',
         'hero_h1_1' => 'Run your business.', 'hero_h1_2' => 'Simplify your day.',
         'hero_sub' => 'The all-in-one platform for shops, SMBs and service businesses. Stock, POS, invoices, clients and finance — one tool, ready in 30 seconds.',
@@ -258,21 +272,7 @@ $TR = [
         'step1_t' => 'Create your workspace', 'step1_d' => 'Message us on WhatsApp: our team sets up your workspace and guides you. No bank card required.',
         'step2_t' => 'Add your products', 'step2_d' => 'Import your catalogue, set prices and opening stock levels.',
         'step3_t' => 'Start selling', 'step3_d' => 'Use the POS, invoice clients, track your finances in real time.',
-        'price_label' => 'Pricing', 'price_title' => 'A plan for every business',
-        'price_desc' => 'Pick your plan and <strong>order on WhatsApp</strong>. Our team guides you, with no commitment.',
-        'plan_starter' => 'Starter', 'plan_starter_d' => 'For growing SMBs',
-        'plan_pro' => 'Pro', 'plan_pro_d' => 'For larger teams',
-        'per_month' => '/ month', 'billed_monthly' => 'Billed monthly', 'per_year' => '/ year', 'billed_yearly' => 'Billed yearly',
-        'plan_secure' => 'Order on WhatsApp',
         // Bullets shown on the live Polar plan cards when no custom list is set in /admin/polar.
-        'feat_b1' => 'POS + unlimited invoices', 'feat_b2' => 'Products, stock, customers, suppliers',
-        'feat_b3' => 'PDF invoices + CSV exports', 'feat_b4' => 'Multi-user and 3 languages',
-        'feat_b5' => 'WhatsApp onboarding support',
-        'starter_b1' => '5 users', 'starter_b2' => '500 products', 'starter_b3' => 'POS + unlimited invoices',
-        'starter_b4' => 'Priority support', 'starter_b5' => 'No commitment',
-        'pro_b1' => '15 users', 'pro_b2' => '5,000 products', 'pro_b3' => 'Everything in Starter',
-        'pro_b4' => '24/7 support', 'pro_b5' => 'Advanced reports',
-        'pricing_note' => 'All prices in MRU. No commitment — no bank card required.',
         'trust_label' => 'Security', 'trust_title' => 'Your data is protected',
         'trust_desc' => 'Encryption, backups and data isolation — your business deserves solid infrastructure.',
         'trust1_t' => 'HTTPS everywhere', 'trust1_d' => 'TLS 1.3 encrypted connections on every page and API call.',
@@ -305,10 +305,31 @@ $TR = [
         'js_created_err' => 'Workspace created but we could not continue automatically. Please sign in.',
         'js_conn_err' => 'Connection error. Please try again.',
         'popular' => '\2B50 Most popular',
-        'wa_order' => 'Order on WhatsApp', 'wa_start' => 'Get started on WhatsApp', 'wa_contact' => 'Contact us on WhatsApp',
+        'wa_start' => 'Get started on WhatsApp', 'wa_contact' => 'Contact us on WhatsApp',
         'wa_msg_general' => 'Hello, I\'d like to know more about GestionPro.',
-        'wa_msg_plan' => 'Hello, I\'d like to order the "%s" pack of GestionPro.',
         'wa_note' => 'Order on WhatsApp and our team will get back to you to finalise your order.',
+        // Use cases per business
+        'nav_usecases' => 'Who it\'s for',
+        'uc_label' => 'Who it\'s for', 'uc_title' => 'Every trade has its own rules',
+        'uc_desc' => 'GestionPro fits your business: switch on only what you need.',
+        'uc1_t' => 'Shops & retail', 'uc1_sub' => 'Groceries, hardware, clothing, cosmetics...',
+        'uc1_b1' => 'Fast till with barcode scanning',
+        'uc1_b2' => 'Live stock and out-of-stock alerts',
+        'uc1_b3' => 'Customer credit: who owes what, since when',
+        'uc1_b4' => 'Printed receipts and PDF invoices',
+        'uc1_b5' => 'Keeps selling when the internet drops',
+        'uc2_t' => 'Restaurant, cafe & pastry', 'uc2_sub' => 'Dining room, snack bar, juice, catering...',
+        'uc2_b1' => 'Orders by table, takeaway or delivery',
+        'uc2_b2' => 'Kitchen screen + ticket printed on send',
+        'uc2_b3' => 'Notes per dish: no onion, well done...',
+        'uc2_b4' => 'Split or merge the bills',
+        'uc2_b5' => 'Kitchen account limited to its own screen',
+        'uc3_t' => 'Services & trades', 'uc3_sub' => 'Workshops, contractors, professionals...',
+        'uc3_b1' => 'Quote turned into an invoice in one click',
+        'uc3_b2' => 'PDF invoices with your letterhead',
+        'uc3_b3' => 'Payment and overdue tracking',
+        'uc3_b4' => 'Client file and full history',
+        'uc3_b5' => 'CSV exports for your accountant',
     ],
 ];
 $t = $TR[$lang];
@@ -322,37 +343,9 @@ $waLink = static function (string $message) use ($waBase) {
 };
 $waGeneral = $waLink($t['wa_msg_general']);
 
-$priceStarter = $fmtMru(GeoCurrency::PLANS['starter']['USD'] ?? 0) . ' ' . $cur;
-$pricePro     = $fmtMru(GeoCurrency::PLANS['pro']['USD'] ?? 0) . ' ' . $cur;
-
-// Pull live Polar products for the dynamic pricing grid. On failure or empty
-// response the view falls back to the hardcoded Starter + Pro cards below.
-$polarProducts = [];
-if (class_exists('Polar') && Polar::isConfigured()) {
-    $featuresMap = class_exists('ProductFeatures') ? ProductFeatures::all() : [];
-    // Fall back to the *translated* bullets, not ProductFeatures::defaults() —
-    // those are hardcoded English and were showing up verbatim on the FR/AR pages.
-    $defaultFeatures = [
-        $t['feat_b1'], $t['feat_b2'], $t['feat_b3'], $t['feat_b4'], $t['feat_b5'],
-    ];
-    foreach (Polar::listProductsCached() as $p) {
-        if (($p['is_archived'] ?? false) === true) continue;
-        $price = ($p['prices'][0] ?? null);
-        if (!$price || ($price['amount_type'] ?? '') !== 'fixed') continue;
-        $pid = (string)($p['id'] ?? '');
-        $polarProducts[] = [
-            'id'       => $pid,
-            'name'     => (string)($p['name'] ?? ''),
-            'desc'     => (string)($p['description'] ?? ''),
-            'amount'   => (int)($price['price_amount'] ?? 0), // cents
-            'currency' => strtoupper((string)($price['price_currency'] ?? 'USD')),
-            'interval' => (string)($p['recurring_interval'] ?? 'month'),
-            'features' => !empty($featuresMap[$pid]) ? $featuresMap[$pid] : $defaultFeatures,
-        ];
-    }
-    // Cheapest first so the layout reads naturally.
-    usort($polarProducts, static fn($a, $b) => $a['amount'] <=> $b['amount']);
-}
+// No pricing grid: plans and prices are agreed on WhatsApp, so the landing no
+// longer fetches Polar products nor prints amounts. $fmtMru stays — the hero
+// mockup still formats its demo revenue with it.
 ?>
 <!DOCTYPE html>
 <html lang="<?= $lang ?>" dir="<?= $dir ?>">
@@ -470,6 +463,25 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         .prob-card{display:flex;gap:16px;align-items:flex-start;padding:24px;border-radius:16px;background:var(--bg);border:1px solid var(--border);transition:all .25s}
         .prob-card:hover{border-color:var(--primary-200);box-shadow:var(--shadow-md);transform:translateY(-2px)}
         .prob-card .ic{flex:0 0 44px;height:44px;border-radius:12px;background:rgba(239,68,68,.09);color:var(--danger);display:flex;align-items:center;justify-content:center;font-size:17px}
+        /* Use cases: one panel per trade, so a visitor sees their own shop. */
+        .uc-section{background:var(--bg)}
+        .uc-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+        .uc-tab{display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:100px;border:1.5px solid var(--border);background:var(--surface);font-family:inherit;font-size:14.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s}
+        .uc-tab:hover{border-color:var(--primary);color:var(--primary)}
+        .uc-tab.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 6px 18px rgba(79,70,229,.3)}
+        .uc-tab i{font-size:16px}
+        .uc-panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;box-shadow:var(--shadow-md);animation:uc-in .25s ease}
+        @keyframes uc-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+        .uc-head{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+        .uc-ic{width:56px;height:56px;flex-shrink:0;border-radius:16px;background:var(--primary-50);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:24px}
+        .uc-head h3{font-size:22px;font-weight:800;letter-spacing:-.5px}
+        .uc-head p{font-size:14px;color:var(--text-muted);margin-top:2px}
+        .uc-list{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:14px 28px;margin-bottom:28px}
+        .uc-list li{display:flex;align-items:flex-start;gap:11px;font-size:15px;color:var(--text-secondary);line-height:1.5}
+        .uc-list li i{color:var(--success);font-size:15px;margin-top:3px;flex-shrink:0}
+        .uc-cta{padding:13px 24px;font-size:14.5px}
+        @media (max-width:768px){.uc-panel{padding:24px}.uc-list{grid-template-columns:1fr}.uc-tab{flex:1;justify-content:center;padding:11px 14px;font-size:13px}}
+
         .prob-card h3{font-size:16px;font-weight:700;margin-bottom:6px;letter-spacing:-.2px}
         .prob-card p{font-size:14px;color:var(--text-secondary);line-height:1.65}
         .feat-card h3{font-size:17px;font-weight:700;margin-bottom:8px}
@@ -486,29 +498,7 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         .step-arrow{position:absolute;top:28px;right:-20px;color:var(--border);font-size:20px}
 
         /* ===== PRICING ===== */
-        .pricing-center{text-align:center}
-        .pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:48px;text-align:left;max-width:760px;margin-left:auto;margin-right:auto}
-        .price-card{padding:32px 28px;border-radius:18px;border:1px solid var(--border);background:var(--surface);position:relative;transition:all .25s}
-        .price-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
-        .price-card.popular{border-color:var(--primary);box-shadow:0 8px 32px rgba(79,70,229,.15);border-width:1.5px}
-        .price-card.popular::before{content:'\2B50 Most popular';position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:5px 14px;background:var(--primary);color:#fff;border-radius:100px;font-size:11px;font-weight:700;white-space:nowrap}
-        .price-name{font-size:19px;font-weight:700;margin-bottom:4px}
-        .price-desc{font-size:13px;color:var(--text-muted);margin-bottom:20px}
-        .price-amount{font-size:42px;font-weight:900;letter-spacing:-1.5px;line-height:1}
-        .price-amount span{font-size:14px;font-weight:500;color:var(--text-muted);margin-left:4px}
-        .price-note{font-size:12px;color:var(--text-muted);margin-top:4px}
-        .price-list{list-style:none;margin:24px 0}
-        .price-list li{padding:8px 0;font-size:14px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:10px}
-        .price-list li i{color:var(--success);font-size:13px;width:16px;margin-top:3px}
         /* WhatsApp order buttons: inline-flex (was block, so the icon sat off-baseline). */
-        .btn-price{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px;border:none;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;font-family:inherit;line-height:1}
-        .btn-price i{font-size:17px}
-        .btn-price.outline{background:#fff;border:1.5px solid var(--wa);color:var(--wa-deep)}
-        .btn-price.outline:hover{background:var(--wa);border-color:var(--wa);color:#fff;transform:translateY(-1px);box-shadow:0 8px 20px var(--wa-glow)}
-        .btn-price.filled{background:var(--wa);color:#fff;box-shadow:0 4px 14px var(--wa-glow)}
-        .btn-price.filled:hover{background:var(--wa-dark);transform:translateY(-1px);box-shadow:0 10px 24px rgba(37,211,102,.45)}
-        .btn-price:active{transform:translateY(0)}
-        .pricing-note{text-align:center;margin-top:28px;font-size:13px;color:var(--text-muted)}
 
         /* ===== TRUST / SECURITY ===== */
         .trust-section{padding:80px 24px;background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);color:#fff}
@@ -576,7 +566,6 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         /* ===== RESPONSIVE ===== */
         @media (max-width:900px){
             .features-grid,.steps,.trust-grid,.prob-grid{grid-template-columns:1fr}
-            .pricing-grid{grid-template-columns:1fr}
             .trust-grid{grid-template-columns:repeat(2,1fr)}
             .hero-stats{grid-template-columns:repeat(2,1fr);gap:14px}
         }
@@ -597,12 +586,10 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         body{font-family:'Cairo','Inter',sans-serif}
         .hero h1{letter-spacing:0}
         .section-title,.hero-sub{letter-spacing:0}
-        .price-amount span{margin-left:0;margin-right:4px}
         .slug-prefix{border-radius:0 10px 10px 0;border-right:1.5px solid var(--border);border-left:0}
         .slug-preview input{border-radius:10px 0 0 10px}
         .step-arrow{right:auto;left:-20px;transform:scaleX(-1)}
         <?php endif; ?>
-        .price-card.popular::before{content:'<?= $t['popular'] ?>'}
         /* Language switcher */
         .lang-switch{display:inline-flex;align-items:center;gap:2px;margin-<?= $isRtl ? 'right' : 'left' ?>:6px}
         .lang-switch a{padding:5px 8px;border-radius:7px;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase}
@@ -621,7 +608,7 @@ if (class_exists('Polar') && Polar::isConfigured()) {
         </div>
         <div class="nav-links">
             <a href="#features" class="hide-mobile"><?= e($t['nav_features']) ?></a>
-            <a href="#pricing" class="hide-mobile"><?= e($t['nav_pricing']) ?></a>
+            <a href="#usecases" class="hide-mobile"><?= e($t['nav_usecases']) ?></a>
             <a href="#faq" class="hide-mobile"><?= e($t['nav_faq']) ?></a>
             <a href="<?= APP_BASE ?>/admin/login" class="hide-mobile" style="font-size:13px;color:var(--text-muted);" title="<?= e($t['nav_admin_title']) ?>"><i class="fas fa-shield-halved"></i></a>
             <span class="lang-switch">
@@ -789,73 +776,48 @@ if (class_exists('Polar') && Polar::isConfigured()) {
     </div>
 </section>
 
-<!-- PRICING -->
-<section class="pad pricing-center" id="pricing">
+<!-- USE CASES — what the product does for *your* trade, not in general -->
+<section class="pad uc-section" id="usecases">
     <div class="container">
-        <div class="section-label"><i class="fas fa-tags"></i> <?= e($t['price_label']) ?></div>
-        <div class="section-title"><?= e($t['price_title']) ?></div>
-        <p class="section-desc center"><?= $t['price_desc'] ?></p>
+        <div class="section-label"><i class="fas fa-store"></i> <?= e($t['uc_label']) ?></div>
+        <div class="section-title"><?= e($t['uc_title']) ?></div>
+        <div class="section-desc"><?= e($t['uc_desc']) ?></div>
 
-        <div class="pricing-grid">
-        <?php if (!empty($polarProducts)):
-            $popularIdx = count($polarProducts) >= 2 ? 1 : 0; // second card, or the only one
-            foreach ($polarProducts as $i => $prod):
-                $priceStr  = $fmtMru($prod['amount'] / 100) . ' ' . $cur;
-                $intervalL = $prod['interval'] === 'year' ? $t['per_year'] : $t['per_month'];
-                $billed    = $prod['interval'] === 'year' ? $t['billed_yearly'] : $t['billed_monthly'];
-                $isPopular = ($i === $popularIdx);
-                $btnClass  = $isPopular ? 'btn-price filled' : 'btn-price outline';
-                $waPlan    = $waLink(sprintf($t['wa_msg_plan'], $prod['name'] !== '' ? $prod['name'] : 'GestionPro'));
-        ?>
-            <div class="price-card<?= $isPopular ? ' popular' : '' ?>">
-                <div class="price-name"><?= htmlspecialchars($prod['name'], ENT_QUOTES) ?></div>
-                <div class="price-desc"><?= htmlspecialchars($prod['desc'] !== '' ? $prod['desc'] : $t['plan_secure']) ?></div>
-                <div class="price-amount"><?= e($priceStr) ?><span><?= e($intervalL) ?></span></div>
-                <div class="price-note"><?= e($billed) ?></div>
-                <ul class="price-list">
-                    <?php foreach ($prod['features'] as $bullet): ?>
-                    <li><i class="fas fa-check"></i> <?= htmlspecialchars($bullet, ENT_QUOTES) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-                <a href="<?= e($waPlan) ?>" target="_blank" rel="noopener" class="<?= $btnClass ?>"><i class="fab fa-whatsapp"></i> <?= e($t['wa_order']) ?></a>
-            </div>
-        <?php endforeach; else: ?>
-            <div class="price-card popular">
-                <div class="price-name"><?= e($t['plan_starter']) ?></div>
-                <div class="price-desc"><?= e($t['plan_starter_d']) ?></div>
-                <div class="price-amount"><?= e($priceStarter) ?><span><?= e($t['per_month']) ?></span></div>
-                <div class="price-note"><?= e($t['billed_monthly']) ?></div>
-                <ul class="price-list">
-                    <li><i class="fas fa-check"></i> <?= e($t['starter_b1']) ?></li>
-                    <li><i class="fas fa-check"></i> <?= e($t['starter_b2']) ?></li>
-                    <li><i class="fas fa-check"></i> <?= e($t['starter_b3']) ?></li>
-                    <li><i class="fas fa-check"></i> <?= e($t['starter_b4']) ?></li>
-                    <li><i class="fas fa-check"></i> <?= e($t['starter_b5']) ?></li>
-                </ul>
-                <a href="<?= e($waLink(sprintf($t['wa_msg_plan'], $t['plan_starter']))) ?>" target="_blank" rel="noopener" class="btn-price filled"><i class="fab fa-whatsapp"></i> <?= e($t['wa_order']) ?></a>
-            </div>
-            <div class="price-card">
-                <div class="price-name"><?= e($t['plan_pro']) ?></div>
-                <div class="price-desc"><?= e($t['plan_pro_d']) ?></div>
-                <div class="price-amount"><?= e($pricePro) ?><span><?= e($t['per_month']) ?></span></div>
-                <div class="price-note"><?= e($t['billed_monthly']) ?></div>
-                <ul class="price-list">
-                    <li><i class="fas fa-check"></i> <?= e($t['pro_b1']) ?></li>
-                    <li><i class="fas fa-check"></i> <?= e($t['pro_b2']) ?></li>
-                    <li><i class="fas fa-check"></i> <?= e($t['pro_b3']) ?></li>
-                    <li><i class="fas fa-check"></i> <?= e($t['pro_b4']) ?></li>
-                    <li><i class="fas fa-check"></i> <?= e($t['pro_b5']) ?></li>
-                </ul>
-                <a href="<?= e($waLink(sprintf($t['wa_msg_plan'], $t['plan_pro']))) ?>" target="_blank" rel="noopener" class="btn-price outline"><i class="fab fa-whatsapp"></i> <?= e($t['wa_order']) ?></a>
-            </div>
-        <?php endif; ?>
+        <div class="uc-tabs" role="tablist">
+            <?php
+            $ucs = [
+                1 => ['icon' => 'fa-store',       'key' => 'uc1'],
+                2 => ['icon' => 'fa-utensils',    'key' => 'uc2'],
+                3 => ['icon' => 'fa-screwdriver-wrench', 'key' => 'uc3'],
+            ];
+            foreach ($ucs as $i => $uc): ?>
+            <button class="uc-tab <?= $i === 1 ? 'active' : '' ?>" data-uc="<?= $i ?>" role="tab"
+                    aria-selected="<?= $i === 1 ? 'true' : 'false' ?>" onclick="showUc(<?= $i ?>)">
+                <i class="fas <?= $uc['icon'] ?>"></i>
+                <span><?= e($t[$uc['key'] . '_t']) ?></span>
+            </button>
+            <?php endforeach; ?>
         </div>
 
-        <p class="pricing-note">
-            <i class="fab fa-whatsapp" style="color:#25D366;"></i>
-            <?= e($t['wa_note']) ?><br>
-            <span style="opacity:.8;"><?= e($t['pricing_note']) ?></span>
-        </p>
+        <?php foreach ($ucs as $i => $uc): ?>
+        <div class="uc-panel <?= $i === 1 ? '' : 'hidden' ?>" id="uc-<?= $i ?>" role="tabpanel">
+            <div class="uc-head">
+                <div class="uc-ic"><i class="fas <?= $uc['icon'] ?>"></i></div>
+                <div>
+                    <h3><?= e($t[$uc['key'] . '_t']) ?></h3>
+                    <p><?= e($t[$uc['key'] . '_sub']) ?></p>
+                </div>
+            </div>
+            <ul class="uc-list">
+                <?php for ($b = 1; $b <= 5; $b++): ?>
+                <li><i class="fas fa-circle-check"></i> <?= e($t[$uc['key'] . '_b' . $b]) ?></li>
+                <?php endfor; ?>
+            </ul>
+            <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-cta btn-primary-cta uc-cta">
+                <i class="fab fa-whatsapp"></i> <?= e($t['wa_start']) ?>
+            </a>
+        </div>
+        <?php endforeach; ?>
     </div>
 </section>
 
@@ -940,7 +902,7 @@ if (class_exists('Polar') && Polar::isConfigured()) {
     <p>&copy; <?= date('Y') ?> <?= e($t['footer_tagline']) ?></p>
     <div class="footer-links">
         <a href="#features"><?= e($t['nav_features']) ?></a>
-        <a href="#pricing"><?= e($t['nav_pricing']) ?></a>
+        <a href="#usecases"><?= e($t['nav_usecases']) ?></a>
         <a href="#faq"><?= e($t['nav_faq']) ?></a>
         <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
         <a href="<?= APP_BASE ?>/admin/login"><?= e($t['nav_admin_title']) ?></a>
@@ -959,6 +921,18 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
         if (target) { e.preventDefault(); target.scrollIntoView({ behavior:'smooth', block:'start' }); }
     });
 });
+
+// Use-case tabs. Panels are rendered server-side and merely toggled, so the
+// content is in the HTML for search engines even though only one shows.
+function showUc(n) {
+    document.querySelectorAll('.uc-panel').forEach(p => p.classList.add('hidden'));
+    document.getElementById('uc-' + n).classList.remove('hidden');
+    document.querySelectorAll('.uc-tab').forEach(t => {
+        const on = t.dataset.uc === String(n);
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+}
 </script>
 
 </body>
