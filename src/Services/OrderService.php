@@ -25,6 +25,15 @@ final class OrderService
     /** Lines a cook still has to act on. */
     public const KITCHEN_STATUSES = ['sent', 'preparing', 'ready'];
 
+    /**
+     * Every status these tables can hold. The DB enums must list exactly these —
+     * OrderSchemaTest pins that, because the SQLite-backed tests cannot: SQLite
+     * has no ENUM and silently accepts any value, so drift here only ever shows
+     * up in production (it did: 'sent' was missing from the order_items enum).
+     */
+    public const ITEM_STATUSES  = ['pending', 'sent', 'preparing', 'ready', 'served', 'cancelled'];
+    public const ORDER_STATUSES = ['open', 'sent', 'preparing', 'ready', 'served', 'paid', 'cancelled'];
+
     public function create(string $type, ?string $tableId, ?string $customerId, string $userId, ?string $sessionId, string $number): string
     {
         if (!in_array($type, ['dine_in', 'takeaway', 'delivery'], true)) {

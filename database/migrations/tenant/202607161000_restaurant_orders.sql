@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS order_items (
     unit_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     tax_rate DECIMAL(5,2) NOT NULL DEFAULT 0.00,
     line_total DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-    status ENUM('pending','preparing','ready','served','cancelled') NOT NULL DEFAULT 'pending',
+    -- 'sent' = queued in the kitchen. Must stay in step with OrderService::ITEM_STATUSES.
+    status ENUM('pending','sent','preparing','ready','served','cancelled') NOT NULL DEFAULT 'pending',
     notes VARCHAR(255) NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_order_items_order (order_id),
