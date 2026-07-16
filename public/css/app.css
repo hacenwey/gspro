@@ -933,6 +933,10 @@ textarea.form-control {
     display: flex;
     align-items: center;
     gap: 8px;
+    /* .toolbar wraps, but that only moves this whole block onto its own line: on a
+       phone its own children (filters + actions) still measured 626px inside a
+       343px screen and pushed the page sideways. It has to wrap internally too. */
+    flex-wrap: wrap;
 }
 
 /* === Empty State === */
