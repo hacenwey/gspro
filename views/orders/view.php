@@ -22,9 +22,15 @@ $itemClass = ['pending' => 'secondary', 'sent' => 'info', 'preparing' => 'warnin
 <div class="pos-layout">
     <!-- Dish picker -->
     <div class="pos-products">
-        <div class="toolbar-search" style="margin-bottom:12px;max-width:100%;">
-            <span class="search-icon"><i class="fas fa-search"></i></span>
-            <input type="text" id="dishSearch" class="form-control" placeholder="<?= __('pos.search') ?>" <?= $locked ? 'disabled' : 'autofocus' ?>>
+        <!-- The row wrapper matters: .toolbar-search carries flex:1, which grows it
+             sideways here. Dropped straight into .pos-products (a flex column) it
+             stretched to full height instead, stranding its absolutely-centred
+             search icon in mid-air and pushing the grid to the bottom. -->
+        <div style="margin-bottom:12px;display:flex;gap:8px;">
+            <div class="toolbar-search" style="max-width:100%;">
+                <span class="search-icon"><i class="fas fa-search"></i></span>
+                <input type="text" id="dishSearch" class="form-control" placeholder="<?= __('pos.search') ?>" <?= $locked ? 'disabled' : 'autofocus' ?>>
+            </div>
         </div>
         <div class="pos-grid" id="dishGrid">
             <?php foreach ($products as $p): ?>

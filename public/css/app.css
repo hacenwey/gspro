@@ -979,6 +979,10 @@ textarea.form-control {
     overflow-y: auto;
     padding: 4px;
     flex: 1;
+    /* Fill from the top and keep cards their natural height. Without this the
+       implicit rows stretch over the whole column, so a short catalogue drew a
+       handful of absurdly tall cards. */
+    align-content: start;
 }
 
 .pos-product-card {
