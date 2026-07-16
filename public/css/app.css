@@ -9,22 +9,29 @@
     --primary-dark: #3730A3;
     --primary-50: rgba(79,70,229,0.06);
     --primary-100: rgba(79,70,229,0.12);
-    --secondary: #0EA5E9;
-    --accent: #F59E0B;
+    /* Accents are the LIGHTEST shade of each hue that still clears WCAG AA
+       (4.5:1) on white. Contrast being symmetric, one such value works both as
+       coloured text on a light surface and as a solid button carrying
+       --on-accent text. The previous shades measured 2.15–3.76:1: the POS's own
+       "Encaisser" and "Envoyer en cuisine" buttons were below the standard. */
+    --secondary: #0369A1;
+    --accent: #B45309;          /* amber-700  — 5.02:1 */
     --accent-light: #FBBF24;
-    --success: #10B981;
+    --success: #047857;         /* emerald-700 — 5.48:1 */
     --success-light: #34D399;
-    --danger: #EF4444;
+    --danger: #DC2626;          /* red-600    — 4.83:1 */
     --danger-light: #F87171;
-    --warning: #F59E0B;
-    --info: #0EA5E9;
+    --warning: #B45309;         /* amber-700  — 5.02:1 */
+    --info: #0369A1;            /* sky-700    — 5.93:1 */
+    /* Text laid on a solid accent. Light theme: accents are dark -> white text. */
+    --on-accent: #FFFFFF;
     --bg: #F8FAFC;
     --bg-subtle: #F1F5F9;
     --surface: #FFFFFF;
     --surface-hover: #F8FAFC;
     --text: #0F172A;
     --text-secondary: #475569;
-    --text-muted: #94A3B8;
+    --text-muted: #64748B;      /* was #94A3B8 — 2.56:1 on white, below AA */
     --border: #E2E8F0;
     --border-light: #F1F5F9;
     --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
@@ -63,7 +70,10 @@
     --surface-hover: #334155;
     --text: #F1F5F9;
     --text-secondary: #94A3B8;
-    --text-muted: #64748B;
+    --text-muted: #94A3B8;      /* was #64748B — 3.07:1 on the dark surface */
+    /* Dark theme keeps the light accents: they only clear AA against DARK text
+       (5.98–10.69:1), never against white (1.67–2.98:1). */
+    --on-accent: #0F172A;
     --border: #334155;
     --border-light: #1E293B;
     --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
@@ -525,7 +535,7 @@ img { max-width: 100%; height: auto; }
 
 .btn-primary {
     background: var(--primary);
-    color: #fff;
+    color: var(--on-accent);
     border-color: var(--primary);
     box-shadow: 0 1px 3px rgba(79,70,229,0.3);
 }
@@ -549,7 +559,7 @@ img { max-width: 100%; height: auto; }
 
 .btn-success {
     background: var(--success);
-    color: #fff;
+    color: var(--on-accent);
     border-color: var(--success);
     box-shadow: 0 1px 3px rgba(16,185,129,0.3);
 }
@@ -557,7 +567,7 @@ img { max-width: 100%; height: auto; }
 
 .btn-danger {
     background: var(--danger);
-    color: #fff;
+    color: var(--on-accent);
     border-color: var(--danger);
     box-shadow: 0 1px 3px rgba(239,68,68,0.3);
 }
@@ -565,7 +575,7 @@ img { max-width: 100%; height: auto; }
 
 .btn-warning {
     background: var(--accent);
-    color: #fff;
+    color: var(--on-accent);
     border-color: var(--accent);
     box-shadow: 0 1px 3px rgba(245,158,11,0.3);
 }

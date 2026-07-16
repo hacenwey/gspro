@@ -364,11 +364,17 @@ $waGeneral = $waLink($t['wa_msg_general']);
         :root{
             --primary:#4F46E5;--primary-light:#6366F1;--primary-dark:#3730A3;
             --primary-50:#EEF2FF;--primary-100:#E0E7FF;--primary-200:#C7D2FE;
-            --text:#0F172A;--text-secondary:#475569;--text-muted:#94A3B8;
+            --text:#0F172A;--text-secondary:#475569;--text-muted:#64748B;
             --bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;--border-light:#F1F5F9;
-            --success:#10B981;--danger:#EF4444;--warning:#F59E0B;
+            /* Lightest shade of each hue that still clears WCAG AA (4.5:1) on
+               white. The previous ones measured 2.15-3.76:1. */
+            --success:#047857;--danger:#DC2626;--warning:#B45309;
             /* WhatsApp brand — every WhatsApp CTA uses it so the action reads instantly */
-            --wa:#25D366;--wa-dark:#1DBF5C;--wa-deep:#128C7E;--wa-glow:rgba(37,211,102,.35);
+            --wa:#25D366;--wa-dark:#1DBF5C;--wa-deep:#0B5C2E;--wa-glow:rgba(37,211,102,.35);
+            /* Text on the brand green: white measures 1.98:1 on it, dark 9.00:1.
+               Keeping the bright green and darkening the label preserves the
+               punch AND clears AA. */
+            --on-wa:#0F172A;
             --shadow-sm:0 1px 2px rgba(0,0,0,.04);
             --shadow-md:0 4px 12px rgba(0,0,0,.06);
             --shadow-lg:0 12px 40px rgba(0,0,0,.08);
@@ -389,8 +395,8 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .nav-links{display:flex;align-items:center;gap:4px}
         .nav-links a{padding:8px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text-secondary);transition:all .2s}
         .nav-links a:hover{color:var(--text);background:var(--primary-50)}
-        .nav-links .btn-nav{background:var(--wa);color:#fff;font-weight:700;padding:9px 18px;border-radius:10px;display:inline-flex;align-items:center;gap:7px;box-shadow:0 3px 10px var(--wa-glow);transition:all .2s}
-        .nav-links .btn-nav:hover{background:var(--wa-dark);color:#fff;box-shadow:0 6px 16px rgba(37,211,102,.45)}
+        .nav-links .btn-nav{background:var(--wa);color:var(--on-wa);font-weight:700;padding:9px 18px;border-radius:10px;display:inline-flex;align-items:center;gap:7px;box-shadow:0 3px 10px var(--wa-glow);transition:all .2s}
+        .nav-links .btn-nav:hover{background:var(--wa-dark);color:var(--on-wa);box-shadow:0 6px 16px rgba(37,211,102,.45)}
         .nav-links .btn-nav i{font-size:16px}
 
         /* ===== HERO ===== */
@@ -405,7 +411,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:52px}
         .btn-cta{display:inline-flex;align-items:center;gap:10px;padding:16px 30px;border-radius:14px;font-weight:700;font-size:15px;transition:all .25s;cursor:pointer;border:none;font-family:inherit}
         /* Both hero and closing CTAs are WhatsApp actions — brand them as such. */
-        .btn-primary-cta{background:var(--wa);color:#fff;box-shadow:0 8px 24px var(--wa-glow)}
+        .btn-primary-cta{background:var(--wa);color:var(--on-wa);box-shadow:0 8px 24px var(--wa-glow)}
         .btn-primary-cta:hover{background:var(--wa-dark);transform:translateY(-2px);box-shadow:0 14px 34px rgba(37,211,102,.45)}
         .btn-cta i{font-size:19px}
         .btn-secondary-cta{background:var(--surface);color:var(--text);border:1.5px solid var(--border)}
