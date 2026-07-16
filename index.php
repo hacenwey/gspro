@@ -172,6 +172,25 @@ Router::post('/caisse/sell', 'CaisseController', 'sell');
 Router::get('/caisse/history', 'CaisseController', 'history');
 Router::get('/api/products/search', 'CaisseController', 'searchProducts');
 
+// Restaurant module (gated by settings.business_type — see isRestaurant())
+Router::get('/orders', 'OrderController', 'index');
+Router::post('/orders/store', 'OrderController', 'store');
+Router::get('/orders/view/{id}', 'OrderController', 'view');
+Router::post('/orders/item/{id}', 'OrderController', 'addItem');
+Router::post('/orders/item/remove/{id}', 'OrderController', 'removeItem');
+Router::post('/orders/send/{id}', 'OrderController', 'send');
+Router::post('/orders/pay/{id}', 'OrderController', 'pay');
+Router::post('/orders/cancel/{id}', 'OrderController', 'cancel');
+
+Router::get('/kitchen', 'KitchenController', 'index');
+Router::get('/kitchen/feed', 'KitchenController', 'feed');
+Router::post('/kitchen/item/{id}', 'KitchenController', 'itemStatus');
+
+Router::get('/tables', 'TableController', 'index');
+Router::post('/tables/store', 'TableController', 'store');
+Router::post('/tables/update/{id}', 'TableController', 'update');
+Router::post('/tables/delete/{id}', 'TableController', 'delete');
+
 // Invoices & Quotes
 Router::get('/invoices', 'InvoiceController', 'index');
 Router::get('/invoices/create', 'InvoiceController', 'create');

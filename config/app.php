@@ -17,16 +17,22 @@ defined('ROLE_ADMIN')         || define('ROLE_ADMIN', 'admin');
 defined('ROLE_MANAGER')       || define('ROLE_MANAGER', 'manager');
 defined('ROLE_CASHIER')       || define('ROLE_CASHIER', 'cashier');
 defined('ROLE_ACCOUNTANT')    || define('ROLE_ACCOUNTANT', 'accountant');
+defined('ROLE_KITCHEN')       || define('ROLE_KITCHEN', 'kitchen');
 
-// Back-office roles = everyone except the cashier, who is restricted to the POS.
-// Guard non-POS controllers with this group.
+// Back-office roles = everyone except the cashier and the kitchen, who are each
+// restricted to a single screen. Guard non-POS controllers with this group.
 defined('ROLES_STAFF')        || define('ROLES_STAFF', [ROLE_ADMIN, ROLE_MANAGER, ROLE_ACCOUNTANT]);
+// Order takers: waiters use the cashier role. Kitchen staff never take orders.
+defined('ROLES_ORDERS')       || define('ROLES_ORDERS', [ROLE_ADMIN, ROLE_MANAGER, ROLE_CASHIER]);
+// Kitchen display: cooks, plus managers who need to watch the pass.
+defined('ROLES_KITCHEN')      || define('ROLES_KITCHEN', [ROLE_ADMIN, ROLE_MANAGER, ROLE_KITCHEN]);
 
 // Invoice prefixes
 defined('INVOICE_PREFIX')     || define('INVOICE_PREFIX', 'FAC');
 defined('QUOTE_PREFIX')       || define('QUOTE_PREFIX', 'DEV');
 defined('CREDIT_NOTE_PREFIX') || define('CREDIT_NOTE_PREFIX', 'AVO');
 defined('PO_PREFIX')          || define('PO_PREFIX', 'BC');
+defined('ORDER_PREFIX')       || define('ORDER_PREFIX', 'CMD');
 
 // Supported languages
 defined('SUPPORTED_LANGS')    || define('SUPPORTED_LANGS', ['en', 'fr', 'ar']);

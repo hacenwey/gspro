@@ -73,7 +73,9 @@ function hasRole(string ...$roles): bool {
  * the dashboard would bounce them straight into an access denial after login.
  */
 function roleHome(): string {
-    return hasRole(ROLE_CASHIER) ? '/caisse' : '/dashboard';
+    if (hasRole(ROLE_KITCHEN)) return '/kitchen';
+    if (hasRole(ROLE_CASHIER)) return isRestaurant() ? '/orders' : '/caisse';
+    return '/dashboard';
 }
 
 /** Tenant's business vertical. Unknown/empty values fall back to retail. */

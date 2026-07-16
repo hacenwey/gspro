@@ -41,9 +41,12 @@
         </div>
         <nav class="sidebar-nav">
             <?php
-            // Cashiers are restricted to the POS (see ROLES_STAFF): hide what they
-            // cannot open, so the menu matches what the server actually allows.
-            $__staff = hasRole(ROLE_ADMIN, ROLE_MANAGER, ROLE_ACCOUNTANT);
+            // Cashiers are restricted to the POS (see ROLES_STAFF) and kitchen staff
+            // to the pass: hide what they cannot open, so the menu matches what the
+            // server actually allows. The restaurant block only exists in that mode.
+            $__staff   = hasRole(ROLE_ADMIN, ROLE_MANAGER, ROLE_ACCOUNTANT);
+            $__resto   = isRestaurant();
+            $__kitchen = hasRole(ROLE_KITCHEN);
             ?>
             <div class="nav-section">
                 <div class="nav-section-title"><?= __('nav.main') ?></div>
@@ -53,10 +56,32 @@
                     <?= __('nav.dashboard') ?>
                 </a>
                 <?php endif; ?>
+                <?php if (!$__kitchen): ?>
                 <a href="<?= url('/caisse') ?>" class="nav-item <?= isActive('/caisse') ?>">
                     <span class="icon"><i class="fas fa-cash-register"></i></span>
                     <?= __('nav.pos') ?>
                 </a>
+                <?php endif; ?>
+                <?php if ($__resto): ?>
+                    <?php if (hasRole(...ROLES_ORDERS)): ?>
+                    <a href="<?= url('/orders') ?>" class="nav-item <?= isActive('/orders') ?>">
+                        <span class="icon"><i class="fas fa-receipt"></i></span>
+                        <?= __('nav.orders') ?>
+                    </a>
+                    <?php endif; ?>
+                    <?php if (hasRole(...ROLES_KITCHEN)): ?>
+                    <a href="<?= url('/kitchen') ?>" class="nav-item <?= isActive('/kitchen') ?>">
+                        <span class="icon"><i class="fas fa-fire-burner"></i></span>
+                        <?= __('nav.kitchen') ?>
+                    </a>
+                    <?php endif; ?>
+                    <?php if ($__staff): ?>
+                    <a href="<?= url('/tables') ?>" class="nav-item <?= isActive('/tables') ?>">
+                        <span class="icon"><i class="fas fa-chair"></i></span>
+                        <?= __('nav.tables') ?>
+                    </a>
+                    <?php endif; ?>
+                <?php endif; ?>
             </div>
             <?php if ($__staff): ?>
             <div class="nav-section">
