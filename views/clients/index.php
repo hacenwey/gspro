@@ -35,7 +35,7 @@
                 <tr>
                     <td>
                         <div class="d-flex align-center gap-1">
-                            <div style="width:36px;height:36px;border-radius:var(--radius);background:<?= $c['category'] === 'vip' ? 'linear-gradient(135deg,#F59E0B,#D97706)' : ($c['category'] === 'regular' ? 'var(--primary)' : 'var(--text-muted)') ?>;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0;">
+                            <div style="width:36px;height:36px;border-radius:var(--radius);background:<?= $c['category'] === 'vip' ? 'linear-gradient(135deg,#B45309,#92400E)' : ($c['category'] === 'regular' ? 'var(--primary)' : 'var(--text-muted)') ?>;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0;">
                                 <?= strtoupper(substr($c['last_name'], 0, 2)) ?>
                             </div>
                             <div>

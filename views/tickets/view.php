@@ -77,7 +77,7 @@ $isClosed = in_array($ticket['status'], ['closed', 'resolved']);
         <div style="padding:20px 24px;<?= $i > 0 ? 'border-top:1px solid var(--border);' : '' ?><?= $isAdmin ? 'background:rgba(79,70,229,0.03);' : '' ?>">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
                 <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;
-                    background:<?= $isAdmin ? 'linear-gradient(135deg,#4F46E5,#6366F1)' : 'linear-gradient(135deg,#10B981,#34D399)' ?>;">
+                    background:<?= $isAdmin ? 'linear-gradient(135deg,#4F46E5,#4338CA)' : 'linear-gradient(135deg,#047857,#065F46)' ?>;">
                     <?= $isAdmin ? '<i class="fas fa-headset" style="font-size:14px;"></i>' : strtoupper(substr($msg['sender_name'], 0, 2)) ?>
                 </div>
                 <div>

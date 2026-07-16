@@ -13,7 +13,7 @@ $slug = $tenant['slug'] ?? '';
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:-apple-system,'Segoe UI',Inter,sans-serif; background:#F9FAFB; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; color:#1F2937; }
         .card { background:#fff; max-width:520px; width:100%; border-radius:16px; box-shadow:0 20px 50px rgba(0,0,0,.08); overflow:hidden; text-align:center; }
-        .banner { padding:40px 32px; background:linear-gradient(135deg,#10B981,#059669); color:#fff; }
+        .banner { padding:40px 32px; background:linear-gradient(135deg,#047857,#065F46); color:#fff; }
         .banner i { font-size:52px; margin-bottom:12px; display:block; }
         .banner h1 { font-size:24px; font-weight:700; }
         .body { padding:32px; }
