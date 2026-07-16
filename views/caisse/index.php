@@ -54,10 +54,17 @@
 
     <!-- Cart -->
     <div class="pos-cart">
-        <div class="pos-cart-header">
+        <!-- On mobile this header is the handle of a bottom sheet: it must show the
+             total and the count while collapsed, so the cashier never loses sight
+             of them behind the catalogue. -->
+        <div class="pos-cart-header" id="cartHeader" onclick="toggleCartSheet()">
             <i class="fas fa-shopping-cart" style="margin-right: 8px;"></i><?= __('pos.cart') ?>
             <span id="pendingSync" class="pos-pending hidden" title="<?= __('pos.pending') ?>"><i class="fas fa-cloud-arrow-up"></i> <span id="pendingCount">0</span></span>
-            <span id="cartCount" style="margin-left: auto; background: var(--primary); color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px;">0</span>
+            <span class="cart-head-right">
+                <span class="cart-total-mini" id="cartTotalMini"></span>
+                <span id="cartCount" style="background: var(--primary); color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px;">0</span>
+                <i class="fas fa-chevron-up cart-chevron"></i>
+            </span>
         </div>
 
         <!-- Client Selection -->
@@ -220,6 +227,18 @@ const POS_LANG = {
     tax: <?= json_encode(__('invoices.tax')) ?>,
     paid: <?= json_encode(__('pos.amount_received')) ?>
 };
+
+// ---- Mobile bottom sheet ----
+// Below 1024px the cart is a sheet pinned to the bottom; the header is its handle.
+function toggleCartSheet() {
+    document.querySelector('.pos-cart').classList.toggle('open');
+}
+
+// Adding a dish should not yank the sheet open over the catalogue, but the
+// cashier must see the total move: the handle always carries it (see renderCart).
+function closeCartSheet() {
+    document.querySelector('.pos-cart').classList.remove('open');
+}
 
 // Visual feedback on the tapped product card (green pulse / red shake).
 function flashCard(card, ok) {
@@ -418,6 +437,9 @@ function renderCart() {
     document.getElementById('taxTotal').textContent = formatMoney(tax);
     document.getElementById('grandTotal').textContent = formatMoney(subtotal + tax);
     document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
+    // Mirrored on the collapsed sheet handle (mobile), where the totals block is
+    // hidden below the fold.
+    document.getElementById('cartTotalMini').textContent = formatMoney(subtotal + tax);
 
     // Pay/clear only make sense with a non-empty cart — reflect that instead of
     // letting the buttons look active but do nothing.
@@ -552,6 +574,7 @@ function resetAfterSale() {
     document.getElementById('clientResult').innerHTML = '';
     document.getElementById('creditSale').checked = false;
     renderCart();
+    closeCartSheet(); // back to the catalogue, ready for the next customer
 }
 
 async function updatePendingBadge() {
