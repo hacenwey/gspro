@@ -505,4 +505,11 @@ return [
     'tables.updated' => 'تم تحديث الطاولة.',
     'tables.removed' => 'تم تعطيل الطاولة.',
     'tables.name_required' => 'الاسم مطلوب.',
+
+    // Kitchen ticket
+    'kticket.title' => 'قسيمة المطبخ',
+    'kticket.autoprint' => 'طباعة قسيمة المطبخ',
+    'kticket.reprint' => 'إعادة طباعة القسيمة',
+    'kticket.waiter' => 'النادل',
+    'kticket.new_items' => 'أصناف جديدة',
 ];

@@ -129,16 +129,40 @@ class OrderController extends Controller {
         $this->redirect($orderId ? '/orders/view/' . $orderId : '/orders');
     }
 
+    /**
+     * Send to the kitchen and hand back the ticket to print.
+     *
+     * Answers JSON rather than redirecting: the browser has to render and print
+     * the kitchen ticket, and only the lines just sent belong on it.
+     */
     public function send(string $id): void {
         $this->guard();
-        if (!verify_csrf()) { $this->flash('error', 'Token invalide'); $this->redirect('/orders/view/' . $id); }
+        if (!verify_csrf()) { $this->json(['error' => 'Token invalide'], 403); }
+
         try {
-            $this->svc()->send($id);
-            $this->flash('success', __('orders.sent_ok', 'Commande envoyee en cuisine.'));
+            $sent = $this->svc()->send($id);
         } catch (\Throwable $e) {
-            $this->flash('error', $e->getMessage());
+            $this->json(['error' => $e->getMessage()], 400);
+            return;
         }
-        $this->redirect('/orders/view/' . $id);
+
+        $stmt = $this->db->prepare("
+            SELECT o.number, o.type, t.name AS table_name, u.full_name AS waiter
+            FROM orders o
+            LEFT JOIN service_tables t ON o.table_id = t.id
+            LEFT JOIN users u ON o.user_id = u.id
+            WHERE o.id = ?");
+        $stmt->execute([$id]);
+        $o = $stmt->fetch() ?: [];
+
+        $this->json(['success' => true, 'ticket' => [
+            'number' => $o['number'] ?? '',
+            'type'   => __('orders.type.' . ($o['type'] ?? 'dine_in')),
+            'table'  => $o['table_name'] ?? '',
+            'waiter' => $o['waiter'] ?? '',
+            'at'     => date('d/m/Y H:i'),
+            'items'  => $sent,
+        ]]);
     }
 
     public function cancel(string $id): void {

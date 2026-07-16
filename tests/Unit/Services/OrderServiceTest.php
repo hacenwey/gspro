@@ -151,6 +151,28 @@ final class OrderServiceTest extends TestCase
     }
 
     /**
+     * The kitchen ticket is built from what send() returns, so a second round
+     * must hand back only the new dishes — never reprint the first round.
+     */
+    public function test_send_returns_only_the_lines_it_just_sent(): void
+    {
+        $id = $this->newOrder();
+        $this->svc->addItem($id, 'p1', 2, 'sans piment');
+
+        $first = $this->svc->send($id);
+        $this->assertCount(1, $first);
+        $this->assertSame(2, $first[0]['qty']);
+        $this->assertSame('Thieboudienne', $first[0]['label']);
+        $this->assertSame('sans piment', $first[0]['notes']);
+
+        $this->svc->addItem($id, 'p2', 1);
+        $second = $this->svc->send($id);
+        $this->assertCount(1, $second, 'second round must not reprint the first');
+        $this->assertSame('Jus de bissap', $second[0]['label']);
+        $this->assertNull($second[0]['notes']);
+    }
+
+    /**
      * The ticket is only as advanced as its least advanced dish.
      * @dataProvider statusCases
      */

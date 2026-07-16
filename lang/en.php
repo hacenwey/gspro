@@ -507,4 +507,11 @@ return [
     'tables.updated' => 'Table updated.',
     'tables.removed' => 'Table deactivated.',
     'tables.name_required' => 'Name is required.',
+
+    // Kitchen ticket
+    'kticket.title' => 'KITCHEN TICKET',
+    'kticket.autoprint' => 'Print kitchen ticket',
+    'kticket.reprint' => 'Reprint ticket',
+    'kticket.waiter' => 'Waiter',
+    'kticket.new_items' => 'New dishes',
 ];

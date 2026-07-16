@@ -79,11 +79,14 @@ $itemClass = ['pending' => 'secondary', 'sent' => 'info', 'preparing' => 'warnin
         </div>
 
         <?php if (!$locked): ?>
+        <div style="padding:8px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text-secondary);">
+                <input type="checkbox" id="autoKitchen"> <i class="fas fa-print"></i> <?= __('kticket.autoprint') ?>
+            </label>
+            <button class="btn btn-sm btn-secondary" id="reprintKBtn" onclick="reprintKitchen()" disabled><i class="fas fa-receipt"></i> <?= __('kticket.reprint') ?></button>
+        </div>
         <div class="pos-actions" style="grid-template-columns:1fr 1fr;">
-            <form method="POST" action="<?= url('/orders/send/' . $order['id']) ?>">
-                <?= csrf_field() ?>
-                <button class="btn btn-warning w-100" type="submit"><i class="fas fa-fire-burner"></i> <?= __('orders.send_kitchen') ?></button>
-            </form>
+            <button class="btn btn-warning w-100" id="sendBtn" onclick="sendToKitchen()"><i class="fas fa-fire-burner"></i> <?= __('orders.send_kitchen') ?></button>
             <button class="btn btn-success btn-pay" onclick="openModal('payOrderModal')" <?= empty($items) ? 'disabled' : '' ?>><i class="fas fa-money-bill-wave"></i> <?= __('orders.pay') ?></button>
         </div>
         <?php endif; ?>
@@ -146,11 +149,23 @@ $itemClass = ['pending' => 'secondary', 'sent' => 'info', 'preparing' => 'warnin
     </div>
 </div>
 
+<!-- Kitchen ticket: hidden on screen, printed alone (see @media print) -->
+<div id="kitchenTicket" aria-hidden="true"></div>
+
 <script>
 const ADD_URL = <?= json_encode(url('/orders/item/' . $order['id'])) ?>;
+const SEND_URL = <?= json_encode(url('/orders/send/' . $order['id'])) ?>;
 const CSRF = <?= json_encode(csrf_token()) ?>;
 const LOCKED = <?= $locked ? 'true' : 'false' ?>;
+const KT = {
+    title: <?= json_encode(__('kticket.title')) ?>,
+    waiter: <?= json_encode(__('kticket.waiter')) ?>,
+    newItems: <?= json_encode(__('kticket.new_items')) ?>,
+    table: <?= json_encode(__('orders.table')) ?>
+};
+const SHOP_NAME = <?= json_encode(Settings::get('company_name', 'GestionPro')) ?>;
 let pendingDish = null;
+let lastTicket = null;
 
 // A dish is added through the note dialog: kitchen notes ("no onion") are the
 // norm in service, so asking once beats editing the line afterwards.
@@ -186,4 +201,71 @@ document.getElementById('dishSearch').addEventListener('input', function () {
         c.style.display = (q === '' || c.dataset.name.toLowerCase().includes(q)) ? '' : 'none';
     });
 });
+
+// ============================================================
+// Kitchen ticket — deliberately price-free: the kitchen needs
+// dishes, quantities and notes, in type big enough to read on a pass.
+// ============================================================
+function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function buildKitchenTicket(t) {
+    const lines = (t.items || []).map(i => `
+        <li class="kt-line">
+            <span class="kt-qty">${i.qty}×</span>
+            <span class="kt-name">${esc(i.label)}</span>
+            ${i.notes ? `<div class="kt-note">** ${esc(i.notes)} **</div>` : ''}
+        </li>`).join('');
+    return `
+    <div class="kt-head">
+        <div class="kt-shop">${esc(SHOP_NAME)}</div>
+        <div class="kt-title">${esc(KT.title)}</div>
+    </div>
+    <div class="kt-meta">
+        <div class="kt-num">${esc(t.number)}</div>
+        <div>${esc(t.type)}${t.table ? ' — ' + KT.table + ' ' + esc(t.table) : ''}</div>
+        <div>${esc(t.at)}${t.waiter ? ' — ' + KT.waiter + ': ' + esc(t.waiter) : ''}</div>
+    </div>
+    <div class="kt-sub">${esc(KT.newItems)}</div>
+    <ul class="kt-items">${lines}</ul>`;
+}
+
+function printKitchenTicket(t) {
+    const el = document.getElementById('kitchenTicket');
+    el.innerHTML = buildKitchenTicket(t);
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+    window.print();
+}
+
+function reprintKitchen() { if (lastTicket) printKitchenTicket(lastTicket); }
+
+async function sendToKitchen() {
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = true;
+    const fd = new FormData();
+    fd.append('csrf_token', CSRF);
+    try {
+        const r = await fetch(SEND_URL, { method: 'POST', body: fd });
+        const d = await r.json();
+        if (d.error) { alert(d.error); btn.disabled = false; return; }
+        lastTicket = d.ticket;
+        document.getElementById('reprintKBtn').disabled = false;
+        if (document.getElementById('autoKitchen').checked) {
+            printKitchenTicket(d.ticket);
+        }
+        // Reload once printing is dismissed so the ticket shows its new statuses.
+        setTimeout(() => location.reload(), 300);
+    } catch (e) {
+        alert('Erreur: ' + e.message);
+        btn.disabled = false;
+    }
+}
+
+(function () {
+    const cb = document.getElementById('autoKitchen');
+    if (!cb) return;
+    cb.checked = localStorage.getItem('kitchen_autoprint') === '1';
+    cb.addEventListener('change', () => localStorage.setItem('kitchen_autoprint', cb.checked ? '1' : '0'));
+})();
 </script>

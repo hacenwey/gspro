@@ -507,4 +507,11 @@ return [
     'tables.updated' => 'Table mise a jour.',
     'tables.removed' => 'Table desactivee.',
     'tables.name_required' => 'Le nom est requis.',
+
+    // Kitchen ticket
+    'kticket.title' => 'BON DE CUISINE',
+    'kticket.autoprint' => 'Imprimer le bon en cuisine',
+    'kticket.reprint' => 'Reimprimer le bon',
+    'kticket.waiter' => 'Serveur',
+    'kticket.new_items' => 'Nouveaux plats',
 ];

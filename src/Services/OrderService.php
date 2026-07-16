@@ -104,18 +104,32 @@ final class OrderService
         $this->db->prepare("DELETE FROM order_items WHERE id = ?")->execute([$itemId]);
     }
 
-    /** Push every pending line to the kitchen queue. */
-    public function send(string $orderId): void
+    /**
+     * Push every pending line to the kitchen queue.
+     *
+     * Returns the lines it just sent — the kitchen ticket must show only the new
+     * dishes, not the whole order, or a second round would reprint the first.
+     *
+     * @return array<int, array{qty:int, label:string, notes:?string}>
+     */
+    public function send(string $orderId): array
     {
         $this->assertEditable($orderId);
-        $n = $this->db->prepare("SELECT COUNT(*) FROM order_items WHERE order_id = ? AND status = 'pending'");
-        $n->execute([$orderId]);
-        if ((int)$n->fetchColumn() === 0) {
+        $q = $this->db->prepare("SELECT quantity, description, notes FROM order_items WHERE order_id = ? AND status = 'pending' ORDER BY created_at");
+        $q->execute([$orderId]);
+        $pending = $q->fetchAll(PDO::FETCH_ASSOC);
+        if (!$pending) {
             throw new RuntimeException('Aucune nouvelle ligne a envoyer.');
         }
         $this->db->prepare("UPDATE order_items SET status = 'sent' WHERE order_id = ? AND status = 'pending'")->execute([$orderId]);
         $this->db->prepare("UPDATE orders SET status = 'sent', sent_at = COALESCE(sent_at, {$this->nowExpr()}) WHERE id = ?")->execute([$orderId]);
         $this->refreshStatus($orderId);
+
+        return array_map(static fn(array $r): array => [
+            'qty'   => (int)$r['quantity'],
+            'label' => (string)$r['description'],
+            'notes' => $r['notes'] !== null ? (string)$r['notes'] : null,
+        ], $pending);
     }
 
     public function setItemStatus(string $itemId, string $status): string
