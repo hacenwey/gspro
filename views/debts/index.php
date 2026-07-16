@@ -51,50 +51,52 @@
             <h4><?= __('debts.no_debts') ?> <?= $typeFilter === 'receivable' ? __('debts.receivable') : __('debts.payable') ?></h4>
         </div>
         <?php else: ?>
-        <table class="table">
-            <thead>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><?= $typeFilter === 'receivable' ? __('invoices.client') : __('suppliers.title') ?></th>
+                        <th><?= __('debts.due_date') ?></th>
+                        <th class="text-right"><?= __('debts.amount') ?></th>
+                        <th class="text-right"><?= __('debts.paid') ?></th>
+                        <th class="text-right"><?= __('debts.remaining') ?></th>
+                        <th><?= __('common.status') ?></th>
+                        <th class="text-right"><?= __('common.actions') ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($items as $d): ?>
                 <tr>
-                    <th><?= $typeFilter === 'receivable' ? __('invoices.client') : __('suppliers.title') ?></th>
-                    <th><?= __('debts.due_date') ?></th>
-                    <th class="text-right"><?= __('debts.amount') ?></th>
-                    <th class="text-right"><?= __('debts.paid') ?></th>
-                    <th class="text-right"><?= __('debts.remaining') ?></th>
-                    <th><?= __('common.status') ?></th>
-                    <th class="text-right"><?= __('common.actions') ?></th>
+                    <td style="font-weight:600;">
+                        <?= $typeFilter === 'receivable'
+                            ? e(($d['first_name'] ?? '') . ' ' . ($d['last_name'] ?? ''))
+                            : e($d['company_name'] ?? '') ?>
+                    </td>
+                    <td>
+                        <?= formatDate($d['due_date']) ?>
+                        <?php if ($d['status'] === 'overdue'): ?>
+                        <div style="font-size:11px;color:var(--danger);">
+                            <?php $days = (int)((time() - strtotime($d['due_date'])) / 86400); ?>
+                            <?= $days ?> <?= __('debts.days_overdue') ?>
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-right text-mono"><?= formatMoney($d['total_amount']) ?></td>
+                    <td class="text-right text-mono text-success"><?= formatMoney($d['paid_amount']) ?></td>
+                    <td class="text-right text-mono fw-bold text-danger"><?= formatMoney($d['remaining']) ?></td>
+                    <td><span class="badge badge-<?= debtStatusClass($d['status']) ?>"><?= $d['status'] ?></span></td>
+                    <td class="text-right">
+                        <?php if ($d['status'] !== 'paid'): ?>
+                        <button class="btn btn-sm btn-success" onclick="openPayModal('<?= $d['id'] ?>', <?= $d['remaining'] ?>)">
+                            <i class="fas fa-money-bill"></i> <?= __('debts.pay') ?>
+                        </button>
+                        <?php endif; ?>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($items as $d): ?>
-            <tr>
-                <td style="font-weight:600;">
-                    <?= $typeFilter === 'receivable'
-                        ? e(($d['first_name'] ?? '') . ' ' . ($d['last_name'] ?? ''))
-                        : e($d['company_name'] ?? '') ?>
-                </td>
-                <td>
-                    <?= formatDate($d['due_date']) ?>
-                    <?php if ($d['status'] === 'overdue'): ?>
-                    <div style="font-size:11px;color:var(--danger);">
-                        <?php $days = (int)((time() - strtotime($d['due_date'])) / 86400); ?>
-                        <?= $days ?> <?= __('debts.days_overdue') ?>
-                    </div>
-                    <?php endif; ?>
-                </td>
-                <td class="text-right text-mono"><?= formatMoney($d['total_amount']) ?></td>
-                <td class="text-right text-mono text-success"><?= formatMoney($d['paid_amount']) ?></td>
-                <td class="text-right text-mono fw-bold text-danger"><?= formatMoney($d['remaining']) ?></td>
-                <td><span class="badge badge-<?= debtStatusClass($d['status']) ?>"><?= $d['status'] ?></span></td>
-                <td class="text-right">
-                    <?php if ($d['status'] !== 'paid'): ?>
-                    <button class="btn btn-sm btn-success" onclick="openPayModal('<?= $d['id'] ?>', <?= $d['remaining'] ?>)">
-                        <i class="fas fa-money-bill"></i> <?= __('debts.pay') ?>
-                    </button>
-                    <?php endif; ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
         <?php if ($totalPages > 1): ?>
         <div class="card-footer"><div class="pagination">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>

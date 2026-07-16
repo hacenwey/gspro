@@ -39,33 +39,35 @@
             </div>
         </div>
         <?php else: ?>
-        <table class="table">
-            <thead><tr><th><?= __('common.number') ?></th><th><?= __('common.type') ?></th><th><?= __('invoices.client') ?></th><th><?= __('common.date') ?></th><th class="text-right"><?= __('common.total') ?></th><th class="text-right"><?= __('debts.paid') ?></th><th><?= __('common.status') ?></th><th class="text-right"><?= __('common.actions') ?></th></tr></thead>
-            <tbody>
-            <?php foreach ($items as $inv): ?>
-            <tr>
-                <td><a href="<?= url('/invoices/view/' . $inv['id']) ?>" class="text-mono" style="font-size:12px;font-weight:600;"><?= e($inv['number']) ?></a></td>
-                <td><span class="badge badge-<?= $inv['type'] === 'invoice' ? 'primary' : ($inv['type'] === 'quote' ? 'info' : 'warning') ?>"><?= $inv['type'] === 'invoice' ? __('invoices.invoice') : ($inv['type'] === 'quote' ? __('invoices.quote') : __('invoices.credit_note')) ?></span></td>
-                <td><?= e(($inv['first_name'] ?? '') . ' ' . ($inv['last_name'] ?? '')) ?></td>
-                <td style="font-size:12px;"><?= formatDate($inv['issue_date']) ?></td>
-                <td class="text-right text-mono fw-bold"><?= formatMoney($inv['total']) ?></td>
-                <td class="text-right text-mono"><?= formatMoney($inv['amount_paid']) ?></td>
-                <td><span class="badge badge-<?= invoiceStatusClass($inv['status']) ?>"><?= invoiceStatusLabel($inv['status']) ?></span></td>
-                <td class="text-right">
-                    <div class="btn-group" style="justify-content:flex-end;">
-                        <a href="<?= url('/invoices/view/' . $inv['id']) ?>" class="btn btn-icon btn-sm btn-secondary"><i class="fas fa-eye"></i></a>
-                        <a href="<?= url('/invoices/pdf/' . $inv['id']) ?>" class="btn btn-icon btn-sm btn-secondary" target="_blank"><i class="fas fa-file-pdf"></i></a>
-                        <?php if ($inv['type'] === 'quote' && $inv['status'] !== 'accepted'): ?>
-                        <form method="POST" action="<?= url('/invoices/convert/' . $inv['id']) ?>" style="display:inline;"><?= csrf_field() ?>
-                            <button type="submit" class="btn btn-icon btn-sm btn-success" title="<?= __('invoices.convert') ?>"><i class="fas fa-exchange-alt"></i></button>
-                        </form>
-                        <?php endif; ?>
-                    </div>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th><?= __('common.number') ?></th><th><?= __('common.type') ?></th><th><?= __('invoices.client') ?></th><th><?= __('common.date') ?></th><th class="text-right"><?= __('common.total') ?></th><th class="text-right"><?= __('debts.paid') ?></th><th><?= __('common.status') ?></th><th class="text-right"><?= __('common.actions') ?></th></tr></thead>
+                <tbody>
+                <?php foreach ($items as $inv): ?>
+                <tr>
+                    <td><a href="<?= url('/invoices/view/' . $inv['id']) ?>" class="text-mono" style="font-size:12px;font-weight:600;"><?= e($inv['number']) ?></a></td>
+                    <td><span class="badge badge-<?= $inv['type'] === 'invoice' ? 'primary' : ($inv['type'] === 'quote' ? 'info' : 'warning') ?>"><?= $inv['type'] === 'invoice' ? __('invoices.invoice') : ($inv['type'] === 'quote' ? __('invoices.quote') : __('invoices.credit_note')) ?></span></td>
+                    <td><?= e(($inv['first_name'] ?? '') . ' ' . ($inv['last_name'] ?? '')) ?></td>
+                    <td style="font-size:12px;"><?= formatDate($inv['issue_date']) ?></td>
+                    <td class="text-right text-mono fw-bold"><?= formatMoney($inv['total']) ?></td>
+                    <td class="text-right text-mono"><?= formatMoney($inv['amount_paid']) ?></td>
+                    <td><span class="badge badge-<?= invoiceStatusClass($inv['status']) ?>"><?= invoiceStatusLabel($inv['status']) ?></span></td>
+                    <td class="text-right">
+                        <div class="btn-group" style="justify-content:flex-end;">
+                            <a href="<?= url('/invoices/view/' . $inv['id']) ?>" class="btn btn-icon btn-sm btn-secondary"><i class="fas fa-eye"></i></a>
+                            <a href="<?= url('/invoices/pdf/' . $inv['id']) ?>" class="btn btn-icon btn-sm btn-secondary" target="_blank"><i class="fas fa-file-pdf"></i></a>
+                            <?php if ($inv['type'] === 'quote' && $inv['status'] !== 'accepted'): ?>
+                            <form method="POST" action="<?= url('/invoices/convert/' . $inv['id']) ?>" style="display:inline;"><?= csrf_field() ?>
+                                <button type="submit" class="btn btn-icon btn-sm btn-success" title="<?= __('invoices.convert') ?>"><i class="fas fa-exchange-alt"></i></button>
+                            </form>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
         <?php if ($totalPages > 1): ?>
         <div class="card-footer"><div class="pagination">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>

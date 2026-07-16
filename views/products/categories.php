@@ -16,28 +16,30 @@
             <button class="btn btn-primary" onclick="openModal('catModal')"><i class="fas fa-plus"></i> <?= __('categories.new') ?></button>
         </div>
         <?php else: ?>
-        <table class="table">
-            <thead><tr><th><?= __('categories.name') ?></th><th><?= __('categories.parent') ?></th><th><?= __('common.description') ?></th><th class="text-center"><?= __('common.products_count') ?></th><th class="text-right"><?= __('common.actions') ?></th></tr></thead>
-            <tbody>
-            <?php foreach ($categories as $cat): ?>
-            <tr>
-                <td style="font-weight: 600;"><?= e($cat['name']) ?></td>
-                <td><?= e($cat['parent_name'] ?? '-') ?></td>
-                <td style="font-size:12px; color: var(--text-secondary);"><?= e($cat['description'] ?? '-') ?></td>
-                <td class="text-center"><span class="badge badge-info"><?= $cat['product_count'] ?></span></td>
-                <td class="text-right">
-                    <div class="btn-group" style="justify-content: flex-end;">
-                        <button class="btn btn-icon btn-sm btn-secondary" onclick="editCat('<?= $cat['id'] ?>', '<?= e($cat['name']) ?>', '<?= $cat['parent_id'] ?? '' ?>', '<?= e($cat['description'] ?? '') ?>')"><i class="fas fa-pen"></i></button>
-                        <form method="POST" action="<?= url('/categories/delete/' . $cat['id']) ?>" style="display:inline;">
-                            <?= csrf_field() ?>
-                            <button type="button" class="btn btn-icon btn-sm btn-danger" onclick="confirmDelete(this.parentNode, '<?= __('common.confirm_delete') ?>')"><i class="fas fa-trash"></i></button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th><?= __('categories.name') ?></th><th><?= __('categories.parent') ?></th><th><?= __('common.description') ?></th><th class="text-center"><?= __('common.products_count') ?></th><th class="text-right"><?= __('common.actions') ?></th></tr></thead>
+                <tbody>
+                <?php foreach ($categories as $cat): ?>
+                <tr>
+                    <td style="font-weight: 600;"><?= e($cat['name']) ?></td>
+                    <td><?= e($cat['parent_name'] ?? '-') ?></td>
+                    <td style="font-size:12px; color: var(--text-secondary);"><?= e($cat['description'] ?? '-') ?></td>
+                    <td class="text-center"><span class="badge badge-info"><?= $cat['product_count'] ?></span></td>
+                    <td class="text-right">
+                        <div class="btn-group" style="justify-content: flex-end;">
+                            <button class="btn btn-icon btn-sm btn-secondary" onclick="editCat('<?= $cat['id'] ?>', '<?= e($cat['name']) ?>', '<?= $cat['parent_id'] ?? '' ?>', '<?= e($cat['description'] ?? '') ?>')"><i class="fas fa-pen"></i></button>
+                            <form method="POST" action="<?= url('/categories/delete/' . $cat['id']) ?>" style="display:inline;">
+                                <?= csrf_field() ?>
+                                <button type="button" class="btn btn-icon btn-sm btn-danger" onclick="confirmDelete(this.parentNode, '<?= __('common.confirm_delete') ?>')"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
         <?php endif; ?>
     </div>
 </div>

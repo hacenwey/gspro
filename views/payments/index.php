@@ -43,28 +43,30 @@
         <?php if (empty($items)): ?>
         <div class="empty-state"><div class="icon"><i class="fas fa-money-bill-wave"></i></div><h4><?= __('payments.no_payments') ?></h4></div>
         <?php else: ?>
-        <table class="table">
-            <thead><tr><th><?= __('common.date') ?></th><th><?= __('common.type') ?></th><th><?= __('invoices.invoice') ?></th><th><?= __('debts.party') ?></th><th><?= __('common.method') ?></th><th class="text-right"><?= __('common.amount') ?></th><th><?= __('common.by') ?></th></tr></thead>
-            <tbody>
-            <?php foreach ($items as $p): ?>
-            <tr>
-                <td style="font-size:12px;"><?= formatDate($p['payment_date']) ?></td>
-                <td>
-                    <span class="badge badge-<?= $p['type'] === 'incoming' ? 'success' : 'danger' ?>">
-                        <?= $p['type'] === 'incoming' ? __('payments.incoming') : __('payments.outgoing') ?>
-                    </span>
-                </td>
-                <td class="text-mono" style="font-size:12px;"><?= e($p['invoice_number'] ?? '-') ?></td>
-                <td><?= e($p['client_name'] ?? $p['supplier_name'] ?? '-') ?></td>
-                <td><span class="badge badge-info"><?= $p['method'] ?></span></td>
-                <td class="text-right text-mono fw-bold <?= $p['type'] === 'incoming' ? 'text-success' : 'text-danger' ?>">
-                    <?= $p['type'] === 'incoming' ? '+' : '-' ?><?= formatMoney($p['amount']) ?>
-                </td>
-                <td style="font-size:12px;"><?= e($p['user_name'] ?? '') ?></td>
-            </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th><?= __('common.date') ?></th><th><?= __('common.type') ?></th><th><?= __('invoices.invoice') ?></th><th><?= __('debts.party') ?></th><th><?= __('common.method') ?></th><th class="text-right"><?= __('common.amount') ?></th><th><?= __('common.by') ?></th></tr></thead>
+                <tbody>
+                <?php foreach ($items as $p): ?>
+                <tr>
+                    <td style="font-size:12px;"><?= formatDate($p['payment_date']) ?></td>
+                    <td>
+                        <span class="badge badge-<?= $p['type'] === 'incoming' ? 'success' : 'danger' ?>">
+                            <?= $p['type'] === 'incoming' ? __('payments.incoming') : __('payments.outgoing') ?>
+                        </span>
+                    </td>
+                    <td class="text-mono" style="font-size:12px;"><?= e($p['invoice_number'] ?? '-') ?></td>
+                    <td><?= e($p['client_name'] ?? $p['supplier_name'] ?? '-') ?></td>
+                    <td><span class="badge badge-info"><?= $p['method'] ?></span></td>
+                    <td class="text-right text-mono fw-bold <?= $p['type'] === 'incoming' ? 'text-success' : 'text-danger' ?>">
+                        <?= $p['type'] === 'incoming' ? '+' : '-' ?><?= formatMoney($p['amount']) ?>
+                    </td>
+                    <td style="font-size:12px;"><?= e($p['user_name'] ?? '') ?></td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
         <?php if ($totalPages > 1): ?>
         <div class="card-footer"><div class="pagination">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
