@@ -20,18 +20,48 @@ class OrderController extends Controller {
         return new \App\Services\OrderService($this->db);
     }
 
+    /**
+     * Service board.
+     *
+     * Filtered by status via ?status=, with live counts per tab: on a busy shift
+     * "how many are ready?" is the question, and a single flat list cannot answer
+     * it. 'active' means anything not yet settled or cancelled.
+     */
     public function index(): void {
         $this->guard();
+
+        $filter = (string)$this->input('status', 'active');
+        $tabs   = ['active', 'open', 'sent', 'preparing', 'ready', 'served', 'paid'];
+        if (!in_array($filter, $tabs, true)) {
+            $filter = 'active';
+        }
+
+        // 'paid' is scoped to today: the board is about the shift, not all history.
+        $where = match ($filter) {
+            'active' => "o.status NOT IN ('paid','cancelled')",
+            'paid'   => "o.status = 'paid' AND DATE(o.closed_at) = CURDATE()",
+            default  => "o.status = " . $this->db->quote($filter),
+        };
+
+        $counts = ['active' => 0, 'paid' => 0];
+        foreach ($this->db->query("SELECT status, COUNT(*) AS n FROM orders WHERE status <> 'cancelled' OR closed_at IS NOT NULL GROUP BY status")->fetchAll() as $r) {
+            $counts[$r['status']] = (int)$r['n'];
+        }
+        $counts['active'] = array_sum(array_map(fn($s) => $counts[$s] ?? 0, ['open', 'sent', 'preparing', 'ready', 'served']));
+        $counts['paid'] = (int)$this->db->query("SELECT COUNT(*) FROM orders WHERE status = 'paid' AND DATE(closed_at) = CURDATE()")->fetchColumn();
 
         $orders = $this->db->query("
             SELECT o.*, t.name AS table_name, u.full_name AS waiter,
                    (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id AND oi.status <> 'cancelled') AS item_count,
-                   (SELECT COALESCE(SUM(oi.line_total),0) FROM order_items oi WHERE oi.order_id = o.id AND oi.status <> 'cancelled') AS total
+                   (SELECT COALESCE(SUM(oi.line_total),0) FROM order_items oi WHERE oi.order_id = o.id AND oi.status <> 'cancelled') AS total,
+                   -- What is still owed. Split bills mean an order can be partly
+                   -- settled, so the board shows it rather than a paid/unpaid flag.
+                   (SELECT COALESCE(SUM(oi.line_total),0) FROM order_items oi WHERE oi.order_id = o.id AND oi.status <> 'cancelled' AND oi.invoice_id IS NULL) AS due
             FROM orders o
             LEFT JOIN service_tables t ON o.table_id = t.id
             LEFT JOIN users u ON o.user_id = u.id
-            WHERE o.status NOT IN ('paid','cancelled')
-            ORDER BY FIELD(o.status,'ready','preparing','sent','open','served'), o.created_at ASC
+            WHERE $where
+            ORDER BY FIELD(o.status,'ready','preparing','sent','open','served','paid'), o.created_at ASC
         ")->fetchAll();
 
         $tables = $this->db->query("
@@ -45,6 +75,9 @@ class OrderController extends Controller {
             'pageTitle' => __('nav.orders', 'Commandes'),
             'orders'    => $orders,
             'tables'    => $tables,
+            'filter'    => $filter,
+            'tabs'      => $tabs,
+            'counts'    => $counts,
         ]);
     }
 

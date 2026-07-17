@@ -531,4 +531,16 @@ return [
     'orders.merged_from' => 'Merged into',
     'orders.no_mergeable' => 'No other open order',
     'orders.selection' => 'Selection',
+
+    // Order board: status tabs + payment state
+    'orders.tab.active' => 'Active',
+    'orders.tab.paid_today' => 'Settled today',
+    'orders.paid_full' => 'Paid',
+    'orders.unpaid' => 'Unpaid',
+    'orders.partial' => 'Left',
+    'orders.act.edit' => 'Edit',
+    'orders.act.kitchen' => 'Track',
+    'orders.act.cash' => 'Take payment',
+    'orders.act.view' => 'View',
+    'orders.none_filter' => 'No order in this filter',
 ];

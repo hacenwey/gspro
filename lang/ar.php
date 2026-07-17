@@ -529,4 +529,16 @@ return [
     'orders.merged_from' => 'مدموج في',
     'orders.no_mergeable' => 'لا يوجد طلب مفتوح آخر',
     'orders.selection' => 'المحدد',
+
+    // Order board: status tabs + payment state
+    'orders.tab.active' => 'نشطة',
+    'orders.tab.paid_today' => 'محصّلة اليوم',
+    'orders.paid_full' => 'مدفوع',
+    'orders.unpaid' => 'غير مدفوع',
+    'orders.partial' => 'المتبقي',
+    'orders.act.edit' => 'تعديل',
+    'orders.act.kitchen' => 'متابعة',
+    'orders.act.cash' => 'تحصيل',
+    'orders.act.view' => 'عرض',
+    'orders.none_filter' => 'لا توجد طلبات في هذا الفلتر',
 ];

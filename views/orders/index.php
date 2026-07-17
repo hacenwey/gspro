@@ -2,12 +2,34 @@
 /** Active service board: open tickets first, plus the floor at a glance. */
 $statusClass = [
     'open' => 'secondary', 'sent' => 'info', 'preparing' => 'warning',
-    'ready' => 'success', 'served' => 'primary',
+    'ready' => 'success', 'served' => 'primary', 'paid' => 'success',
 ];
 ?>
 <div class="toolbar">
     <div></div>
     <button class="btn btn-primary" onclick="openModal('newOrderModal')"><i class="fas fa-plus"></i> <?= __('orders.new') ?></button>
+</div>
+
+<?php
+// Status tabs with live counts: on a busy shift the question is "how many are
+// ready?", and a single flat list cannot answer it.
+$tabLabel = [
+    'active'    => __('orders.tab.active'),
+    'open'      => __('orders.status.open'),
+    'sent'      => __('orders.status.sent'),
+    'preparing' => __('orders.status.preparing'),
+    'ready'     => __('orders.status.ready'),
+    'served'    => __('orders.status.served'),
+    'paid'      => __('orders.tab.paid_today'),
+];
+?>
+<div class="status-tabs">
+    <?php foreach ($tabs as $t): ?>
+    <a href="<?= url('/orders') ?>?status=<?= e($t) ?>" class="status-tab <?= $filter === $t ? 'active' : '' ?> tab-<?= e($t) ?>">
+        <?= e($tabLabel[$t] ?? $t) ?>
+        <span class="st-count"><?= (int)($counts[$t] ?? 0) ?></span>
+    </a>
+    <?php endforeach; ?>
 </div>
 
 <?php if (!empty($tables)): ?>
@@ -33,7 +55,7 @@ $statusClass = [
         <?php if (empty($orders)): ?>
         <div class="empty-state">
             <div class="icon"><i class="fas fa-receipt"></i></div>
-            <h4><?= __('orders.none') ?></h4>
+            <h4><?= $filter === 'active' ? __('orders.none') : __('orders.none_filter') ?></h4>
             <p><?= __('orders.none_hint') ?></p>
             <button class="btn btn-primary" onclick="openModal('newOrderModal')"><i class="fas fa-plus"></i> <?= __('orders.new') ?></button>
         </div>
@@ -47,19 +69,41 @@ $statusClass = [
                 <th class="text-center"><?= __('common.status') ?></th><th></th>
             </tr></thead>
             <tbody>
-            <?php foreach ($orders as $o): ?>
+            <?php foreach ($orders as $o):
+                $due  = (float)$o['due'];
+                $paid = $due <= 0.001;
+                // The action follows the state: one obvious next move per row beats a
+                // row of identical pencils.
+                [$actIcon, $actLabel, $actClass] = match ($o['status']) {
+                    'open'                 => ['fa-pen',           __('orders.act.edit'),    'btn-secondary'],
+                    'sent', 'preparing'    => ['fa-fire-burner',   __('orders.act.kitchen'), 'btn-secondary'],
+                    'ready', 'served'      => ['fa-money-bill-wave', __('orders.act.cash'),  'btn-success'],
+                    default                => ['fa-eye',           __('orders.act.view'),    'btn-secondary'],
+                };
+            ?>
             <tr>
                 <td class="text-mono" style="font-size:12px;"><?= e($o['number']) ?></td>
                 <td><?= __('orders.type.' . $o['type']) ?></td>
                 <td><?= e($o['table_name'] ?? '-') ?></td>
                 <td style="font-size:12px;color:var(--text-secondary);"><?= e($o['waiter'] ?? '-') ?></td>
                 <td class="text-center"><?= (int)$o['item_count'] ?></td>
-                <td class="text-right text-mono fw-bold"><?= formatMoney($o['total']) ?></td>
+                <td class="text-right">
+                    <div class="text-mono fw-bold"><?= formatMoney($o['total']) ?></div>
+                    <?php if ($paid): ?>
+                    <div class="pay-state paid"><?= __('orders.paid_full') ?></div>
+                    <?php elseif ($due < (float)$o['total'] - 0.001): ?>
+                    <div class="pay-state partial"><?= __('orders.partial') ?> <?= formatMoney($due) ?></div>
+                    <?php else: ?>
+                    <div class="pay-state unpaid"><?= __('orders.unpaid') ?></div>
+                    <?php endif; ?>
+                </td>
                 <td class="text-center">
                     <span class="badge badge-<?= $statusClass[$o['status']] ?? 'secondary' ?>"><?= __('orders.status.' . $o['status']) ?></span>
                 </td>
                 <td class="text-right">
-                    <a href="<?= url('/orders/view/' . $o['id']) ?>" class="btn btn-sm btn-secondary"><i class="fas fa-pen"></i></a>
+                    <a href="<?= url('/orders/view/' . $o['id']) ?>" class="btn btn-sm <?= $actClass ?>">
+                        <i class="fas <?= $actIcon ?>"></i> <?= e($actLabel) ?>
+                    </a>
                 </td>
             </tr>
             <?php endforeach; ?>

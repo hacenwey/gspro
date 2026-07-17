@@ -531,4 +531,16 @@ return [
     'orders.merged_from' => 'Fusionnee dans',
     'orders.no_mergeable' => 'Aucune autre commande ouverte',
     'orders.selection' => 'Selection',
+
+    // Order board: status tabs + payment state
+    'orders.tab.active' => 'Actives',
+    'orders.tab.paid_today' => 'Encaissees du jour',
+    'orders.paid_full' => 'Paye',
+    'orders.unpaid' => 'Non paye',
+    'orders.partial' => 'Reste',
+    'orders.act.edit' => 'Modifier',
+    'orders.act.kitchen' => 'Suivre',
+    'orders.act.cash' => 'Encaisser',
+    'orders.act.view' => 'Voir',
+    'orders.none_filter' => 'Aucune commande dans ce filtre',
 ];

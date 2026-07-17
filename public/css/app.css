@@ -1592,3 +1592,29 @@ body.is-offline .app-layout { padding-top: 38px; }
     /* Room so the last row of products is never hidden behind the handle. */
     .pos-products { padding-bottom: 64px; }
 }
+
+/* ===================== Order board: status tabs + payment state ===================== */
+.status-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.status-tab {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 100px;
+    border: 1.5px solid var(--border); background: var(--surface);
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    transition: var(--transition); white-space: nowrap;
+}
+.status-tab:hover { border-color: var(--primary); color: var(--primary); }
+.status-tab.active { background: var(--primary); border-color: var(--primary); color: var(--on-accent); }
+.status-tab .st-count {
+    background: var(--bg-subtle); color: var(--text-secondary);
+    padding: 1px 8px; border-radius: 100px; font-size: 11px; font-weight: 800;
+    font-family: var(--font-mono);
+}
+.status-tab.active .st-count { background: rgba(255,255,255,.22); color: var(--on-accent); }
+/* The tab that matters during service: a ready dish is money waiting. */
+.status-tab.tab-ready:not(.active) { border-color: var(--success); color: var(--success); }
+
+/* Payment state, read under the amount rather than in its own column. */
+.pay-state { font-size: 10.5px; font-weight: 700; margin-top: 2px; letter-spacing: .2px; }
+.pay-state.paid    { color: var(--success); }
+.pay-state.unpaid  { color: var(--danger); }
+.pay-state.partial { color: var(--accent); }
