@@ -13,7 +13,7 @@ $slug = $tenant['slug'] ?? '';
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:-apple-system,'Segoe UI',Inter,sans-serif; background:#F9FAFB; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; color:#1F2937; }
         .card { background:#fff; max-width:520px; width:100%; border-radius:16px; box-shadow:0 20px 50px rgba(0,0,0,.08); overflow:hidden; text-align:center; }
-        .banner { padding:40px 32px; background:linear-gradient(135deg,#047857,#065F46); color:#fff; }
+        .banner { padding:40px 32px; background:linear-gradient(135deg,#2E7D32,#1B5E20); color:#fff; }
         .banner i { font-size:52px; margin-bottom:12px; display:block; }
         .banner h1 { font-size:24px; font-weight:700; }
         .body { padding:32px; }
@@ -22,7 +22,7 @@ $slug = $tenant['slug'] ?? '';
         .btn { display:inline-block; padding:12px 28px; background:#DC2626; color:#fff; text-decoration:none; border-radius:10px; font-weight:600; transition:all .2s; }
         .btn:hover { background:#B91C1C; transform:translateY(-1px); }
         .badge { display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; margin-bottom:8px; }
-        .badge-ok { background:#D1FAE5; color:#065F46; }
+        .badge-ok { background:#D1FAE5; color:#1B5E20; }
         .badge-wait { background:#FEF3C7; color:#92400E; }
     </style>
 </head>

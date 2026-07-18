@@ -192,8 +192,8 @@ function loadChart(period) {
 
             const ctx = document.getElementById('revenueChart').getContext('2d');
             const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-            gradient.addColorStop(0, 'rgba(79,70,229,0.12)');
-            gradient.addColorStop(1, 'rgba(79,70,229,0)');
+            gradient.addColorStop(0, 'rgba(27,58,92,0.12)');
+            gradient.addColorStop(1, 'rgba(27,58,92,0)');
 
             revenueChart = new Chart(ctx, {
                 type: 'line',
@@ -202,15 +202,15 @@ function loadChart(period) {
                     datasets: [{
                         label: '<?= __('dash.revenue') ?>',
                         data: values,
-                        borderColor: '#4F46E5',
+                        borderColor: '#1B3A5C',
                         backgroundColor: gradient,
                         fill: true,
                         tension: 0.4,
                         borderWidth: 2.5,
                         pointRadius: 3,
-                        pointBackgroundColor: '#4F46E5',
+                        pointBackgroundColor: '#1B3A5C',
                         pointHoverRadius: 6,
-                        pointHoverBackgroundColor: '#4F46E5',
+                        pointHoverBackgroundColor: '#1B3A5C',
                         pointHoverBorderColor: '#fff',
                         pointHoverBorderWidth: 2
                     }]

@@ -16,7 +16,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #312E81 0%, #4F46E5 50%, #6366F1 100%);
+            background: linear-gradient(135deg, #12283F 0%, #1B3A5C 50%, #2C5A8A 100%);
             position: relative;
         }
         body::before {
@@ -24,7 +24,7 @@
             position: absolute;
             inset: 0;
             background: radial-gradient(circle at 30% 20%, rgba(99,102,241,0.3) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 80%, rgba(79,70,229,0.2) 0%, transparent 50%);
+                        radial-gradient(circle at 70% 80%, rgba(27,58,92,0.2) 0%, transparent 50%);
             pointer-events: none;
         }
         .login-container {
@@ -48,7 +48,7 @@
         .login-brand .logo {
             width: 68px;
             height: 68px;
-            background: linear-gradient(135deg, #4F46E5, #6366F1);
+            background: linear-gradient(135deg, #1B3A5C, #2C5A8A);
             border-radius: 18px;
             display: inline-flex;
             align-items: center;
@@ -57,7 +57,7 @@
             font-size: 26px;
             color: #fff;
             margin-bottom: 16px;
-            box-shadow: 0 8px 24px rgba(79,70,229,0.35);
+            box-shadow: 0 8px 24px rgba(27,58,92,0.35);
         }
         .login-brand h1 { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
         .login-brand p { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
@@ -81,7 +81,7 @@
 <div class="login-container">
     <div class="login-card">
         <div class="login-brand">
-            <div class="logo">GP</div>
+            <?= brandMark() ?>
             <h1>GestionPro</h1>
             <?php if (class_exists('Tenant') && Tenant::current()): ?>
             <p style="font-weight:600;color:var(--text);font-size:15px;margin-bottom:4px;"><?= e(Tenant::current()['company_name']) ?></p>

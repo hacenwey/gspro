@@ -16,6 +16,23 @@ function asset(string $path): string {
     return APP_BASE . '/public/' . $path;
 }
 
+/**
+ * Brand mark for the sidebar / login / landing.
+ *
+ * Renders public/img/logo-mark.png when it is there, and falls back to the "GP"
+ * monogram otherwise — so dropping the file in is all it takes to switch, and a
+ * missing file never leaves a broken image in the header.
+ */
+function brandMark(string $class = 'logo'): string {
+    $file = APP_ROOT . '/public/img/logo-mark.png';
+    if (is_file($file)) {
+        // Cache-bust on mtime: the logo is long-cached but must update on replace.
+        $src = asset('img/logo-mark.png') . '?v=' . filemtime($file);
+        return '<div class="' . e($class) . ' has-mark"><img src="' . e($src) . '" alt="GestionPro"></div>';
+    }
+    return '<div class="' . e($class) . '">GP</div>';
+}
+
 function tenantUrl(string $slug, string $path = ''): string {
     return APP_BASE . '/' . $slug . $path;
 }

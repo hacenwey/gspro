@@ -4,11 +4,17 @@
 
 /* === CSS Variables === */
 :root {
-    --primary: #4F46E5;
-    --primary-light: #6366F1;
-    --primary-dark: #3730A3;
-    --primary-50: rgba(79,70,229,0.06);
-    --primary-100: rgba(79,70,229,0.12);
+    /* Brand: navy + green, taken from the GestionPro logo (the navy "G", the
+       green "P"). Every value below clears WCAG AA on white — see --brand-green
+       for the one exception, which stays decorative. */
+    --primary: #1B3A5C;         /* navy       — 11.63:1 */
+    --primary-light: #2C5A8A;   /*            —  7.15:1 */
+    --primary-dark: #12283F;    /*            — 14.99:1 */
+    --primary-50: rgba(27,58,92,0.06);
+    --primary-100: rgba(27,58,92,0.12);
+    /* The logo green (#4CAF50) measures 2.78:1 on white: identity only — logo,
+       flat decorative fills. Never text, never a button carrying white text. */
+    --brand-green: #4CAF50;
     /* Accents are the LIGHTEST shade of each hue that still clears WCAG AA
        (4.5:1) on white. Contrast being symmetric, one such value works both as
        coloured text on a light surface and as a solid button carrying
@@ -17,8 +23,10 @@
     --secondary: #0369A1;
     --accent: #B45309;          /* amber-700  — 5.02:1 */
     --accent-light: #FBBF24;
-    --success: #047857;         /* emerald-700 — 5.48:1 */
-    --success-light: #34D399;
+    /* Accessible shade of the brand green: same hue as the logo's "P", dark
+       enough to carry white text and to be read on a light surface. */
+    --success: #2E7D32;         /* green-800  — 5.13:1 */
+    --success-light: #66BB6A;
     --danger: #DC2626;          /* red-600    — 4.83:1 */
     --danger-light: #F87171;
     --warning: #B45309;         /* amber-700  — 5.02:1 */
@@ -53,14 +61,17 @@
 }
 
 [data-theme="dark"] {
-    --primary: #818CF8;
-    --primary-light: #A5B4FC;
-    --primary-dark: #6366F1;
-    --primary-50: rgba(129,140,248,0.08);
-    --primary-100: rgba(129,140,248,0.15);
+    /* Same brand hues, lifted so they read on a dark surface and can carry
+       --on-accent (dark) text. */
+    --primary: #7BA7D4;         /* navy, lightened — 5.80:1 on --surface */
+    --primary-light: #A3C4E4;
+    --primary-dark: #5C89B8;
+    --primary-50: rgba(123,167,212,0.10);
+    --primary-100: rgba(123,167,212,0.18);
+    --brand-green: #81C784;
     --secondary: #38BDF8;
     --accent: #FBBF24;
-    --success: #34D399;
+    --success: #66BB6A;         /* brand green, lightened — 6.19:1 */
     --danger: #F87171;
     --warning: #FBBF24;
     --info: #38BDF8;
@@ -165,7 +176,7 @@ img { max-width: 100%; height: auto; }
     font-size: 15px;
     color: #fff;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+    box-shadow: 0 2px 8px rgba(27,58,92,0.3);
 }
 
 .sidebar-brand h1 {
@@ -537,13 +548,13 @@ img { max-width: 100%; height: auto; }
     background: var(--primary);
     color: var(--on-accent);
     border-color: var(--primary);
-    box-shadow: 0 1px 3px rgba(79,70,229,0.3);
+    box-shadow: 0 1px 3px rgba(27,58,92,0.3);
 }
 .btn-primary:hover {
     background: var(--primary-light);
     border-color: var(--primary-light);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(79,70,229,0.35);
+    box-shadow: 0 4px 12px rgba(27,58,92,0.35);
 }
 
 .btn-secondary {
@@ -890,14 +901,14 @@ textarea.form-control {
     background: var(--primary);
     color: #fff;
     border-color: var(--primary);
-    box-shadow: 0 2px 6px rgba(79,70,229,0.3);
+    box-shadow: 0 2px 6px rgba(27,58,92,0.3);
 }
 
 .pagination .active {
     background: var(--primary);
     color: #fff;
     border-color: var(--primary);
-    box-shadow: 0 2px 6px rgba(79,70,229,0.3);
+    box-shadow: 0 2px 6px rgba(27,58,92,0.3);
 }
 
 /* === Toolbar === */
@@ -1435,7 +1446,7 @@ body.is-offline .app-layout { padding-top: 38px; }
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(79,70,229,0.4);
+    box-shadow: 0 6px 18px rgba(27,58,92,0.4);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1618,3 +1629,8 @@ body.is-offline .app-layout { padding-top: 38px; }
 .pay-state.paid    { color: var(--success); }
 .pay-state.unpaid  { color: var(--danger); }
 .pay-state.partial { color: var(--accent); }
+
+/* Logo image (public/img/logo-mark.png). Without the file, brandMark() renders
+   the "GP" monogram and these rules simply never apply. */
+.logo.has-mark { background: none !important; box-shadow: none !important; padding: 0; }
+.logo.has-mark img { width: 100%; height: 100%; object-fit: contain; display: block; }

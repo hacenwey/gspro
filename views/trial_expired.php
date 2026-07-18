@@ -31,7 +31,7 @@ $pageIntro = match($subStatus) {
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
         .card{max-width:520px;width:100%;background:#fff;color:#0F172A;border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.4);overflow:hidden}
-        .card-top{background:linear-gradient(135deg,#4F46E5,#6366F1);padding:40px 32px;text-align:center;color:#fff}
+        .card-top{background:linear-gradient(135deg,#1B3A5C,#2C5A8A);padding:40px 32px;text-align:center;color:#fff}
         .icon-ring{width:80px;height:80px;margin:0 auto 16px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:34px}
         .card-top h1{font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:8px}
         .card-top p{font-size:15px;opacity:.9}
@@ -41,11 +41,11 @@ $pageIntro = match($subStatus) {
         .tenant-box .name{font-size:18px;font-weight:700;margin-top:4px}
         .tenant-box .slug{font-size:13px;color:#475569;font-family:'Inter',monospace}
         .plan-box{background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border:1px solid #C7D2FE;border-radius:14px;padding:24px;text-align:center;margin-bottom:24px}
-        .plan-box .pname{font-size:14px;font-weight:700;color:#4F46E5;text-transform:uppercase;letter-spacing:1px}
+        .plan-box .pname{font-size:14px;font-weight:700;color:#1B3A5C;text-transform:uppercase;letter-spacing:1px}
         .plan-box .pprice{font-size:40px;font-weight:900;color:#0F172A;margin-top:6px;letter-spacing:-1px}
         .plan-box .pper{font-size:13px;color:#64748B}
-        .pay-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:linear-gradient(135deg,#4F46E5,#6366F1);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
-        .pay-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,70,229,.4)}
+        .pay-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:linear-gradient(135deg,#1B3A5C,#2C5A8A);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
+        .pay-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(27,58,92,.4)}
         .trust-row{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:#64748B}
         .trust-row span{display:inline-flex;align-items:center;gap:6px}
         .trust-row i{color:#10B981}

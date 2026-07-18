@@ -362,13 +362,13 @@ $waGeneral = $waLink($t['wa_msg_general']);
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         :root{
-            --primary:#4F46E5;--primary-light:#6366F1;--primary-dark:#3730A3;
-            --primary-50:#EEF2FF;--primary-100:#E0E7FF;--primary-200:#C7D2FE;
+            --primary:#1B3A5C;--primary-light:#2C5A8A;--primary-dark:#12283F;
+            --primary-50:#EDF2F7;--primary-100:#DCE6F0;--primary-200:#B8CCE0;
             --text:#0F172A;--text-secondary:#475569;--text-muted:#64748B;
             --bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;--border-light:#F1F5F9;
             /* Lightest shade of each hue that still clears WCAG AA (4.5:1) on
                white. The previous ones measured 2.15-3.76:1. */
-            --success:#047857;--danger:#DC2626;--warning:#B45309;
+            --success:#2E7D32;--danger:#DC2626;--warning:#B45309;
             /* WhatsApp brand — every WhatsApp CTA uses it so the action reads instantly */
             --wa:#25D366;--wa-dark:#1DBF5C;--wa-deep:#0B5C2E;--wa-glow:rgba(37,211,102,.35);
             /* Text on the brand green: white measures 1.98:1 on it, dark 9.00:1.
@@ -401,12 +401,14 @@ $waGeneral = $waLink($t['wa_msg_general']);
 
         /* ===== HERO ===== */
         .hero{padding:130px 24px 80px;position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,var(--primary-50) 100%)}
-        .hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,.08) 0%,transparent 70%);pointer-events:none}
+        .hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,92,.08) 0%,transparent 70%);pointer-events:none}
         .hero-inner{max-width:1100px;margin:0 auto;text-align:center;position:relative}
         .hero h1{font-size:clamp(36px,5.5vw,68px);font-weight:900;line-height:1.05;letter-spacing:-2px;max-width:860px;margin:0 auto 20px;background:linear-gradient(135deg,var(--text) 0%,var(--primary-dark) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .hero-sub{font-size:clamp(16px,2vw,19px);color:var(--text-secondary);max-width:620px;margin:0 auto 36px;line-height:1.65}
         .hero-trust{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:28px;font-size:13px;color:var(--text-secondary)}
         .hero-trust span{display:inline-flex;align-items:center;gap:6px}
+        .logo.has-mark{background:none!important;box-shadow:none!important;padding:0}
+        .logo.has-mark img{width:100%;height:100%;object-fit:contain;display:block}
         .hero-trust i{color:var(--success)}
         .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:52px}
         .btn-cta{display:inline-flex;align-items:center;gap:10px;padding:16px 30px;border-radius:14px;font-weight:700;font-size:15px;transition:all .25s;cursor:pointer;border:none;font-family:inherit}
@@ -439,7 +441,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .m-kpi .val{font-size:20px;font-weight:800}
         .m-kpi .lbl{font-size:10px;color:var(--text-muted);margin-top:2px}
         .m-kpi .val.green{color:var(--success)}.m-kpi .val.blue{color:var(--primary)}.m-kpi .val.orange{color:var(--warning)}
-        .mockup-chart{height:140px;background:linear-gradient(180deg,rgba(79,70,229,.06) 0%,transparent 100%);border-radius:10px;border:1px solid var(--border);position:relative;overflow:hidden}
+        .mockup-chart{height:140px;background:linear-gradient(180deg,rgba(27,58,92,.06) 0%,transparent 100%);border-radius:10px;border:1px solid var(--border);position:relative;overflow:hidden}
         .mockup-chart svg{position:absolute;bottom:0;left:0;width:100%}
 
         /* ===== SECTION ===== */
@@ -456,7 +458,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .feat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary-200)}
         .feat-card:hover::before{transform:scaleX(1)}
         .feat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px}
-        .feat-icon.i1{background:rgba(79,70,229,.1);color:#4F46E5}
+        .feat-icon.i1{background:rgba(27,58,92,.1);color:#1B3A5C}
         .feat-icon.i2{background:rgba(16,185,129,.1);color:#10B981}
         .feat-icon.i3{background:rgba(245,158,11,.1);color:#F59E0B}
         .feat-icon.i4{background:rgba(14,165,233,.1);color:#0EA5E9}
@@ -474,7 +476,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .uc-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
         .uc-tab{display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:100px;border:1.5px solid var(--border);background:var(--surface);font-family:inherit;font-size:14.5px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s}
         .uc-tab:hover{border-color:var(--primary);color:var(--primary)}
-        .uc-tab.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 6px 18px rgba(79,70,229,.3)}
+        .uc-tab.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 6px 18px rgba(27,58,92,.3)}
         .uc-tab i{font-size:16px}
         .uc-panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;box-shadow:var(--shadow-md);animation:uc-in .25s ease}
         @keyframes uc-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -559,7 +561,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .fg{margin-bottom:16px}
         .fg label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text-secondary)}
         .fg input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;transition:border .2s;background:var(--bg)}
-        .fg input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+        .fg input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(27,58,92,.1)}
         .slug-preview{display:flex;align-items:center;gap:0;margin-top:6px}
         .slug-prefix{padding:11px 12px;background:var(--bg);border:1.5px solid var(--border);border-right:0;border-radius:10px 0 0 10px;font-size:12px;color:var(--text-muted);white-space:nowrap}
         .slug-preview input{border-radius:0 10px 10px 0}
@@ -609,7 +611,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
 <nav class="navbar" id="navbar">
     <div class="container nav-inner">
         <div class="nav-brand">
-            <div class="logo">GP</div>
+            <?= brandMark() ?>
             <span>GestionPro</span>
         </div>
         <div class="nav-links">
@@ -674,9 +676,9 @@ $waGeneral = $waLink($t['wa_msg_general']);
                     </div>
                     <div class="mockup-chart">
                         <svg viewBox="0 0 500 100" preserveAspectRatio="none" style="height:100%;width:100%;">
-                            <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(79,70,229,0.15)"/><stop offset="100%" stop-color="rgba(79,70,229,0)"/></linearGradient></defs>
+                            <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(27,58,92,0.15)"/><stop offset="100%" stop-color="rgba(27,58,92,0)"/></linearGradient></defs>
                             <path d="M0,80 C50,60 100,70 150,45 C200,20 250,50 300,30 C350,10 400,40 450,25 L500,20 L500,100 L0,100Z" fill="url(#cg)"/>
-                            <path d="M0,80 C50,60 100,70 150,45 C200,20 250,50 300,30 C350,10 400,40 450,25 L500,20" fill="none" stroke="#4F46E5" stroke-width="2.5"/>
+                            <path d="M0,80 C50,60 100,70 150,45 C200,20 250,50 300,30 C350,10 400,40 450,25 L500,20" fill="none" stroke="#1B3A5C" stroke-width="2.5"/>
                         </svg>
                     </div>
                 </div>

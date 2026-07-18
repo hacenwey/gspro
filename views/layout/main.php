@@ -12,12 +12,12 @@
     <link rel="stylesheet" href="<?= asset('css/rtl.css') ?>">
     <?php endif; ?>
     <link rel="manifest" href="<?= APP_BASE ?>/manifest.json">
-    <meta name="theme-color" content="#4F46E5">
+    <meta name="theme-color" content="#1B3A5C">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="GestionPro">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='34' fill='%234F46E5'/><text x='90' y='118' text-anchor='middle' font-family='Arial' font-size='78' font-weight='800' fill='white'>GP</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='34' fill='%231B3A5C'/><text x='90' y='118' text-anchor='middle' font-family='Arial' font-size='78' font-weight='800' fill='white'>GP</text></svg>">
     <?php if (isset($extraCss)): ?>
     <style><?= $extraCss ?></style>
     <?php endif; ?>
@@ -31,7 +31,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <div class="logo">GP</div>
+            <?= brandMark() ?>
             <div>
                 <h1>GestionPro</h1>
                 <?php if (class_exists('Tenant') && Tenant::current()): ?>
