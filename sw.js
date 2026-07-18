@@ -5,12 +5,15 @@
 //  - Same-origin static assets + cross-origin fonts/CDN: cache-first.
 //  - Never touch non-GET requests or API/sell endpoints (POS sync must reach the network).
 
-const VERSION = 'gp-v2-2026-07-14';
+const VERSION = 'gp-v3-2026-07-18';
 const STATIC_CACHE = 'gp-static-' + VERSION;
 const PAGE_CACHE   = 'gp-pages-'  + VERSION;
 
 const STATIC_ASSETS = [
     '/offline.html',
+    // Brand marks: the sidebar would otherwise show a broken image offline.
+    '/public/img/logo-mark.png',
+    '/public/img/icon-192.png',
 ];
 
 // Cross-origin hosts whose CSS/fonts we want available offline (icons, webfonts).

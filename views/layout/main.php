@@ -17,7 +17,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="GestionPro">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='34' fill='%231B3A5C'/><text x='90' y='118' text-anchor='middle' font-family='Arial' font-size='78' font-weight='800' fill='white'>GP</text></svg>">
+    <link rel="apple-touch-icon" href="<?= asset('img/icon-192.png') ?>">
+    <link rel="icon" type="image/png" href="<?= asset('img/icon-192.png') ?>">
     <?php if (isset($extraCss)): ?>
     <style><?= $extraCss ?></style>
     <?php endif; ?>
