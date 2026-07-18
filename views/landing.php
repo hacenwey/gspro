@@ -529,9 +529,33 @@ $waGeneral = $waLink($t['wa_msg_general']);
         /* ===== STEPS ===== */
         .how-section{padding:96px 24px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
         .how-inner{max-width:1000px;margin:0 auto;text-align:center}
-        .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px}
-        .step{position:relative}
-        .step-num{width:56px;height:56px;border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:var(--primary);background:var(--primary-50);border:2px solid var(--primary-100)}
+        /* Stepper: the numbers sit on a single rail, so the three steps read as
+           one journey instead of three loose cards. */
+        .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px;position:relative}
+        .steps::before{content:'';position:absolute;top:28px;left:16%;right:16%;height:2px;
+            background:linear-gradient(90deg,var(--primary-200),var(--primary),var(--primary-200));
+            opacity:.35;z-index:0}
+        .step{position:relative;z-index:1}
+        .step-num{width:56px;height:56px;border-radius:50%;margin:0 auto 16px;display:flex;
+            align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;
+            background:var(--primary);border:4px solid var(--surface);
+            box-shadow:0 4px 16px rgba(27,58,92,.28);transition:transform .25s}
+        .step:hover .step-num{transform:translateY(-4px) scale(1.06)}
+        .step h3{font-size:18px;font-weight:800;margin-bottom:8px}
+
+        /* Scroll reveal. The .reveal class is added by JS, never in the markup:
+           if the script fails the content simply stays visible instead of being
+           stuck at opacity 0. Motion is skipped for users who ask for less. */
+        @media (prefers-reduced-motion: no-preference){
+            .reveal{opacity:0;transform:translateY(18px);
+                transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1)}
+            .reveal.in{opacity:1;transform:none}
+        }
+        /* The stepper rail draws itself once the section comes into view. */
+        @media (prefers-reduced-motion: no-preference){
+            .steps.rail::before{transform:scaleX(0);transform-origin:left;transition:transform .9s cubic-bezier(.22,1,.36,1) .2s}
+            .steps.rail.in::before{transform:scaleX(1)}
+        }
         .step h3{font-size:16px;font-weight:700;margin-bottom:8px}
         .step p{font-size:14px;color:var(--text-secondary);line-height:1.6}
         .step-arrow{position:absolute;top:28px;right:-20px;color:var(--border);font-size:20px}
@@ -718,6 +742,60 @@ $waGeneral = $waLink($t['wa_msg_general']);
     </div>
 </section>
 
+<!-- USE CASES — what the product does for *your* trade, not in general -->
+<section class="pad uc-section" id="usecases">
+    <div class="container">
+        <div class="section-label"><i class="fas fa-store"></i> <?= e($t['uc_label']) ?></div>
+        <div class="section-title"><?= e($t['uc_title']) ?></div>
+        <div class="section-desc"><?= e($t['uc_desc']) ?></div>
+
+        <div class="uc-tabs" role="tablist">
+            <?php
+            // Cumulative offers: Business is the base, the others add to it.
+            // 'soon' marks what does not ship yet — the rest of the page only
+            // ever claims features that actually run.
+            $ucs = [
+                1 => ['icon' => 'fa-briefcase',      'key' => 'uc1'],
+                2 => ['icon' => 'fa-cash-register',  'key' => 'uc2'],
+                3 => ['icon' => 'fa-utensils',       'key' => 'uc3'],
+                4 => ['icon' => 'fa-graduation-cap', 'key' => 'uc4', 'soon' => true],
+            ];
+            foreach ($ucs as $i => $uc): ?>
+            <button class="uc-tab <?= $i === 1 ? 'active' : '' ?>" data-uc="<?= $i ?>" role="tab"
+                    aria-selected="<?= $i === 1 ? 'true' : 'false' ?>" onclick="showUc(<?= $i ?>)">
+                <i class="fas <?= $uc['icon'] ?>"></i>
+                <span><?= e($t[$uc['key'] . '_t']) ?></span>
+                <?php if (!empty($uc['soon'])): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
+            </button>
+            <?php endforeach; ?>
+        </div>
+
+        <?php foreach ($ucs as $i => $uc): ?>
+        <div class="uc-panel <?= $i === 1 ? '' : 'hidden' ?>" id="uc-<?= $i ?>" role="tabpanel">
+            <div class="uc-head">
+                <div class="uc-ic"><i class="fas <?= $uc['icon'] ?>"></i></div>
+                <div>
+                    <h3>
+                        <?= e($t[$uc['key'] . '_t']) ?>
+                        <?php if (!empty($uc['soon'])): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
+                    </h3>
+                    <p><?= e($t[$uc['key'] . '_sub']) ?></p>
+                </div>
+            </div>
+            <ul class="uc-list<?= !empty($uc['soon']) ? ' is-soon' : '' ?>">
+                <?php for ($b = 1; $b <= 5; $b++): ?>
+                <li><i class="fas <?= !empty($uc['soon']) ? 'fa-circle-dot' : 'fa-circle-check' ?>"></i> <?= e($t[$uc['key'] . '_b' . $b]) ?></li>
+                <?php endfor; ?>
+            </ul>
+            <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-cta btn-primary-cta uc-cta">
+                <i class="fab fa-whatsapp"></i>
+                <?= e(!empty($uc['soon']) ? $t['uc_notify'] : $t['wa_start']) ?>
+            </a>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+
 <!-- PROBLEMS — name the pain first, then sell the cure -->
 <section class="pad prob-section">
     <div class="container">
@@ -812,60 +890,6 @@ $waGeneral = $waLink($t['wa_msg_general']);
                 <p><?= e($t['step3_d']) ?></p>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- USE CASES — what the product does for *your* trade, not in general -->
-<section class="pad uc-section" id="usecases">
-    <div class="container">
-        <div class="section-label"><i class="fas fa-store"></i> <?= e($t['uc_label']) ?></div>
-        <div class="section-title"><?= e($t['uc_title']) ?></div>
-        <div class="section-desc"><?= e($t['uc_desc']) ?></div>
-
-        <div class="uc-tabs" role="tablist">
-            <?php
-            // Cumulative offers: Business is the base, the others add to it.
-            // 'soon' marks what does not ship yet — the rest of the page only
-            // ever claims features that actually run.
-            $ucs = [
-                1 => ['icon' => 'fa-briefcase',      'key' => 'uc1'],
-                2 => ['icon' => 'fa-cash-register',  'key' => 'uc2'],
-                3 => ['icon' => 'fa-utensils',       'key' => 'uc3'],
-                4 => ['icon' => 'fa-graduation-cap', 'key' => 'uc4', 'soon' => true],
-            ];
-            foreach ($ucs as $i => $uc): ?>
-            <button class="uc-tab <?= $i === 1 ? 'active' : '' ?>" data-uc="<?= $i ?>" role="tab"
-                    aria-selected="<?= $i === 1 ? 'true' : 'false' ?>" onclick="showUc(<?= $i ?>)">
-                <i class="fas <?= $uc['icon'] ?>"></i>
-                <span><?= e($t[$uc['key'] . '_t']) ?></span>
-                <?php if (!empty($uc['soon'])): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
-            </button>
-            <?php endforeach; ?>
-        </div>
-
-        <?php foreach ($ucs as $i => $uc): ?>
-        <div class="uc-panel <?= $i === 1 ? '' : 'hidden' ?>" id="uc-<?= $i ?>" role="tabpanel">
-            <div class="uc-head">
-                <div class="uc-ic"><i class="fas <?= $uc['icon'] ?>"></i></div>
-                <div>
-                    <h3>
-                        <?= e($t[$uc['key'] . '_t']) ?>
-                        <?php if (!empty($uc['soon'])): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
-                    </h3>
-                    <p><?= e($t[$uc['key'] . '_sub']) ?></p>
-                </div>
-            </div>
-            <ul class="uc-list<?= !empty($uc['soon']) ? ' is-soon' : '' ?>">
-                <?php for ($b = 1; $b <= 5; $b++): ?>
-                <li><i class="fas <?= !empty($uc['soon']) ? 'fa-circle-dot' : 'fa-circle-check' ?>"></i> <?= e($t[$uc['key'] . '_b' . $b]) ?></li>
-                <?php endfor; ?>
-            </ul>
-            <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-cta btn-primary-cta uc-cta">
-                <i class="fab fa-whatsapp"></i>
-                <?= e(!empty($uc['soon']) ? $t['uc_notify'] : $t['wa_start']) ?>
-            </a>
-        </div>
-        <?php endforeach; ?>
     </div>
 </section>
 
@@ -970,11 +994,48 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     });
 });
 
+// ---- Scroll reveal ----
+// Classes are attached here rather than in the markup on purpose: if this script
+// never runs, nothing is hidden. Honoured only when the user allows motion.
+(function () {
+    if (!('IntersectionObserver' in window)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const groups = ['.uc-tabs', '.uc-panel', '.prob-card', '.feat-card', '.step',
+                    '.trust-card', '.faq-item', '.section-label', '.section-title',
+                    '.section-desc', '.steps'];
+    const items = [];
+    groups.forEach(sel => document.querySelectorAll(sel).forEach(el => items.push(el)));
+
+    document.querySelector('.steps')?.classList.add('rail');
+    items.forEach(el => el.classList.add('reveal'));
+
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            // Stagger siblings so a row of cards arrives in sequence, not as a block.
+            const sibs = el.parentElement ? [...el.parentElement.children] : [];
+            const i = Math.max(0, sibs.indexOf(el));
+            el.style.transitionDelay = Math.min(i * 70, 350) + 'ms';
+            el.classList.add('in');
+            io.unobserve(el);
+        });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+
+    items.forEach(el => io.observe(el));
+})();
+
 // Use-case tabs. Panels are rendered server-side and merely toggled, so the
 // content is in the HTML for search engines even though only one shows.
 function showUc(n) {
     document.querySelectorAll('.uc-panel').forEach(p => p.classList.add('hidden'));
-    document.getElementById('uc-' + n).classList.remove('hidden');
+    const panel = document.getElementById('uc-' + n);
+    panel.classList.remove('hidden');
+    // A hidden panel never intersects, so the observer never marked it visible:
+    // without this it would appear at opacity 0 when its tab is clicked.
+    panel.style.transitionDelay = '0ms';
+    panel.classList.add('in');
     document.querySelectorAll('.uc-tab').forEach(t => {
         const on = t.dataset.uc === String(n);
         t.classList.toggle('active', on);
