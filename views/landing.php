@@ -110,29 +110,37 @@ $TR = [
         'wa_start' => 'ابدأ عبر واتساب', 'wa_contact' => 'تواصل معنا عبر واتساب',
         'wa_msg_general' => 'مرحباً، أرغب في معرفة المزيد عن GestionPro.',
         'wa_note' => 'اطلب عبر واتساب وسيتواصل معك فريقنا لإتمام طلبك.',
+        // Offers
+        'nav_usecases' => 'العروض',
+        'uc_label' => 'العروض', 'uc_title' => 'عرض لكل مهنة',
+        'uc_desc' => 'GestionPro Business هو الأساس: زبائن، عروض أسعار، فواتير، ديون. كل مهنة تضيف إليه ما تحتاجه.',
+        'uc_soon' => 'قريباً', 'uc_notify' => 'أبلغني عند الإطلاق',
+        'uc1_t' => 'GestionPro Business', 'uc1_sub' => 'الأساس: خدمات، حرفيون، مقدمو خدمات',
+        'uc1_b1' => 'عرض سعر يتحول إلى فاتورة بنقرة',
+        'uc1_b2' => 'فواتير PDF بترويسة مؤسستك',
+        'uc1_b3' => 'متابعة المدفوعات والمتأخرات',
+        'uc1_b4' => 'ملف الزبائن والسجل الكامل',
+        'uc1_b5' => 'تصدير CSV لمحاسبك',
+        'uc2_t' => 'GestionPro POS', 'uc2_sub' => 'الأساس + الصندوق: متاجر، مواد غذائية، أدوات',
+        'uc2_b1' => 'صندوق سريع مع قارئ الباركود',
+        'uc2_b2' => 'مخزون لحظي وتنبيهات النفاد',
+        'uc2_b3' => 'إيصالات مطبوعة 58/80 ملم',
+        'uc2_b4' => 'يواصل البيع حتى لو انقطع الإنترنت',
+        'uc2_b5' => 'ديون الزبائن: من يدين وبكم ومنذ متى',
+        'uc3_t' => 'GestionPro Resto', 'uc3_sub' => 'POS + القاعة: مطاعم، مقاهٍ، حلويات',
+        'uc3_b1' => 'طلبات حسب الطاولة أو سفري أو توصيل',
+        'uc3_b2' => 'شاشة مطبخ وبون يطبع عند الإرسال',
+        'uc3_b3' => 'ملاحظات لكل صنف: بدون بصل، ناضج جيدا...',
+        'uc3_b4' => 'تقسيم أو دمج الفواتير',
+        'uc3_b5' => 'حساب طاه محصور في شاشته',
+        'uc4_t' => 'GestionPro School', 'uc4_sub' => 'مدارس ومعاهد ومراكز تكوين',
+        'uc4_b1' => 'التلاميذ والأقسام والتسجيلات',
+        'uc4_b2' => 'رسوم الدراسة ومتابعة المتأخرات',
+        'uc4_b3' => 'النقاط وكشوف الدرجات',
+        'uc4_b4' => 'الحضور والغياب',
+        'uc4_b5' => 'التواصل مع أولياء الأمور',
         // Use cases per business
-        'nav_usecases' => 'لمن؟',
-        'uc_label' => 'لمن؟', 'uc_title' => 'لكل مهنة قواعدها',
-        'uc_desc' => 'يتكيف GestionPro مع نشاطك: فعّل ما تحتاجه فقط.',
-        'uc1_t' => 'متجر وتجارة', 'uc1_sub' => 'مواد غذائية، أدوات، ملابس، تجميل...',
-        'uc1_b1' => 'صندوق سريع مع قارئ الباركود',
-        'uc1_b2' => 'مخزون لحظي وتنبيهات النفاد',
-        'uc1_b3' => 'ديون الزبائن: من يدين وبكم ومنذ متى',
-        'uc1_b4' => 'إيصالات مطبوعة وفواتير PDF',
-        'uc1_b5' => 'يواصل البيع حتى لو انقطع الإنترنت',
-        'uc2_t' => 'مطعم ومقهى وحلويات', 'uc2_sub' => 'قاعة، وجبات سريعة، عصائر، تموين...',
-        'uc2_b1' => 'طلبات حسب الطاولة أو سفري أو توصيل',
-        'uc2_b2' => 'شاشة مطبخ وبون يطبع عند الإرسال',
-        'uc2_b3' => 'ملاحظات لكل صنف: بدون بصل، ناضج جيدا...',
-        'uc2_b4' => 'تقسيم أو دمج الفواتير',
-        'uc2_b5' => 'حساب طاه محصور في شاشته',
-        'uc3_t' => 'خدمات وحرفيون', 'uc3_sub' => 'ورشات، مقدمو خدمات، مهن حرة...',
-        'uc3_b1' => 'عرض سعر يتحول إلى فاتورة بنقرة',
-        'uc3_b2' => 'فواتير PDF بترويسة مؤسستك',
-        'uc3_b3' => 'متابعة المدفوعات والمتأخرات',
-        'uc3_b4' => 'ملف الزبائن والسجل الكامل',
-        'uc3_b5' => 'تصدير CSV لمحاسبك',
-    ],
+                                                                                                                                                                            ],
     'fr' => [
         'cur' => 'MRU',
         'page_title' => 'GestionPro — Logiciel de gestion d\'entreprise tout-en-un',
@@ -209,29 +217,37 @@ $TR = [
         'wa_start' => 'Démarrer sur WhatsApp', 'wa_contact' => 'Nous contacter sur WhatsApp',
         'wa_msg_general' => 'Bonjour, je souhaite en savoir plus sur GestionPro.',
         'wa_note' => 'Commandez sur WhatsApp et notre équipe vous recontacte pour finaliser votre commande.',
+        // Offers
+        'nav_usecases' => 'Offres',
+        'uc_label' => 'Nos offres', 'uc_title' => 'Une offre par metier',
+        'uc_desc' => 'GestionPro Business est le socle : clients, devis, factures, dettes. Chaque metier y ajoute ce qu\'il lui faut.',
+        'uc_soon' => 'Bientot', 'uc_notify' => 'Etre prevenu au lancement',
+        'uc1_t' => 'GestionPro Business', 'uc1_sub' => 'Le socle : services, artisans, prestataires',
+        'uc1_b1' => 'Devis converti en facture en un clic',
+        'uc1_b2' => 'Factures PDF a votre en-tete',
+        'uc1_b3' => 'Suivi des paiements et des impayes',
+        'uc1_b4' => 'Fichier clients et historique complet',
+        'uc1_b5' => 'Exports CSV pour votre comptable',
+        'uc2_t' => 'GestionPro POS', 'uc2_sub' => 'Le socle + la caisse : boutiques, alimentation, quincaillerie',
+        'uc2_b1' => 'Caisse rapide avec scan de code-barres',
+        'uc2_b2' => 'Stock en temps reel et alertes de rupture',
+        'uc2_b3' => 'Tickets imprimes 58 / 80 mm',
+        'uc2_b4' => 'Encaisse meme quand internet tombe',
+        'uc2_b5' => 'Credits clients : qui doit quoi, depuis quand',
+        'uc3_t' => 'GestionPro Resto', 'uc3_sub' => 'POS + la salle : restaurants, cafes, patisseries',
+        'uc3_b1' => 'Commandes par table, a emporter ou en livraison',
+        'uc3_b2' => 'Ecran cuisine + bon imprime a l\'envoi',
+        'uc3_b3' => 'Notes par plat : sans oignon, bien cuit...',
+        'uc3_b4' => 'Separer ou fusionner les additions',
+        'uc3_b5' => 'Compte cuisinier limite a son ecran',
+        'uc4_t' => 'GestionPro School', 'uc4_sub' => 'Ecoles, instituts et centres de formation',
+        'uc4_b1' => 'Eleves, classes et inscriptions',
+        'uc4_b2' => 'Frais de scolarite et suivi des impayes',
+        'uc4_b3' => 'Notes et bulletins',
+        'uc4_b4' => 'Presences et absences',
+        'uc4_b5' => 'Communication avec les parents',
         // Use cases per business
-        'nav_usecases' => 'Pour qui',
-        'uc_label' => 'Pour qui', 'uc_title' => 'Chaque metier a ses regles',
-        'uc_desc' => 'GestionPro s\'adapte a votre activite : vous n\'activez que ce dont vous avez besoin.',
-        'uc1_t' => 'Boutique & commerce', 'uc1_sub' => 'Alimentation, quincaillerie, vetements, cosmetiques...',
-        'uc1_b1' => 'Caisse rapide avec scan de code-barres',
-        'uc1_b2' => 'Stock en temps reel et alertes de rupture',
-        'uc1_b3' => 'Credits clients : qui doit quoi, depuis quand',
-        'uc1_b4' => 'Tickets imprimes et factures PDF',
-        'uc1_b5' => 'Encaisse meme quand internet tombe',
-        'uc2_t' => 'Restaurant, cafe & patisserie', 'uc2_sub' => 'Salle, snack, jus, traiteur...',
-        'uc2_b1' => 'Commandes par table, a emporter ou en livraison',
-        'uc2_b2' => 'Ecran cuisine + bon imprime a l\'envoi',
-        'uc2_b3' => 'Notes par plat : sans oignon, bien cuit...',
-        'uc2_b4' => 'Separer ou fusionner les additions',
-        'uc2_b5' => 'Compte cuisinier limite a son ecran',
-        'uc3_t' => 'Services & artisans', 'uc3_sub' => 'Ateliers, prestataires, professions liberales...',
-        'uc3_b1' => 'Devis converti en facture en un clic',
-        'uc3_b2' => 'Factures PDF a votre en-tete',
-        'uc3_b3' => 'Suivi des paiements et des impayes',
-        'uc3_b4' => 'Fichier clients et historique complet',
-        'uc3_b5' => 'Exports CSV pour votre comptable',
-    ],
+                                                                                                                                                                            ],
     'en' => [
         'cur' => 'MRU',
         'page_title' => 'GestionPro — All-in-one business management software',
@@ -308,29 +324,37 @@ $TR = [
         'wa_start' => 'Get started on WhatsApp', 'wa_contact' => 'Contact us on WhatsApp',
         'wa_msg_general' => 'Hello, I\'d like to know more about GestionPro.',
         'wa_note' => 'Order on WhatsApp and our team will get back to you to finalise your order.',
+        // Offers
+        'nav_usecases' => 'Offers',
+        'uc_label' => 'Our offers', 'uc_title' => 'One offer per trade',
+        'uc_desc' => 'GestionPro Business is the base: clients, quotes, invoices, debts. Each trade adds what it needs on top.',
+        'uc_soon' => 'Soon', 'uc_notify' => 'Tell me at launch',
+        'uc1_t' => 'GestionPro Business', 'uc1_sub' => 'The base: services, trades, contractors',
+        'uc1_b1' => 'Quote turned into an invoice in one click',
+        'uc1_b2' => 'PDF invoices with your letterhead',
+        'uc1_b3' => 'Payment and overdue tracking',
+        'uc1_b4' => 'Client file and full history',
+        'uc1_b5' => 'CSV exports for your accountant',
+        'uc2_t' => 'GestionPro POS', 'uc2_sub' => 'The base + the till: shops, groceries, hardware',
+        'uc2_b1' => 'Fast till with barcode scanning',
+        'uc2_b2' => 'Live stock and out-of-stock alerts',
+        'uc2_b3' => 'Printed receipts, 58 / 80 mm',
+        'uc2_b4' => 'Keeps selling when the internet drops',
+        'uc2_b5' => 'Customer credit: who owes what, since when',
+        'uc3_t' => 'GestionPro Resto', 'uc3_sub' => 'POS + the floor: restaurants, cafes, pastry shops',
+        'uc3_b1' => 'Orders by table, takeaway or delivery',
+        'uc3_b2' => 'Kitchen screen + ticket printed on send',
+        'uc3_b3' => 'Notes per dish: no onion, well done...',
+        'uc3_b4' => 'Split or merge the bills',
+        'uc3_b5' => 'Kitchen account limited to its own screen',
+        'uc4_t' => 'GestionPro School', 'uc4_sub' => 'Schools, institutes and training centres',
+        'uc4_b1' => 'Students, classes and enrolment',
+        'uc4_b2' => 'Tuition fees and overdue tracking',
+        'uc4_b3' => 'Grades and report cards',
+        'uc4_b4' => 'Attendance and absences',
+        'uc4_b5' => 'Communication with parents',
         // Use cases per business
-        'nav_usecases' => 'Who it\'s for',
-        'uc_label' => 'Who it\'s for', 'uc_title' => 'Every trade has its own rules',
-        'uc_desc' => 'GestionPro fits your business: switch on only what you need.',
-        'uc1_t' => 'Shops & retail', 'uc1_sub' => 'Groceries, hardware, clothing, cosmetics...',
-        'uc1_b1' => 'Fast till with barcode scanning',
-        'uc1_b2' => 'Live stock and out-of-stock alerts',
-        'uc1_b3' => 'Customer credit: who owes what, since when',
-        'uc1_b4' => 'Printed receipts and PDF invoices',
-        'uc1_b5' => 'Keeps selling when the internet drops',
-        'uc2_t' => 'Restaurant, cafe & pastry', 'uc2_sub' => 'Dining room, snack bar, juice, catering...',
-        'uc2_b1' => 'Orders by table, takeaway or delivery',
-        'uc2_b2' => 'Kitchen screen + ticket printed on send',
-        'uc2_b3' => 'Notes per dish: no onion, well done...',
-        'uc2_b4' => 'Split or merge the bills',
-        'uc2_b5' => 'Kitchen account limited to its own screen',
-        'uc3_t' => 'Services & trades', 'uc3_sub' => 'Workshops, contractors, professionals...',
-        'uc3_b1' => 'Quote turned into an invoice in one click',
-        'uc3_b2' => 'PDF invoices with your letterhead',
-        'uc3_b3' => 'Payment and overdue tracking',
-        'uc3_b4' => 'Client file and full history',
-        'uc3_b5' => 'CSV exports for your accountant',
-    ],
+                                                                                                                                                                            ],
 ];
 $t = $TR[$lang];
 $cur = $t['cur'];
@@ -487,6 +511,13 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .uc-list{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:14px 28px;margin-bottom:28px}
         .uc-list li{display:flex;align-items:flex-start;gap:11px;font-size:15px;color:var(--text-secondary);line-height:1.5}
         .uc-list li i{color:var(--success);font-size:15px;margin-top:3px;flex-shrink:0}
+        /* Not shipped yet: say so plainly rather than let it read as available. */
+        .uc-soon{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:100px;
+            background:var(--accent-50,rgba(180,83,9,.12));color:#B45309;
+            font-size:10.5px;font-weight:800;letter-spacing:.4px;vertical-align:middle}
+        .uc-tab.active .uc-soon{background:rgba(255,255,255,.22);color:#fff}
+        .uc-list.is-soon li{color:var(--text-muted)}
+        .uc-list.is-soon li i{color:var(--text-muted)}
         .uc-cta{padding:13px 24px;font-size:14.5px}
         @media (max-width:768px){.uc-panel{padding:24px}.uc-list{grid-template-columns:1fr}.uc-tab{flex:1;justify-content:center;padding:11px 14px;font-size:13px}}
 
@@ -793,16 +824,21 @@ $waGeneral = $waLink($t['wa_msg_general']);
 
         <div class="uc-tabs" role="tablist">
             <?php
+            // Cumulative offers: Business is the base, the others add to it.
+            // 'soon' marks what does not ship yet — the rest of the page only
+            // ever claims features that actually run.
             $ucs = [
-                1 => ['icon' => 'fa-store',       'key' => 'uc1'],
-                2 => ['icon' => 'fa-utensils',    'key' => 'uc2'],
-                3 => ['icon' => 'fa-screwdriver-wrench', 'key' => 'uc3'],
+                1 => ['icon' => 'fa-briefcase',      'key' => 'uc1'],
+                2 => ['icon' => 'fa-cash-register',  'key' => 'uc2'],
+                3 => ['icon' => 'fa-utensils',       'key' => 'uc3'],
+                4 => ['icon' => 'fa-graduation-cap', 'key' => 'uc4', 'soon' => true],
             ];
             foreach ($ucs as $i => $uc): ?>
             <button class="uc-tab <?= $i === 1 ? 'active' : '' ?>" data-uc="<?= $i ?>" role="tab"
                     aria-selected="<?= $i === 1 ? 'true' : 'false' ?>" onclick="showUc(<?= $i ?>)">
                 <i class="fas <?= $uc['icon'] ?>"></i>
                 <span><?= e($t[$uc['key'] . '_t']) ?></span>
+                <?php if (!empty($uc['soon'])): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
             </button>
             <?php endforeach; ?>
         </div>
@@ -812,17 +848,21 @@ $waGeneral = $waLink($t['wa_msg_general']);
             <div class="uc-head">
                 <div class="uc-ic"><i class="fas <?= $uc['icon'] ?>"></i></div>
                 <div>
-                    <h3><?= e($t[$uc['key'] . '_t']) ?></h3>
+                    <h3>
+                        <?= e($t[$uc['key'] . '_t']) ?>
+                        <?php if (!empty($uc['soon'])): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
+                    </h3>
                     <p><?= e($t[$uc['key'] . '_sub']) ?></p>
                 </div>
             </div>
-            <ul class="uc-list">
+            <ul class="uc-list<?= !empty($uc['soon']) ? ' is-soon' : '' ?>">
                 <?php for ($b = 1; $b <= 5; $b++): ?>
-                <li><i class="fas fa-circle-check"></i> <?= e($t[$uc['key'] . '_b' . $b]) ?></li>
+                <li><i class="fas <?= !empty($uc['soon']) ? 'fa-circle-dot' : 'fa-circle-check' ?>"></i> <?= e($t[$uc['key'] . '_b' . $b]) ?></li>
                 <?php endfor; ?>
             </ul>
             <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-cta btn-primary-cta uc-cta">
-                <i class="fab fa-whatsapp"></i> <?= e($t['wa_start']) ?>
+                <i class="fab fa-whatsapp"></i>
+                <?= e(!empty($uc['soon']) ? $t['uc_notify'] : $t['wa_start']) ?>
             </a>
         </div>
         <?php endforeach; ?>
