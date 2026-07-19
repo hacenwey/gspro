@@ -115,6 +115,7 @@ $TR = [
         'uc_label' => 'العروض', 'uc_title' => 'عرض لكل مهنة',
         'uc_desc' => 'GestionPro Business هو الأساس: زبائن، عروض أسعار، فواتير، ديون. كل مهنة تضيف إليه ما تحتاجه.',
         'uc_soon' => 'قريباً', 'uc_notify' => 'أبلغني عند الإطلاق',
+        'uc_popular' => 'الأكثر طلباً', 'uc_start' => 'ابدأ',
         'uc1_t' => 'GestionPro Business', 'uc1_sub' => 'الأساس: خدمات، حرفيون، مقدمو خدمات',
         'uc1_b1' => 'عرض سعر يتحول إلى فاتورة بنقرة',
         'uc1_b2' => 'فواتير PDF بترويسة مؤسستك',
@@ -222,6 +223,7 @@ $TR = [
         'uc_label' => 'Nos offres', 'uc_title' => 'Une offre par metier',
         'uc_desc' => 'GestionPro Business est le socle : clients, devis, factures, dettes. Chaque metier y ajoute ce qu\'il lui faut.',
         'uc_soon' => 'Bientot', 'uc_notify' => 'Etre prevenu au lancement',
+        'uc_popular' => 'Populaire', 'uc_start' => 'Demarrer',
         'uc1_t' => 'GestionPro Business', 'uc1_sub' => 'Le socle : services, artisans, prestataires',
         'uc1_b1' => 'Devis converti en facture en un clic',
         'uc1_b2' => 'Factures PDF a votre en-tete',
@@ -329,6 +331,7 @@ $TR = [
         'uc_label' => 'Our offers', 'uc_title' => 'One offer per trade',
         'uc_desc' => 'GestionPro Business is the base: clients, quotes, invoices, debts. Each trade adds what it needs on top.',
         'uc_soon' => 'Soon', 'uc_notify' => 'Tell me at launch',
+        'uc_popular' => 'Popular', 'uc_start' => 'Get started',
         'uc1_t' => 'GestionPro Business', 'uc1_sub' => 'The base: services, trades, contractors',
         'uc1_b1' => 'Quote turned into an invoice in one click',
         'uc1_b2' => 'PDF invoices with your letterhead',
@@ -381,15 +384,21 @@ $waGeneral = $waLink($t['wa_msg_general']);
     <?php if (defined('GOOGLE_SITE_VERIFICATION') && GOOGLE_SITE_VERIFICATION !== ''): ?>
     <meta name="google-site-verification" content="<?= e(GOOGLE_SITE_VERIFICATION) ?>">
     <?php endif; ?>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@600;700;800&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         :root{
-            --primary:#1B3A5C;--primary-light:#2C5A8A;--primary-dark:#12283F;
-            --primary-50:#EDF2F7;--primary-100:#DCE6F0;--primary-200:#B8CCE0;
-            --text:#0F172A;--text-secondary:#475569;--text-muted:#64748B;
-            --bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;--border-light:#F1F5F9;
+            /* Palette relevee sur la maquette fournie : creme + vert profond,
+               teintes chaudes. Une seule valeur corrigee — le texte attenue de la
+               maquette (#8A8272) mesure 3.59:1 sur le creme, sous le minimum ;
+               #767061 est la nuance la plus claire de la meme famille qui passe. */
+            --primary:#1F6F5C;--primary-light:#2A8871;--primary-dark:#175647;
+            --primary-50:#E3EFE9;--primary-100:#D3E5DC;--primary-200:#B7D5C8;
+            --text:#241F1A;--text-secondary:#5B5347;--text-muted:#767061;
+            --bg:#FAF8F4;--surface:#FFFFFF;--border:#E8E2D6;--border-light:#F3F0E8;
+            --sand:#D9D2C3;--sand-light:#EFEAE0;
+            --font-display:'Manrope','Inter',sans-serif;
             /* Lightest shade of each hue that still clears WCAG AA (4.5:1) on
                white. The previous ones measured 2.15-3.76:1. */
             --success:#2E7D32;--danger:#DC2626;--warning:#B45309;
@@ -427,6 +436,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .hero{padding:132px 24px 80px;position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,var(--primary-50) 100%)}
         .hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,92,.08) 0%,transparent 70%);pointer-events:none}
         .hero-inner{max-width:1100px;margin:0 auto;text-align:center;position:relative}
+        h1,h2,h3,.section-title{font-family:var(--font-display);letter-spacing:-.02em}
         .hero h1{font-size:clamp(40px,5.5vw,68px);font-weight:900;line-height:1.05;letter-spacing:-2px;max-width:860px;margin:0 auto 20px;background:linear-gradient(135deg,var(--text) 0%,var(--primary-dark) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .hero-sub{font-size:clamp(16px,2vw,18px);color:var(--text-secondary);max-width:620px;margin:0 auto 36px;line-height:1.65}
         .hero-trust{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:28px;font-size:12px;color:var(--text-secondary)}
@@ -497,29 +507,38 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .prob-card .ic{flex:0 0 44px;height:44px;border-radius:12px;background:rgba(239,68,68,.09);color:var(--danger);display:flex;align-items:center;justify-content:center;font-size:16px}
         /* Use cases: one panel per trade, so a visitor sees their own shop. */
         .uc-section{background:var(--bg)}
-        .uc-tabs{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
-        .uc-tab{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:100px;border:1.5px solid var(--border);background:var(--surface);font-family:inherit;font-size:14px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s}
-        .uc-tab:hover{border-color:var(--primary);color:var(--primary)}
-        .uc-tab.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 6px 18px rgba(27,58,92,.3)}
-        .uc-tab i{font-size:16px}
-        .uc-panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;box-shadow:var(--shadow-md);animation:uc-in .25s ease}
-        @keyframes uc-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-        .uc-head{display:flex;align-items:center;gap:16px;margin-bottom:24px}
-        .uc-ic{width:56px;height:56px;flex-shrink:0;border-radius:16px;background:var(--primary-50);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:24px}
-        .uc-head h3{font-size:24px;font-weight:800;letter-spacing:-.5px}
-        .uc-head p{font-size:14px;color:var(--text-muted);margin-top:2px}
-        .uc-list{list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:16px 28px;margin-bottom:28px}
-        .uc-list li{display:flex;align-items:flex-start;gap:12px;font-size:14px;color:var(--text-secondary);line-height:1.5}
-        .uc-list li i{color:var(--success);font-size:14px;margin-top:3px;flex-shrink:0}
+        /* Offer cards, tokens taken from the supplied mockup: cream page, white
+           cards, warm sand borders, deep green accent. */
+        .offer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:stretch}
+        .offer-card{position:relative;display:flex;flex-direction:column;background:var(--surface);
+            border:1px solid var(--border);border-radius:16px;padding:28px 24px;transition:all .25s}
+        .offer-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(36,31,26,.10);border-color:var(--primary-200)}
+        .offer-card.is-popular{border-color:var(--primary);border-width:1.5px;box-shadow:0 12px 32px rgba(31,111,92,.13)}
+        .offer-flag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;
+            background:var(--primary);color:var(--bg);font-size:11px;font-weight:800;
+            letter-spacing:.4px;padding:4px 12px;border-radius:100px}
+        .offer-ic{width:44px;height:44px;border-radius:12px;background:var(--primary-50);
+            color:var(--primary);display:flex;align-items:center;justify-content:center;
+            font-size:18px;margin-bottom:16px}
+        .offer-card h3{font-size:20px;font-weight:800;margin-bottom:4px}
+        .offer-sub{font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.5}
+        .offer-list{list-style:none;margin:0 0 24px;flex:1}
+        .offer-list li{display:flex;gap:9px;align-items:flex-start;font-size:14px;
+            color:var(--text-secondary);line-height:1.55;margin-bottom:10px}
+        .offer-list li i{color:var(--primary);font-size:12px;margin-top:5px;flex-shrink:0}
+        .offer-card.is-soon .offer-list li,.offer-card.is-soon .offer-list li i{color:var(--text-muted)}
+        .offer-cta{display:flex;align-items:center;justify-content:center;gap:8px;
+            padding:12px;border-radius:10px;font-weight:700;font-size:14px;
+            background:var(--primary-50);color:var(--primary-dark);transition:all .2s}
+        .offer-card.is-popular .offer-cta{background:var(--primary);color:var(--bg)}
+        .offer-cta:hover{background:var(--primary);color:var(--bg)}
+        .offer-card.is-soon .offer-cta{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
+        @media (max-width:1024px){.offer-grid{grid-template-columns:repeat(2,1fr)}}
+        @media (max-width:600px){.offer-grid{grid-template-columns:1fr}}
         /* Not shipped yet: say so plainly rather than let it read as available. */
-        .uc-soon{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:100px;
-            background:var(--accent-50,rgba(180,83,9,.12));color:#B45309;
-            font-size:11px;font-weight:800;letter-spacing:.4px;vertical-align:middle}
-        .uc-tab.active .uc-soon{background:rgba(255,255,255,.22);color:#fff}
-        .uc-list.is-soon li{color:var(--text-muted)}
-        .uc-list.is-soon li i{color:var(--text-muted)}
-        .uc-cta{padding:12px 24px;font-size:14px}
-        @media (max-width:768px){.uc-panel{padding:24px}.uc-list{grid-template-columns:1fr}.uc-tab{flex:1;justify-content:center;padding:12px 16px;font-size:12px}}
+        .uc-soon{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:100px;
+            background:var(--sand-light);color:var(--text-muted);border:1px solid var(--border);
+            font-size:10px;font-weight:800;letter-spacing:.4px;vertical-align:middle}
 
         .prob-card h3{font-size:16px;font-weight:700;margin-bottom:8px;letter-spacing:-.2px}
         .prob-card p{font-size:14px;color:var(--text-secondary);line-height:1.65}
@@ -742,57 +761,47 @@ $waGeneral = $waLink($t['wa_msg_general']);
     </div>
 </section>
 
-<!-- USE CASES — what the product does for *your* trade, not in general -->
+<!-- OFFERS — four cards side by side: the visitor compares without clicking,
+     which is why the design dropped the tabs. -->
 <section class="pad uc-section" id="usecases">
     <div class="container">
-        <div class="section-label"><i class="fas fa-store"></i> <?= e($t['uc_label']) ?></div>
+        <div class="section-label"><i class="fas fa-layer-group"></i> <?= e($t['uc_label']) ?></div>
         <div class="section-title"><?= e($t['uc_title']) ?></div>
         <div class="section-desc"><?= e($t['uc_desc']) ?></div>
 
-        <div class="uc-tabs" role="tablist">
+        <div class="offer-grid">
             <?php
-            // Cumulative offers: Business is the base, the others add to it.
-            // 'soon' marks what does not ship yet — the rest of the page only
-            // ever claims features that actually run.
-            $ucs = [
-                1 => ['icon' => 'fa-briefcase',      'key' => 'uc1'],
-                2 => ['icon' => 'fa-cash-register',  'key' => 'uc2'],
-                3 => ['icon' => 'fa-utensils',       'key' => 'uc3'],
-                4 => ['icon' => 'fa-graduation-cap', 'key' => 'uc4', 'soon' => true],
+            $offers = [
+                ['key' => 'uc1', 'icon' => 'fa-briefcase'],
+                ['key' => 'uc2', 'icon' => 'fa-cash-register', 'popular' => true],
+                ['key' => 'uc3', 'icon' => 'fa-utensils'],
+                ['key' => 'uc4', 'icon' => 'fa-graduation-cap', 'soon' => true],
             ];
-            foreach ($ucs as $i => $uc): ?>
-            <button class="uc-tab <?= $i === 1 ? 'active' : '' ?>" data-uc="<?= $i ?>" role="tab"
-                    aria-selected="<?= $i === 1 ? 'true' : 'false' ?>" onclick="showUc(<?= $i ?>)">
-                <i class="fas <?= $uc['icon'] ?>"></i>
-                <span><?= e($t[$uc['key'] . '_t']) ?></span>
-                <?php if (!empty($uc['soon'])): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
-            </button>
+            foreach ($offers as $o):
+                $soon = !empty($o['soon']);
+            ?>
+            <div class="offer-card<?= !empty($o['popular']) ? ' is-popular' : '' ?><?= $soon ? ' is-soon' : '' ?>">
+                <?php if (!empty($o['popular'])): ?>
+                <span class="offer-flag"><?= e($t['uc_popular']) ?></span>
+                <?php endif; ?>
+                <div class="offer-ic"><i class="fas <?= $o['icon'] ?>"></i></div>
+                <h3>
+                    <?= e($t[$o['key'] . '_t']) ?>
+                    <?php if ($soon): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
+                </h3>
+                <p class="offer-sub"><?= e($t[$o['key'] . '_sub']) ?></p>
+                <ul class="offer-list">
+                    <?php for ($b = 1; $b <= 5; $b++): ?>
+                    <li><i class="fas <?= $soon ? 'fa-circle-dot' : 'fa-check' ?>"></i> <?= e($t[$o['key'] . '_b' . $b]) ?></li>
+                    <?php endfor; ?>
+                </ul>
+                <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="offer-cta">
+                    <i class="fab fa-whatsapp"></i>
+                    <?= e($soon ? $t['uc_notify'] : $t['uc_start']) ?>
+                </a>
+            </div>
             <?php endforeach; ?>
         </div>
-
-        <?php foreach ($ucs as $i => $uc): ?>
-        <div class="uc-panel <?= $i === 1 ? '' : 'hidden' ?>" id="uc-<?= $i ?>" role="tabpanel">
-            <div class="uc-head">
-                <div class="uc-ic"><i class="fas <?= $uc['icon'] ?>"></i></div>
-                <div>
-                    <h3>
-                        <?= e($t[$uc['key'] . '_t']) ?>
-                        <?php if (!empty($uc['soon'])): ?><span class="uc-soon"><?= e($t['uc_soon']) ?></span><?php endif; ?>
-                    </h3>
-                    <p><?= e($t[$uc['key'] . '_sub']) ?></p>
-                </div>
-            </div>
-            <ul class="uc-list<?= !empty($uc['soon']) ? ' is-soon' : '' ?>">
-                <?php for ($b = 1; $b <= 5; $b++): ?>
-                <li><i class="fas <?= !empty($uc['soon']) ? 'fa-circle-dot' : 'fa-circle-check' ?>"></i> <?= e($t[$uc['key'] . '_b' . $b]) ?></li>
-                <?php endfor; ?>
-            </ul>
-            <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-cta btn-primary-cta uc-cta">
-                <i class="fab fa-whatsapp"></i>
-                <?= e(!empty($uc['soon']) ? $t['uc_notify'] : $t['wa_start']) ?>
-            </a>
-        </div>
-        <?php endforeach; ?>
     </div>
 </section>
 
@@ -1001,7 +1010,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     if (!('IntersectionObserver' in window)) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const groups = ['.uc-tabs', '.uc-panel', '.prob-card', '.feat-card', '.step',
+    const groups = ['.offer-card', '.prob-card', '.feat-card', '.step',
                     '.trust-card', '.faq-item', '.section-label', '.section-title',
                     '.section-desc', '.steps'];
     const items = [];
@@ -1026,22 +1035,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     items.forEach(el => io.observe(el));
 })();
 
-// Use-case tabs. Panels are rendered server-side and merely toggled, so the
-// content is in the HTML for search engines even though only one shows.
-function showUc(n) {
-    document.querySelectorAll('.uc-panel').forEach(p => p.classList.add('hidden'));
-    const panel = document.getElementById('uc-' + n);
-    panel.classList.remove('hidden');
-    // A hidden panel never intersects, so the observer never marked it visible:
-    // without this it would appear at opacity 0 when its tab is clicked.
-    panel.style.transitionDelay = '0ms';
-    panel.classList.add('in');
-    document.querySelectorAll('.uc-tab').forEach(t => {
-        const on = t.dataset.uc === String(n);
-        t.classList.toggle('active', on);
-        t.setAttribute('aria-selected', on ? 'true' : 'false');
-    });
-}
 </script>
 
 </body>
