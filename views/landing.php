@@ -38,7 +38,7 @@ $TR = [
         'cur' => 'أوقية',
         'page_title' => 'GestionPro — برنامج إدارة الأعمال المتكامل',
         'page_desc' => 'أدِر المخزون والفواتير ونقاط البيع والعملاء. أداة واحدة لتجارتك — اطلب عبر واتساب، دون التزام.',
-        'nav_features' => 'المميزات', 'nav_faq' => 'الأسئلة الشائعة',
+        'nav_faq' => 'الأسئلة الشائعة',
         'nav_admin_title' => 'الإدارة', 'nav_cta' => 'تواصل معنا',
         'hero_h1_1' => 'أدِر تجارتك.', 'hero_h1_2' => 'بسّط يومك.',
         'hero_sub' => 'المنصة المتكاملة للمتاجر والشركات الصغيرة والمتوسطة وأصحاب الخدمات. المخزون، نقاط البيع، الفواتير، العملاء والمالية — أداة واحدة، جاهزة في 30 ثانية.',
@@ -49,17 +49,9 @@ $TR = [
         'm_dashboard' => 'لوحة التحكم', 'm_pos' => 'نقاط البيع', 'm_products' => 'المنتجات', 'm_clients' => 'العملاء',
         'm_invoices' => 'الفواتير', 'm_debts' => 'الديون', 'm_payments' => 'المدفوعات',
         'kpi_revenue' => 'إيرادات اليوم', 'kpi_stock' => 'منتجات في المخزون', 'kpi_alerts' => 'تنبيهات المخزون',
-        'feat_label' => 'المميزات', 'feat_title' => 'كل ما تحتاجه لإدارة تجارتك',
-        'feat_desc' => 'مجموعة أدوات متكاملة للمتاجر والشركات الصغيرة والمتوسطة في أي مكان. متعدد المستخدمين واللغات، جاهز للاستخدام فوراً.',
-        'feat1_t' => 'نقاط بيع سريعة', 'feat1_d' => 'واجهة بيع سهلة مع قارئ الباركود، بحث فوري عن المنتجات ودفع بنقرة واحدة.',
-        'feat2_t' => 'إدارة المخزون', 'feat2_d' => 'تتبّع فوري، تنبيهات نفاد المخزون، إدخال وإخراج تلقائي مع كل عملية بيع.',
-        'feat3_t' => 'عروض الأسعار والفواتير', 'feat3_d' => 'أنشئ عروض أسعار، حوّلها إلى فواتير، وأصدر ملفات PDF احترافية في ثوانٍ.',
-        'feat4_t' => 'متابعة الديون', 'feat4_d' => 'أدِر مستحقات العملاء والموردين. اعرف من يدين لك وبماذا في أي وقت.',
-        'feat5_t' => 'لوحات معلومات وتقارير', 'feat5_d' => 'اتجاهات الإيرادات، أفضل المنتجات، وضع الخزينة — رؤى واضحة بنظرة واحدة.',
-        // Slot 6 sells offline rather than languages: it is the real differentiator,
+                                                                // Slot 6 sells offline rather than languages: it is the real differentiator,
         // and the language mention already lives in the hero and the FAQ.
-        'feat6_t' => 'يعمل دون اتصال', 'feat6_d' => 'الصندوق يواصل البيع حتى بدون إنترنت. تتم مزامنة المبيعات تلقائياً بمجرد عودة الشبكة.',
-        // Problem-first section — each pain maps to a feature above it.
+                // Problem-first section — each pain maps to a feature above it.
         'prob_label' => 'هل يبدو مألوفاً؟', 'prob_title' => 'الصداع الذي يعرفه كل تاجر',
         'prob_desc' => 'إذا وجدت نفسك في واحدة فقط من هذه النقاط، فإن GestionPro صُنع لك.',
         'prob1_t' => 'البيع بالأجل دون رؤية واضحة',
@@ -146,7 +138,7 @@ $TR = [
         'cur' => 'MRU',
         'page_title' => 'GestionPro — Logiciel de gestion d\'entreprise tout-en-un',
         'page_desc' => 'Gérez stock, factures, caisse et clients. Un seul outil pour votre activité — commandez sur WhatsApp, sans engagement.',
-        'nav_features' => 'Fonctionnalités', 'nav_faq' => 'FAQ',
+        'nav_faq' => 'FAQ',
         'nav_admin_title' => 'Administration', 'nav_cta' => 'Nous contacter',
         'hero_h1_1' => 'Gérez votre activité.', 'hero_h1_2' => 'Simplifiez votre journée.',
         'hero_sub' => 'La plateforme tout-en-un pour boutiques, PME et prestataires de services. Stock, caisse, factures, clients et finances — un seul outil, prêt en 30 secondes.',
@@ -157,17 +149,9 @@ $TR = [
         'm_dashboard' => 'Tableau de bord', 'm_pos' => 'Caisse', 'm_products' => 'Produits', 'm_clients' => 'Clients',
         'm_invoices' => 'Factures', 'm_debts' => 'Dettes', 'm_payments' => 'Paiements',
         'kpi_revenue' => 'Revenu du jour', 'kpi_stock' => 'Produits en stock', 'kpi_alerts' => 'Alertes de stock',
-        'feat_label' => 'Fonctionnalités', 'feat_title' => 'Tout pour gérer votre activité',
-        'feat_desc' => 'Une boîte à outils complète pour boutiques et PME partout dans le monde. Multi-utilisateurs, multilingue, prêt à l\'emploi.',
-        'feat1_t' => 'Caisse rapide', 'feat1_d' => 'Interface de vente intuitive avec scan de code-barres, recherche instantanée et encaissement en un clic.',
-        'feat2_t' => 'Gestion du stock', 'feat2_d' => 'Suivi en temps réel, alertes de stock bas, entrées et sorties automatiques à chaque vente.',
-        'feat3_t' => 'Devis & Factures', 'feat3_d' => 'Créez des devis, convertissez-les en factures, générez des PDF professionnels en quelques secondes.',
-        'feat4_t' => 'Suivi des crédits', 'feat4_d' => 'Gérez les créances clients et les dettes fournisseurs. Sachez qui vous doit quoi, à tout moment.',
-        'feat5_t' => 'Tableaux de bord & rapports', 'feat5_d' => 'Tendances du chiffre d\'affaires, meilleurs produits, situation de trésorerie — des analyses claires en un coup d\'œil.',
-        // Slot 6 sells offline rather than languages: it is the real differentiator,
+                                                                // Slot 6 sells offline rather than languages: it is the real differentiator,
         // and the language mention already lives in the hero and the FAQ.
-        'feat6_t' => 'Fonctionne hors ligne', 'feat6_d' => 'La caisse continue d\'encaisser même sans internet. Les ventes se synchronisent toutes seules dès que le réseau revient.',
-        // Problem-first section — each pain maps to a feature above it.
+                // Problem-first section — each pain maps to a feature above it.
         'prob_label' => 'Ça vous parle ?', 'prob_title' => 'Les casse-têtes que tout commerçant connaît',
         'prob_desc' => 'Si vous vous reconnaissez dans un seul de ces points, GestionPro est fait pour vous.',
         'prob1_t' => 'Vendre à crédit, à l\'aveugle',
@@ -254,7 +238,7 @@ $TR = [
         'cur' => 'MRU',
         'page_title' => 'GestionPro — All-in-one business management software',
         'page_desc' => 'Manage stock, invoices, POS and clients. One tool for your business — order on WhatsApp, no commitment.',
-        'nav_features' => 'Features', 'nav_faq' => 'FAQ',
+        'nav_faq' => 'FAQ',
         'nav_admin_title' => 'Administration', 'nav_cta' => 'Contact us',
         'hero_h1_1' => 'Run your business.', 'hero_h1_2' => 'Simplify your day.',
         'hero_sub' => 'The all-in-one platform for shops, SMBs and service businesses. Stock, POS, invoices, clients and finance — one tool, ready in 30 seconds.',
@@ -265,17 +249,9 @@ $TR = [
         'm_dashboard' => 'Dashboard', 'm_pos' => 'POS', 'm_products' => 'Products', 'm_clients' => 'Clients',
         'm_invoices' => 'Invoices', 'm_debts' => 'Debts', 'm_payments' => 'Payments',
         'kpi_revenue' => 'Today\'s revenue', 'kpi_stock' => 'Products in stock', 'kpi_alerts' => 'Stock alerts',
-        'feat_label' => 'Features', 'feat_title' => 'Everything to run your business',
-        'feat_desc' => 'A complete toolkit for shops and SMBs anywhere in the world. Multi-user, multilingual, ready out of the box.',
-        'feat1_t' => 'Fast POS', 'feat1_d' => 'Intuitive sales interface with barcode scan, instant product search and one-click checkout.',
-        'feat2_t' => 'Stock management', 'feat2_d' => 'Real-time tracking, low-stock alerts, automatic ins and outs with every sale.',
-        'feat3_t' => 'Quotes & Invoices', 'feat3_d' => 'Create quotes, convert them to invoices, generate professional PDFs in seconds.',
-        'feat4_t' => 'Credit tracking', 'feat4_d' => 'Manage customer receivables and supplier payables. Know who owes you what, anytime.',
-        'feat5_t' => 'Dashboards & reports', 'feat5_d' => 'Revenue trends, top products, cash positions — clear insights at a glance.',
-        // Slot 6 sells offline rather than languages: it is the real differentiator,
+                                                                // Slot 6 sells offline rather than languages: it is the real differentiator,
         // and the language mention already lives in the hero and the FAQ.
-        'feat6_t' => 'Works offline', 'feat6_d' => 'The till keeps selling with no internet. Sales sync on their own the moment the connection is back.',
-        // Problem-first section — each pain maps to a feature above it.
+                // Problem-first section — each pain maps to a feature above it.
         'prob_label' => 'Sound familiar?', 'prob_title' => 'The headaches every shop owner knows',
         'prob_desc' => 'If even one of these rings true, GestionPro was built for you.',
         'prob1_t' => 'Selling on credit, blind',
@@ -384,7 +360,17 @@ $waGeneral = $waLink($t['wa_msg_general']);
     <?php if (defined('GOOGLE_SITE_VERIFICATION') && GOOGLE_SITE_VERIFICATION !== ''): ?>
     <meta name="google-site-verification" content="<?= e(GOOGLE_SITE_VERIFICATION) ?>">
     <?php endif; ?>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@600;700;800&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <?php
+    // Only the weights the page actually paints. Measured on the rendered page:
+    // Inter 400-900 and Manrope 700/800 are used; Inter 300 and Manrope 600 never
+    // were. Cairo is the Arabic face — it used to be downloaded by every visitor,
+    // including French ones who never see a single glyph of it.
+    $fontFamilies = 'family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@700;800';
+    if ($lang === 'ar') {
+        $fontFamilies .= '&family=Cairo:wght@400;600;700;800';
+    }
+    ?>
+    <link href="https://fonts.googleapis.com/css2?<?= $fontFamilies ?>&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -486,18 +472,6 @@ $waGeneral = $waLink($t['wa_msg_general']);
         .section-desc.center{margin-left:auto;margin-right:auto}
 
         /* ===== FEATURES ===== */
-        .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-        .feat-card{padding:28px;border-radius:16px;border:1px solid var(--border);background:var(--surface);transition:all .25s;position:relative;overflow:hidden}
-        .feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--primary-light));transform:scaleX(0);transform-origin:left;transition:transform .3s}
-        .feat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary-200)}
-        .feat-card:hover::before{transform:scaleX(1)}
-        .feat-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px}
-        .feat-icon.i1{background:rgba(27,58,92,.1);color:#1B3A5C}
-        .feat-icon.i2{background:rgba(16,185,129,.1);color:#10B981}
-        .feat-icon.i3{background:rgba(245,158,11,.1);color:#F59E0B}
-        .feat-icon.i4{background:rgba(14,165,233,.1);color:#0EA5E9}
-        .feat-icon.i5{background:rgba(239,68,68,.1);color:#EF4444}
-        .feat-icon.i6{background:rgba(168,85,247,.1);color:#A855F7}
 
         /* Problem-first section: name the pain before selling the cure. */
         .prob-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -542,8 +516,6 @@ $waGeneral = $waLink($t['wa_msg_general']);
 
         .prob-card h3{font-size:16px;font-weight:700;margin-bottom:8px;letter-spacing:-.2px}
         .prob-card p{font-size:14px;color:var(--text-secondary);line-height:1.65}
-        .feat-card h3{font-size:16px;font-weight:700;margin-bottom:8px}
-        .feat-card p{font-size:14px;color:var(--text-secondary);line-height:1.65}
 
         /* ===== STEPS ===== */
         .how-section{padding:96px 24px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -647,7 +619,6 @@ $waGeneral = $waLink($t['wa_msg_general']);
 
         /* ===== RESPONSIVE ===== */
         @media (max-width:900px){
-            .features-grid,.steps,.trust-grid,.prob-grid{grid-template-columns:1fr}
             .trust-grid{grid-template-columns:repeat(2,1fr)}
             .hero-stats{grid-template-columns:repeat(2,1fr);gap:16px}
         }
@@ -689,7 +660,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
             <span>GestionPro</span>
         </div>
         <div class="nav-links">
-            <a href="#features" class="hide-mobile"><?= e($t['nav_features']) ?></a>
+            <a href="#how" class="hide-mobile"><?= e($t['how_label']) ?></a>
             <a href="#usecases" class="hide-mobile"><?= e($t['nav_usecases']) ?></a>
             <a href="#faq" class="hide-mobile"><?= e($t['nav_faq']) ?></a>
             <a href="<?= APP_BASE ?>/admin/login" class="hide-mobile" style="font-size:13px;color:var(--text-muted);" title="<?= e($t['nav_admin_title']) ?>"><i class="fas fa-shield-halved"></i></a>
@@ -717,7 +688,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
 
         <div class="hero-cta">
             <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener" class="btn-cta btn-primary-cta"><i class="fab fa-whatsapp"></i> <?= e($t['wa_start']) ?></a>
-            <a href="#features" class="btn-cta btn-secondary-cta"><i class="fas fa-play-circle"></i> <?= e($t['hero_cta2']) ?></a>
+            <a href="#how" class="btn-cta btn-secondary-cta"><i class="fas fa-play-circle"></i> <?= e($t['hero_cta2']) ?></a>
         </div>
 
         <div class="hero-stats">
@@ -833,50 +804,8 @@ $waGeneral = $waLink($t['wa_msg_general']);
     </div>
 </section>
 
-<!-- FEATURES -->
-<section class="pad" id="features">
-    <div class="container">
-        <div class="section-label"><i class="fas fa-bolt"></i> <?= e($t['feat_label']) ?></div>
-        <div class="section-title"><?= e($t['feat_title']) ?></div>
-        <div class="section-desc"><?= e($t['feat_desc']) ?></div>
-
-        <div class="features-grid">
-            <div class="feat-card">
-                <div class="feat-icon i1"><i class="fas fa-cash-register"></i></div>
-                <h3><?= e($t['feat1_t']) ?></h3>
-                <p><?= e($t['feat1_d']) ?></p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon i6"><i class="fas fa-wifi"></i></div>
-                <h3><?= e($t['feat6_t']) ?></h3>
-                <p><?= e($t['feat6_d']) ?></p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon i2"><i class="fas fa-boxes-stacked"></i></div>
-                <h3><?= e($t['feat2_t']) ?></h3>
-                <p><?= e($t['feat2_d']) ?></p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon i3"><i class="fas fa-file-invoice-dollar"></i></div>
-                <h3><?= e($t['feat3_t']) ?></h3>
-                <p><?= e($t['feat3_d']) ?></p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon i4"><i class="fas fa-hand-holding-dollar"></i></div>
-                <h3><?= e($t['feat4_t']) ?></h3>
-                <p><?= e($t['feat4_d']) ?></p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon i5"><i class="fas fa-chart-line"></i></div>
-                <h3><?= e($t['feat5_t']) ?></h3>
-                <p><?= e($t['feat5_d']) ?></p>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- HOW IT WORKS -->
-<section class="how-section">
+<section class="how-section" id="how">
     <div class="how-inner">
         <div class="section-label"><i class="fas fa-wand-magic-sparkles"></i> <?= e($t['how_label']) ?></div>
         <div class="section-title" style="margin-bottom:0;"><?= e($t['how_title']) ?></div>
@@ -982,7 +911,7 @@ $waGeneral = $waLink($t['wa_msg_general']);
     <div class="footer-brand">GestionPro</div>
     <p>&copy; <?= date('Y') ?> <?= e($t['footer_tagline']) ?></p>
     <div class="footer-links">
-        <a href="#features"><?= e($t['nav_features']) ?></a>
+        <a href="#how"><?= e($t['how_label']) ?></a>
         <a href="#usecases"><?= e($t['nav_usecases']) ?></a>
         <a href="#faq"><?= e($t['nav_faq']) ?></a>
         <a href="<?= e($waGeneral) ?>" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
@@ -1010,7 +939,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     if (!('IntersectionObserver' in window)) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const groups = ['.offer-card', '.prob-card', '.feat-card', '.step',
+    const groups = ['.offer-card', '.prob-card', '.step',
                     '.trust-card', '.faq-item', '.section-label', '.section-title',
                     '.section-desc', '.steps'];
     const items = [];
